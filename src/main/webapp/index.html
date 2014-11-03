@@ -1,61 +1,66 @@
 <!DOCTYPE html>
-<html class=no-js>
+
+<html>
 <head>
-    <meta charset=utf-8>
-    <title>nav</title>
-    <meta name=description content="">
-    <meta name=viewport content="width=device-width">
-    <link rel="shortcut icon" href=/6df2b309.favicon.ico>
-    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <link rel=stylesheet href=styles/2dc0a2fe.main.css>
-    <script src=scripts/vendor/fbe20327.modernizr.js></script>
-    <script type=text/javascript
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKWD-hVZscJYssrnOe6h1bKcZyb1su56w"></script>
-<body> <!--[if lt IE 10]>
-<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
-    your browser</a> to improve your experience.</p>
-<![endif]-->
-<div class=container>
-    <div class=header>
-        <h3 class=text-muted>Smooth<h3></h3></h3>
+    <meta charset="utf-8">
+    <title>Smooth</title>
+    <link rel="stylesheet" href="styles/bootstrap.css">
+    <link rel="stylesheet" href="styles/leaflet.css"/>
+    <link rel="stylesheet" href="styles/style.css">
+
+    <script type="text/javascript" src="scripts/leaflet.js" ></script>
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKWD-hVZscJYssrnOe6h1bKcZyb1su56w">
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h3 class="text-muted">Smooth</h3>
     </div>
-    <ul class=functions>
-        <li><a href=# class=routing>Проложить маршрут</a></li>
-        <li><a href=# class=inform>Рассказать о проблеме</a></li>
+    <ul class="functions">
+        <li>
+            <a href="#" class="routing">Проложить маршрут</a>
+        </li>
+        <li>
+            <a href="#" class="inform">Рассказать о проблеме</a>
+        </li>
     </ul>
-    <div id=map-canvas>
-        <div class=tools>
-            <div class=route-points>
-                <div class=spoint><a href=#>Старт</a>
 
-                    <form action=""><input class=start-address></form>
-                </div>
-                <div class=fpoint><a href=#>Финиш</a>
-
-                    <form action=""><input class=finish-address></form>
-                </div>
-            </div>
-            <a href=# class=add-point>Добавить точку</a></div>
+    <div id="map-canvas">
     </div>
-    <div class=points></div>
-    <button class=submit>Отправить</button>
-    <div class=response></div>
-    <div class=footer><p>#hackpiter</p></div>
+
+    <div class="tools">
+        <div class="route-points">
+            <div class="spoint">
+                <a href="#">Старт</a>
+
+                <form action="">
+                    <input type="text" class="start-address">
+                </form>
+            </div>
+            <div class="fpoint">
+                <a href="#">Финиш</a>
+
+                <form action="">
+                    <input type="text" class="finish-address">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <button class="submit">Отправить</button>
+    <div class="points">
+    </div>
+    <div class="response"></div>
+
+    <div class="footer">
+        <p>#hackpiter</p>
+    </div>
+
 </div>
-<script src=scripts/38ef3709.vendor.js></script>
-<!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
-<script>(function (b, o, i, l, e, r) {
-    b.GoogleAnalyticsObject = l;
-    b[l] || (b[l] =
-            function () {
-                (b[l].q = b[l].q || []).push(arguments)
-            });
-    b[l].l = +new Date;
-    e = o.createElement(i);
-    r = o.getElementsByTagName(i)[0];
-    e.src = '//www.google-analytics.com/analytics.js';
-    r.parentNode.insertBefore(e, r)
-}(window, document, 'script', 'ga'));
-ga('create', 'UA-XXXXX-X');
-ga('send', 'pageview');</script>
-<script src=scripts/6efad156.main.js></script>
+
+<script type="text/javascript" src="scripts/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="scripts/main.js"></script>
+</body>
+</html>
