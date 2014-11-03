@@ -1,83 +1,87 @@
-console.log('\'Allo \'Allo!');
-
+/**
+ * Created by kascode on 29.10.14.
+ */
 var poly;
 var map;
 var pins = [];
 var polys = [];
-var nodes = {
-    '1': [],  // pedestrian
-    '2': [],  // transport
-    '3': []   // road
-};
+
+var workingArea = [[59.94486691748142, 30.304434299468994], [59.93431196599729, 30.335376262664795]];
 
 var routePlan = '59.57 30.29\n59.58 39.29\n59.50 39\n-27.46758 153.027892';
+var dummyResponse = "59.9403254 30.352156 1\nerror: Test error message\n59.25 30.352156 2\n59.25 30 3\n59.5 30.5\ndist: 120 50 0";
 
 function initialize() {
-    var mapOptions = {
-        center: { lat: 59.94, lng: 30.35},
-        zoom: 12,
-        zoomControl: false,
-        panControl: false,
-        rotateControl: false,
-        streetViewControl: false,
-        noClear: true
-    };
-    map = new google.maps.Map(document.getElementById('map-canvas'),
-        mapOptions);
+    //var mapOptions = {
+    //    center: { lat: 59.94, lng: 30.35},
+    //    zoom: 12,
+    //    zoomControl: false,
+    //    panControl: false,
+    //    rotateControl: false,
+    //    streetViewControl: false,
+    //    noClear: true
+    //};
+    //map = new google.maps.Map(document.getElementById('map-canvas'),
+    //    mapOptions);
+    //
+    //google.maps.event.addListener(map, 'click', function(event) {
+    //    placeMarker(event.latLng);
+    //});
 
-    google.maps.event.addListener(map, 'click', function(event) {
-        placeMarker(event.latLng);
+    map = L.map('map-canvas', {
+        center: [59.9398893, 30.3191246],
+        zoom: 15
+    });
+
+    L.rectangle(workingArea, {
+        color: "#9BF986",
+        fillOpacity: 0,
+        lineJoin: 'round'
+    }).addTo(map);
+
+    L.tileLayer('http://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+        maxZoom: 18
+    }).addTo(map);
+
+    map.on('click', function(e) {
+        var coords = e.latlng;
+
+        placeMarker(coords);
     });
 }
-google.maps.event.addDomListener(window, 'load', initialize);
+//google.maps.event.addDomListener(window, 'load', initialize);
+
+window.addEventListener("load", initialize);
 
 var placeMarker = function(location) {
-    var marker = new google.maps.Marker({
-        position: location,
-        map: map
-    });
+    //var marker = new google.maps.Marker({
+    //    position: location,
+    //    map: map
+    //});
+
+    var workingBounds = L.bounds(L.point(workingArea[0][0], workingArea[0][1]), L.point(workingArea[1][0], workingArea[1][1]));
+
+    if (workingBounds.contains(L.point(location.lat, location.lng))) {
+        var marker = L.marker(location);
+        marker.addTo(map);
 
 
-    if (pins.length >= 2) {
-        for (i=0; i<pins.length; i++) {
-            pins[i].setMap(null);
+        if (pins.length >= 2) {
+            for (i = 0; i < pins.length; i++) {
+                //pins[i].setMap(null);
+                map.removeLayer(pins[i]);
+            }
+            pins = [];
         }
-        pins = [];
-        //pins.push(marker);
-    }
 
-    pins.push(marker);
-
-    var p = $('<div/>').addClass('point');
-    var lat = $('<span/>').addClass('lat').html(location.lat());
-    var lng = $('<span/>').addClass('lng').html(location.lng());
-    p.append(lat);
-    p.append(lng);
-    $('.points').append(p);
-}
-
-var pushPoint = function(point_data) {
-
-    var point_type = point_data[2];
-
-    var numOfPolylines = nodes[point_type].length;
-    var polyLength = nodes[point_type][0].length;
-
-    var point = new google.maps.LatLng(point_data[1], point_data[0]);
-
-    if (last_type != point_type || last_type == -1) {
-        // Push point coords to same array of polyline points' coords
-        nodes[point_type][numOfPolylines].push(point);
+        pins.push(marker);
     } else {
-        // Push point coords to new array of polyline points' coords
-        nodes[point_type][numOfPolylines-1].push(point);
-        nodes[point_type][numOfPolylines-1].push(point);
+        handleError('Point is out of working area');
     }
+};
 
-    last_type = point_type;
-}
-
-var drawLine0 = function(p1_data, p2_data) {
+var drawLine = function(p1_data, p2_data) {
     var point_type = p1_data[2];
     var lon1 = p1_data[0];
     var lat1 = p1_data[1];
@@ -98,101 +102,72 @@ var drawLine0 = function(p1_data, p2_data) {
     else if (point_type.trim() == '3')
         color = '#3366ff';
 
-    var p1 = new google.maps.LatLng(lat1, lon1);
-    var p2 = new google.maps.LatLng(lat2, lon2);
+    var p1 = new L.LatLng(lat1, lon1);
+    var p2 = new L.LatLng(lat2, lon2);
 
-    var _polys = [p1, p2];
+    //var _polys = [p1, p2];
 
-    var poly = new google.maps.Polyline({
-        path: _polys,
-        geodesic: false,
-        strokeColor: color,
-        strokeOpacity: 1,
-        strokeWight: 2
+    var poly = L.polyline([p1, p2], {
+        color: color,
+        opacity: 0.8,
+        lineCap: 'round',
+        lineJoin: 'round'
     });
+
+    poly.addTo(map);
+
+    //var poly = new google.maps.Polyline({
+    //    path: _polys,
+    //    geodesic: false,
+    //    strokeColor: color,
+    //    strokeOpacity: 1,
+    //    strokeWight: 2
+    //});
     polys.push(poly);
-    poly.setMap(map);
-
-}
-
-var drawPolys = function(polysArray, polyType) {
-    var arrLen = polysArray.length;
-    var color = '';
-
-    if (polyType == '1')
-        color = '#66ff66';
-    if (polyType == '2')
-        color = '#ffcc00';
-    if (polyType == '3')
-        color = '#3366ff';
-
-    for (var i = arrLen - 1; i >= 0; i--) {
-        var poly = new google.maps.Polyline({
-            path: polysArray[i],
-            geodesic: false,
-            strokeColor: color,
-            strokeOpacity: 1,
-            strokeWight: 2
-        });
-        polys.push(poly);
-        poly.setMap(map);
-    };
+    //poly.setMap(map);
 };
 
-var handleError = function() {
-    alert('РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР° РЅР° СЃРµСЂРІРµСЂРµ. РјР°СЂС€СЂСѓС‚ РјРѕР¶РµС‚ Р±С‹С‚СЊ РЅРµ С‚РѕС‡РЅС‹Рј');
+var handleError = function(errorText) {
+    alert('Error: ' + errorText);
 };
 
-$(document).ready(function() {
+var removePolylines = function () {
+    for (var i = 0; i < polys.length; i++) {
+        //polys[i].setMap(null);
+        map.removeLayer(polys[i]);
+    }
 
-    $('.submit').click(function() {
-        var points = $('.point');
-        var i = 1;
-        var url_string = '';
-        points.each(function() {
-            if (i < 3) {
-                var t = $(this);
+    polys = [];
 
-                url_string += t.children('.lng').html() + '&';
-                url_string += t.children('.lat').html();
+    $('.points p').html('');
+};
 
-                if (i < 2)
-                    url_string += '&'
-            };
-            i++;
-        });
+var drawPolylines = function (points) {
+    for (var i = 0; i < points.length - 1; i++) {
+        if (points[i].trim() == "" || points[i+1].trim() == "") continue;
+        if (points[i+1].indexOf("dist:") >= 0 ) {
+            $('.points').append($('<p/>').html(points[i+1]));
+            continue;
+        }
+        if (points[i].indexOf("error") >= 0 || points[i+1].indexOf("error") >= 0) {
+            continue;
+        }
 
-        console.log(url_string, points.length);
+        console.log(points[i] + '\n' + points[i+1]);
 
-        $.ajax({
-            url: "http://localhost:8080/navigator/path?" + url_string,
-            dataType: 'text',
-            success: function(msg) {
-                var points = msg.split('\n');
-                var correct_points = null;
+        drawLine(points[i].split(' '), points[i + 1].split(' '));
+    }
+};
 
-//                for (var i = points.length - 1; i >= 0; i--) {
-//                    if (indexOf('error', points[i]) >= 0) {
-//                        handleError();
-//                        correct_points = points.splice(i, 1);
-//                    }
-//                };
+var handleRouteResponse = function(msg) {
 
-                for (var i=0; i<polys.length; i++) {
-                    polys[i].setMap(null);
-                }
+    var points = msg.split('\n');
 
-                for (var i = 0; i < points.length - 1; i++) {
-                    if (points[i].trim() == "") continue;
-                    if (points[i].indexOf("dist:") >= 0) {
-                        $('.points').append($('<p/>').html(points[i]));
-                    }
-                    //var point_data = points[i].split(' ');
-                    drawLine0(points[i].split(' '), points[i+1].split(' '));
-                    //pushPoint(point_data);
-                };
+    console.log('points: ' + points);
 
-                console.log(points);
+    removePolylines();
+
+    drawPolylines(points);
 
 //                poly = new google.maps.Polyline({
 //                    path: nodes,
@@ -204,6 +179,42 @@ $(document).ready(function() {
 //
 //                poly.setMap(null);
 //                poly.setMap(map);
+};
+
+$(document).ready(function() {
+
+    // TODO: replace with real
+
+    //$('.submit').click(function(e) {
+    //    e.preventDefault();
+    //
+    //    handleRouteResponse(dummyResponse);
+    //});
+
+    $('.submit').click(function(e) {
+        e.preventDefault();
+        //var points = $('.point');
+        var url_string = '';
+
+        for (var i = 0; i < pins.length; i++) {
+            var lat = pins[i].getLatLng().lat;
+            var lng = pins[i].getLatLng().lng;
+
+            url_string += lng + '&' + lat;
+
+            if (i == 0) {
+                url_string += '&';
+            }
+        }
+
+        var request_path = document.URL+"path?" + url_string;
+        console.log(request_path);
+
+        $.ajax({
+            url: request_path,
+            dataType: 'text',
+            success: function(msg) {
+                handleRouteResponse(msg);
             }
         });
     });
@@ -235,7 +246,7 @@ $(document).ready(function() {
                 result.lng = msg.results[0].geometry.location.lng;
                 console.log(result);
 
-                var coords = new google.maps.LatLng(result.lat, result.lng);
+                var coords = [result.lat, result.lng];
 
                 placeMarker(coords);
             }
@@ -253,7 +264,7 @@ $(document).ready(function() {
                 console.log(url_string);
 
                 $.ajax({
-                    url: 'http://localhost:8080/navigator/obstavle?' + url_string,
+                    url: document.URL+'obstacle?' + url_string,
                     dataType: 'text',
                     success: function(msg) {
                         if (msg == "error")

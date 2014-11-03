@@ -1,0 +1,1 @@
+mvn clean package && asadmin redeploy --name smooth target/smooth.war
