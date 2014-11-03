@@ -48,6 +48,7 @@ public class OsmParser {
 
         Graph res;
         Way enclosingWay = null;
+        boolean enclosingWayIsHighway;
 
         @Override
         public void startDocument() throws SAXException {
@@ -81,6 +82,7 @@ public class OsmParser {
                     if (enclosingWay != null) throw new IllegalStateException("<way>: enclosing way != null");
                     _id = Long.parseLong(attributes.getValue("id"));
                     enclosingWay = new Way(_id);
+                    enclosingWayIsHighway = false;
                     break;
 
                 case "nd":
@@ -91,8 +93,12 @@ public class OsmParser {
 
                 case "tag":
                     if (enclosingWay == null) return;
-                    if (attributes.getValue("k").equals("highway") && (attributes.getValue("v").equals("footway") || attributes.getValue("v").equals("pedestrian"))) {
-                        enclosingWay.roadType = RoadType.PEDESTRIAN;
+                    if (attributes.getValue("k").equals("highway")) {
+                        enclosingWayIsHighway = true;
+
+                        if (attributes.getValue("v").equals("footway") || attributes.getValue("v").equals("pedestrian")) {
+                            enclosingWay.roadType = RoadType.PEDESTRIAN;
+                        }
                     }
 
                 default:
@@ -107,11 +113,15 @@ public class OsmParser {
 
                 case "way":
                     if (enclosingWay == null) throw new IllegalStateException("</way>: enclosing way == null");
+                    if (!enclosingWayIsHighway) {
+                        enclosingWay = null;
+                        break;
+                    }
 
                     enclosingWay.finish();
                     res.addWay(enclosingWay);
-
                     enclosingWay = null;
+
                     break;
 
                 default:
