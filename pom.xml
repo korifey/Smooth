@@ -52,6 +52,13 @@
   </dependencies>
   <build>
     <finalName>smooth</finalName>
+      <extensions>
+          <extension>
+              <groupId>org.apache.maven.wagon</groupId>
+              <artifactId>wagon-ssh</artifactId>
+              <version>1.0-beta-7</version>
+          </extension>
+      </extensions>
 
       <plugins>
           <plugin>
@@ -63,6 +70,28 @@
                   <target>1.8</target>
               </configuration>
           </plugin>
+
+          <!--<plugin>-->
+              <!--<groupId>org.codehaus.mojo</groupId>-->
+              <!--<artifactId>wagon-maven-plugin</artifactId>-->
+              <!--<version>1.0-beta-5</version>-->
+              <!--<executions>-->
+                  <!--<execution>-->
+                      <!--<id>upload-static</id>-->
+                      <!--<phase>install</phase>-->
+                      <!--<goals>-->
+                          <!--<goal>upload</goal>-->
+                      <!--</goals>-->
+                      <!--<configuration>-->
+                          <!--<fromDir>${project.build.directory}/${artifactId}/scripts</fromDir>-->
+                          <!--<includes>*</includes>-->
+                          <!--&lt;!&ndash;excludes>pom.xml</excludes&ndash;&gt;-->
+                          <!--<url>scp://146.185.158.35/</url>-->
+                          <!--<toDir>/home/smoothadmin/tmp</toDir>-->
+                      <!--</configuration>-->
+                  <!--</execution>-->
+              <!--</executions>-->
+          <!--</plugin>-->
       </plugins>
   </build>
 </project>
