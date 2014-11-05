@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+  <component name="CompassSettings">
+    <option name="compassExecutableFilePath" value="/usr/local/bin/compass" />
+  </component>
   <component name="FacetManager">
     <facet type="web" name="Web">
       <configuration>
@@ -36,6 +39,7 @@
     <orderEntry type="library" name="Maven: javax:javaee-api:7.0" level="project" />
     <orderEntry type="library" name="Maven: com.sun.mail:javax.mail:1.5.0" level="project" />
     <orderEntry type="library" name="Maven: javax.activation:activation:1.1" level="project" />
+    <orderEntry type="library" name="sass-stdlib" level="application" />
   </component>
 </module>
 
