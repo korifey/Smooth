@@ -4,7 +4,6 @@
 <head>
     <meta charset="utf-8">
     <title>Smooth</title>
-    <link rel="stylesheet" href="styles/bootstrap.css">
     <link rel="stylesheet" href="styles/leaflet.css"/>
     <link rel="stylesheet" href="styles/style.css">
 
@@ -18,16 +17,12 @@
     <div class="header">
         <h3 class="text-muted">Smooth</h3>
     </div>
-    <ul class="functions">
-        <li>
-            <a href="#" class="routing">Проложить маршрут</a>
-        </li>
-        <li>
-            <a href="#" class="inform">Рассказать о проблеме</a>
-        </li>
-    </ul>
 
     <div id="map-canvas">
+    </div>
+
+    <div class="functions">
+        <a href="#" class="inform">!</a>
     </div>
 
     <div class="tools">
@@ -36,27 +31,29 @@
                 <a href="#">Старт</a>
 
                 <form action="">
-                    <input type="text" class="start-address">
+                    <label>
+                        Точка начала маршрута
+                        <input type="text" class="start-address">
+                    </label>
                 </form>
             </div>
             <div class="fpoint">
                 <a href="#">Финиш</a>
 
                 <form action="">
-                    <input type="text" class="finish-address">
+                    <label>
+                        Точка завершения маршрута
+                        <input type="text" class="finish-address">
+                    </label>
                 </form>
             </div>
         </div>
     </div>
 
-    <button class="submit">Отправить</button>
+    <button class="submit">Проложить маршрут</button>
     <div class="points">
     </div>
     <div class="response"></div>
-
-    <div class="footer">
-        <p>#hackpiter</p>
-    </div>
 
 </div>
 

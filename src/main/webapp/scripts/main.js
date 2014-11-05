@@ -1,32 +1,17 @@
 /**
  * Created by kascode on 29.10.14.
  */
-var poly;
+
 var map;
 var pins = [];
 var polys = [];
 
 var workingArea = [[59.94486691748142, 30.304434299468994], [59.93431196599729, 30.335376262664795]];
 
-var routePlan = '59.57 30.29\n59.58 39.29\n59.50 39\n-27.46758 153.027892';
-var dummyResponse = "59.9403254 30.352156 1\nerror: Test error message\n59.25 30.352156 2\n59.25 30 3\n59.5 30.5\ndist: 120 50 0";
+//var routePlan = '59.57 30.29\n59.58 39.29\n59.50 39\n-27.46758 153.027892';
+//var dummyResponse = "59.9403254 30.352156 1\nerror: Test error message\n59.25 30.352156 2\n59.25 30 3\n59.5 30.5\ndist: 120 50 0";
 
 function initialize() {
-    //var mapOptions = {
-    //    center: { lat: 59.94, lng: 30.35},
-    //    zoom: 12,
-    //    zoomControl: false,
-    //    panControl: false,
-    //    rotateControl: false,
-    //    streetViewControl: false,
-    //    noClear: true
-    //};
-    //map = new google.maps.Map(document.getElementById('map-canvas'),
-    //    mapOptions);
-    //
-    //google.maps.event.addListener(map, 'click', function(event) {
-    //    placeMarker(event.latLng);
-    //});
 
     map = L.map('map-canvas', {
         center: [59.9398893, 30.3191246],
@@ -50,15 +35,10 @@ function initialize() {
         placeMarker(coords);
     });
 }
-//google.maps.event.addDomListener(window, 'load', initialize);
 
-window.addEventListener("load", initialize);
+//window.addEventListener("load", initialize);
 
 var placeMarker = function(location) {
-    //var marker = new google.maps.Marker({
-    //    position: location,
-    //    map: map
-    //});
 
     var workingBounds = L.bounds(L.point(workingArea[0][0], workingArea[0][1]), L.point(workingArea[1][0], workingArea[1][1]));
 
@@ -68,8 +48,7 @@ var placeMarker = function(location) {
 
 
         if (pins.length >= 2) {
-            for (i = 0; i < pins.length; i++) {
-                //pins[i].setMap(null);
+            for (var i = 0; i < pins.length; i++) {
                 map.removeLayer(pins[i]);
             }
             pins = [];
@@ -105,8 +84,6 @@ var drawLine = function(p1_data, p2_data) {
     var p1 = new L.LatLng(lat1, lon1);
     var p2 = new L.LatLng(lat2, lon2);
 
-    //var _polys = [p1, p2];
-
     var poly = L.polyline([p1, p2], {
         color: color,
         opacity: 0.8,
@@ -116,15 +93,7 @@ var drawLine = function(p1_data, p2_data) {
 
     poly.addTo(map);
 
-    //var poly = new google.maps.Polyline({
-    //    path: _polys,
-    //    geodesic: false,
-    //    strokeColor: color,
-    //    strokeOpacity: 1,
-    //    strokeWight: 2
-    //});
     polys.push(poly);
-    //poly.setMap(map);
 };
 
 var handleError = function(errorText) {
@@ -168,32 +137,27 @@ var handleRouteResponse = function(msg) {
     removePolylines();
 
     drawPolylines(points);
-
-//                poly = new google.maps.Polyline({
-//                    path: nodes,
-//                    geodesic: false,
-//                    strokeColor: '#f99',
-//                    strokeOpacity: 1,
-//                    strokeWight: 2
-//                });
-//
-//                poly.setMap(null);
-//                poly.setMap(map);
 };
 
+function setMapArea() {
+    var windowHeight = $(window).height();
+    var mapHeight = windowHeight - 220;
+
+    $('#map-canvas').height(mapHeight).css('top', '80px');
+    $('.functions').css({
+        'top': '100px',
+        'right': '20px'
+    });
+    $('.tools').css('top', mapHeight + 80);
+    $('.submit').css('top', mapHeight + 140);
+    initialize();
+}
 $(document).ready(function() {
 
-    // TODO: replace with real
-
-    //$('.submit').click(function(e) {
-    //    e.preventDefault();
-    //
-    //    handleRouteResponse(dummyResponse);
-    //});
+    setMapArea();
 
     $('.submit').click(function(e) {
         e.preventDefault();
-        //var points = $('.point');
         var url_string = '';
 
         for (var i = 0; i < pins.length; i++) {
@@ -253,8 +217,8 @@ $(document).ready(function() {
         });
     });
 
-    $('.add-point').click(function(e) {
-        console.log('add point');
+    $('.inform').click(function(e) {
+        e.preventDefault();
         if("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 var url_string = '';
@@ -268,12 +232,12 @@ $(document).ready(function() {
                     dataType: 'text',
                     success: function(msg) {
                         if (msg == "error")
-                            alert('РџСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР° РїСЂРё РґРѕР±Р°РІР»РµРЅРёРё С‚РѕС‡РєРё')
+                            handleError('Ошибка отправки информации о препятствии');
                     }
                 });
             });
         } else {
-            alert('Рљ СЃРѕР¶Р°Р»РµРЅРёСЋ РіРµРѕРґР°РЅРЅС‹Рµ РІ РґР°РЅС‹Р№ РјРѕРјРµРЅ РЅРµ РґРѕСЃС‚СѓРїРЅС‹.')
+            handleError("Невозможно получить информацию о текущем положении")
         }
     });
 });
