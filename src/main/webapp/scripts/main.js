@@ -193,7 +193,7 @@ $(document).ready(function() {
     $('.tools form').submit(function(e) {
         e.preventDefault();
 
-        var query = $(this).children('input').val();
+        var query = $(this).find('input').val();
 
         query = query.replace(/ /g, "+");
 
@@ -210,7 +210,7 @@ $(document).ready(function() {
                 result.lng = msg.results[0].geometry.location.lng;
                 console.log(result);
 
-                var coords = [result.lat, result.lng];
+                var coords = new L.LatLng(result.lat, result.lng);
 
                 placeMarker(coords);
             }
