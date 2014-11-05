@@ -140,7 +140,7 @@ var handleRouteResponse = function(msg) {
 };
 
 function setMapArea() {
-    var windowHeight = $(window).height();
+    var windowHeight = window.innerHeight;
     var mapHeight = windowHeight - 220;
 
     $('#map-canvas').height(mapHeight).css('top', '80px');
