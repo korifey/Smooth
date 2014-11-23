@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="styles/leaflet.css"/>
     <link rel="stylesheet" href="styles/style.css">
 
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+
     <script type="text/javascript" src="scripts/leaflet.js" ></script>
     <script type="text/javascript"
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKWD-hVZscJYssrnOe6h1bKcZyb1su56w">
@@ -15,7 +17,7 @@
 <body>
 <div class="container">
     <div class="header">
-        <h3 class="text-muted">Smooth</h3>
+        <h3 class="text-muted">Smooth <sup>&#945;</sup></h3>
     </div>
 
     <div id="map-canvas">
@@ -34,6 +36,12 @@
                     <label>
                         Точка начала маршрута
                         <input type="text" class="start-address">
+                        <a class="voice-input" href="#">
+                            <img src="images/mic.png" alt=""/>
+                        </a>
+                        <a class="voice-input-stop" href="#">
+                            <img src="images/stop.png" alt=""/>
+                        </a>
                     </label>
                 </form>
             </div>
@@ -44,6 +52,12 @@
                     <label>
                         Точка завершения маршрута
                         <input type="text" class="finish-address">
+                        <a class="voice-input" href="#">
+                            <img src="images/mic.png" alt=""/>
+                        </a>
+                        <a class="voice-input-stop" href="#">
+                            <img src="images/stop.png" alt=""/>
+                        </a>
                     </label>
                 </form>
             </div>
@@ -58,6 +72,9 @@
 </div>
 
 <script type="text/javascript" src="scripts/jquery-2.1.1.min.js"></script>
+<script src="scripts/jquery-ui.min.js"></script>
+<script src="scripts/webspeechkit.min.js"></script>
 <script type="text/javascript" src="scripts/main.js"></script>
+<script src="scripts/speechKitClient.js"></script>
 </body>
 </html>

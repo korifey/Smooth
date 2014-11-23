@@ -5,13 +5,28 @@
 var map;
 var pins = [];
 var polys = [];
+var new_polys = {
+    "pedestrian": [],
+    "road": [],
+    "transport": []
+};
+var lastPointType = null;
+var busPins = [];
+var walkPins = [];
+var positionPin;
+var positionIcon;
+var busIcon;
 
 var workingArea = [[59.94486691748142, 30.304434299468994], [59.93431196599729, 30.335376262664795]];
 
 //var routePlan = '59.57 30.29\n59.58 39.29\n59.50 39\n-27.46758 153.027892';
-//var dummyResponse = "59.9403254 30.352156 1\nerror: Test error message\n59.25 30.352156 2\n59.25 30 3\n59.5 30.5\ndist: 120 50 0";
+//var dummyResponse = "30.3333029000 59.9399723000 1,30.3331847000 59.9400771000 1,30.3319002000 59.9401990000 1,30.3316895000 59.9402190000 1,30.3316385000 59.9402126000 1,30.3315559000 59.9401959000 1,30.3314069000 59.9401534000 1,30.3307705000 59.9399132000 1,30.3306092000 59.9398830000 1,30.3304466000 59.9398747000 1,30.3302803000 59.9398898000 1,30.3300224000 59.9399132000 1,30.3297349000 59.9399392000 1,30.3296320000 59.9399540000 1,30.3296017000 59.9399059000 1,30.3295113000 59.9398282000 1,30.3294215000 59.9397885000 1,30.3292846000 59.9397477000 1,30.3291124000 59.9397204000 1,30.3289008000 59.9397111000 1,30.3287414000 59.9397095000 1,30.3285492000 59.9397140000 1,30.3284303000 59.9396882000 1,30.3283966000 59.9396078000 1,30.3278817000 59.9383744000 1,30.3278656000 59.9383411000 2,30.3274199000 59.9372025000 1,30.3269077000 59.9372528000 2,30.3262097000 59.9355299000 1,30.3259972000 59.9355560000 1,30.3259522000 59.9354647000 1,30.3258965000 59.9353514000 1,30.3258557000 59.9352685000 1,30.3256738000 59.9352910000 1,30.3247505000 59.9354050000 1,30.3246755000 59.9354143000 3,30.3177361000 59.9363138000 3,30.3135788000 59.9368024000 1,30.3127726000 59.9368971000 1,30.3119859000 59.9369896000 1,30.3119412000 59.9369933000 1,30.3118959000 59.9369943000 1,30.3118507000 59.9369923000 1,30.3118064000 59.9369875000 1,30.3117636000 59.9369800000 1,30.3117231000 59.9369698000 1,30.3116855000 59.9369571000 1,30.3116331000 59.9369369000 1,30.3115894000 59.9369654000 1,30.3115292000 59.9370046000 1,30.3114473000 59.9370580000 1,30.3114254000 59.9370722000 1,30.3114090000 59.9370829000 1,30.3113653000 59.9371114000 1,30.3113435000 59.9371256000 1,30.3112970000 59.9371076000 1,30.3112342000 59.9371554000 1,30.3098388000 59.9366283000 1,30.3095680000 59.9365260000 1,30.3084397000 59.9360999000 1,30.3076807000 59.9358132000 1,30.3074341000 59.9359796000 1,30.3073902000 59.9359711000 1,30.3073432000 59.9359690000 1,30.3072970000 59.9359736000 1,30.3072551000 59.9359843000 1,30.3072207000 59.9360005000 1,30.3071966000 59.9360207000 1,30.3070742000 59.9359778000 1,30.3061305000 59.9356470000,dist: 1234 326 743";
+//var dummyLocation = {
+//    "lat": 59.93833227235004,
+//    "lng": 30.32299518585205
+//};
 
-function initialize() {
+function initializeMap() {
 
     map = L.map('map-canvas', {
         center: [59.9398893, 30.3191246],
@@ -34,9 +49,24 @@ function initialize() {
 
         placeMarker(coords);
     });
+
+    positionIcon = L.icon({
+        iconUrl: 'scripts/images/person.png',
+        iconRetinaUrl: 'scripts/images/person-2x.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 31]
+    });
+
+    busIcon = L.icon({
+        iconUrl: 'scripts/images/bus.png',
+        iconRetinaUrl: 'scripts/images/bus-2x.png',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        className: 'busPin'
+    });
 }
 
-//window.addEventListener("load", initialize);
+//window.addEventListener("load", initializeMap);
 
 var placeMarker = function(location) {
 
@@ -85,13 +115,20 @@ var drawLine = function(p1_data, p2_data) {
     var p2 = new L.LatLng(lat2, lon2);
 
     var poly = L.polyline([p1, p2], {
-        color: color,
-        opacity: 0.8,
-        lineCap: 'round',
-        lineJoin: 'round'
+        color: '#fff',
+        weight: 10,
+        opacity: 0.8
     });
 
     poly.addTo(map);
+
+    var polyone = L.polyline([p1, p2], {
+        color: color,
+        weight: 5,
+        opacity: 1
+    });
+
+    polyone.addTo(map);
 
     polys.push(poly);
 };
@@ -100,18 +137,118 @@ var handleError = function(errorText) {
     alert('Error: ' + errorText);
 };
 
-var removePolylines = function () {
+var removePolylines = function (cb) {
     for (var i = 0; i < polys.length; i++) {
-        //polys[i].setMap(null);
         map.removeLayer(polys[i]);
     }
 
-    polys = [];
+    for (i = 0; i < busPins.length; i++) {
+        map.removeLayer(busPins[i]);
+    }
 
-    $('.points p').html('');
+    polys = [];
+    new_polys.pedestrian = [];
+    new_polys.transport = [];
+    new_polys.road =[];
+    lastPointType = null;
+    busPins = [];
+
+    if (typeof cb != 'undefined') {
+        cb(arguments[1]); // Calling callback function with argument that must be 2nd argument in removePolylines call
+    }
 };
 
-var drawPolylines = function (points) {
+function drawLineLong() {
+    var i = 0;
+    // Draw pedestrian lines
+    for (i = 0; i < new_polys.pedestrian.length; i++) {
+        // outline
+        var poly = L.polyline(new_polys.pedestrian[i], {
+            color: '#fff',
+            weight: 6,
+            opacity: 1,
+            lineJoin: 'round',
+            lineCap: 'round'
+        });
+
+        poly.addTo(map);
+        polys.push(poly);
+
+        // fill
+        var polyone = L.polyline(new_polys.pedestrian[i], {
+            color: "#25a92f",
+            weight: 4,
+            opacity: 1,
+            lineJoin: 'round',
+            lineCap: 'round'
+        });
+
+        polyone.addTo(map);
+        polys.push(polyone);
+    }
+
+    // Draw road lines
+    for (i = 0; i < new_polys.road.length; i++) {
+        // outline
+        var poly = L.polyline(new_polys.road[i], {
+            color: '#fff',
+            weight: 6,
+            opacity: 1,
+            lineJoin: 'round',
+            lineCap: 'round'
+        });
+
+        poly.addTo(map);
+        polys.push(poly);
+
+        // fill
+        var polyone = L.polyline(new_polys.road[i], {
+            color: "#dd701a",
+            weight: 4,
+            opacity: 1,
+            lineJoin: 'round',
+            lineCap: 'round'
+        });
+
+        polyone.addTo(map);
+        polys.push(polyone);
+    }
+
+    // Draw transport lines
+    for (i = 0; i < new_polys.transport.length; i++) {
+        // outline
+        var poly = L.polyline(new_polys.transport[i], {
+            color: '#fff',
+            weight: 8,
+            opacity: 1,
+            lineJoin: 'round',
+            lineCap: 'round'
+        });
+
+        poly.addTo(map);
+        polys.push(poly);
+
+        // fill
+        var polyone = L.polyline(new_polys.transport[i], {
+            color: "#4663A1",
+            weight: 6,
+            opacity: 1,
+            lineJoin: 'round',
+            lineCap: 'round'
+        });
+
+        polyone.addTo(map);
+        polys.push(polyone);
+    }
+}
+function addBusPin(lat, lng) {
+    var pin = L.marker([lat, lng], {
+        icon: busIcon
+    }).addTo(map);
+
+    busPins.push(pin);
+}
+var formPolylines = function (points) {
     for (var i = 0; i < points.length - 1; i++) {
         if (points[i].trim() == "" || points[i+1].trim() == "") continue;
         if (points[i+1].indexOf("dist:") >= 0 ) {
@@ -124,37 +261,110 @@ var drawPolylines = function (points) {
 
         console.log(points[i] + '\n' + points[i+1]);
 
-        drawLine(points[i].split(' '), points[i + 1].split(' '));
+        var point1 = points[i].split(' ');
+        var point2 = points[i + 1].split(' ');
+
+//        drawLine(points[i].split(' '), points[i + 1].split(' '));
+
+        if (point1[2] != lastPointType) {  // start new line
+
+            lastPointType = point1[2];
+
+            if (point1[2] == 1) {  // line is pedestrian
+                var array_length = new_polys.pedestrian.length;
+
+                new_polys.pedestrian[array_length] = [L.latLng(point1[1], point1[0]), L.latLng(point2[1], point2[0])];
+                continue;
+            }
+
+            if (point1[2] == 2) {  // line is road
+                var array_length = new_polys.road.length;
+
+                new_polys.road[array_length] = [L.latLng(point1[1], point1[0]), L.latLng(point2[1], point2[0])];
+                continue;
+            }
+
+            if (point1[2] == 3) {  // line is transport
+                var array_length = new_polys.transport.length;
+                new_polys.transport[array_length] = [L.latLng(point1[1], point1[0]), L.latLng(point2[1], point2[0])];
+
+                addBusPin(point1[1], point1[0]);
+            }
+        } else { // continue existing line
+
+            if (point1[2] == 1) {  // line is pedestrian
+                var array_length = new_polys.pedestrian.length;
+                new_polys.pedestrian[array_length - 1].push(L.latLng(point2[1], point2[0]));
+                continue;
+            }
+
+            if (point1[2] == 2) {  // line is road
+                var array_length = new_polys.road.length;
+                new_polys.road[array_length - 1].push(L.latLng(point2[1], point2[0]));
+                continue;
+            }
+
+            if (point1[2] == 3 ) {  // line is transport
+                var array_length = new_polys.transport.length;
+                new_polys.transport[array_length - 1].push(L.latLng(point2[1], point2[0]));
+            }
+        }
     }
+
+    drawLineLong();
 };
 
 var handleRouteResponse = function(msg) {
 
-    var points = msg.split('\n');
+    var points = msg.split('\n').reverse();
+//    var points = msg.split(',');
 
     console.log('points: ' + points);
 
-    removePolylines();
-
-    drawPolylines(points);
+    removePolylines(formPolylines, points);
 };
 
 function setMapArea() {
     var windowHeight = window.innerHeight;
-    var mapHeight = windowHeight - 220;
+    var header = $('.header');
+    var tools = $('.tools');
+    var subm = $('.submit');
+    console.log(header.outerHeight(), tools.outerHeight());
+    var mapHeight = windowHeight - header.outerHeight() - tools.outerHeight() - subm.outerHeight();
 
-    $('#map-canvas').height(mapHeight).css('top', '80px');
+    $('#map-canvas').height(mapHeight).css('top', header.outerHeight());
     $('.functions').css({
         'top': '100px',
         'right': '20px'
     });
-    $('.tools').css('top', mapHeight + 80);
-    $('.submit').css('top', mapHeight + 140);
-    initialize();
+    tools.css('top', mapHeight + header.outerHeight());
+    subm.css('top', mapHeight + header.outerHeight() + tools.outerHeight());
+    initializeMap();
+}
+
+function setPositionPin(latitude, longitude) {
+    if (typeof positionPin != 'undefined')
+        map.removeLayer(positionPin);
+
+    positionPin = L.marker([latitude, longitude], {
+        icon: positionIcon
+    }).addTo(map);
+}
+function watchSuccess(position) {
+    setPositionPin(position.coords.latitude, position.coords.longitude);
+}
+function watchError() {
+    console.error("Position watch error");
 }
 $(document).ready(function() {
 
     setMapArea();
+
+    // For testing purpose
+//    $('.submit').click(function(e) {
+//        e.preventDefault();
+//        handleRouteResponse(dummyResponse);
+//    });
 
     $('.submit').click(function(e) {
         e.preventDefault();
@@ -240,4 +450,9 @@ $(document).ready(function() {
             handleError("Невозможно получить информацию о текущем положении")
         }
     });
+
+    if ("geolocation" in navigator) {
+        var positionWatch = navigator.geolocation.watchPosition(watchSuccess, watchError);
+    }
+
 });
