@@ -47,6 +47,8 @@ function initializeMap() {
     map.on('click', function(e) {
         var coords = e.latlng;
 
+        console.log(coords);
+
         placeMarker(coords);
     });
 
@@ -251,10 +253,10 @@ function addBusPin(lat, lng) {
 var formPolylines = function (points) {
     for (var i = 0; i < points.length - 1; i++) {
         if (points[i].trim() == "" || points[i+1].trim() == "") continue;
-        if (points[i+1].indexOf("dist:") >= 0 ) {
-            $('.points').append($('<p/>').html(points[i+1]));
-            continue;
-        }
+//        if (points[i+1].indexOf("dist:") >= 0 ) {
+//            $('.points').append($('<p/>').html(points[i+1]));
+//            continue;
+//        }
         if (points[i].indexOf("error") >= 0 || points[i+1].indexOf("error") >= 0) {
             continue;
         }
@@ -314,9 +316,33 @@ var formPolylines = function (points) {
     drawLineLong();
 };
 
+function displayDistance(walk, road, transport) {
+    var $dist_container = $('.distance');
+
+    // Clear dists
+    $dist_container.find('.value').empty();
+
+    $dist_container.find('.walk .value').text(walk + road);
+    $dist_container.find('.transport .value').text(transport);
+
+    $dist_container.css('display', 'block');
+}
+
 var handleRouteResponse = function(msg) {
 
-    var points = msg.split('\n').reverse();
+    var points = [];
+    var dist;
+    var lines = msg.split('\n');
+
+    for (var i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf('dist:') >= 0) {
+            var distParts = lines[i].split(' ');
+
+            displayDistance(parseInt(distParts[1]), parseInt(distParts[2]), parseInt(distParts[3]));
+            continue;
+        }
+        points.push(lines[i]);
+    }
 //    var points = msg.split(',');
 
     console.log('points: ' + points);
