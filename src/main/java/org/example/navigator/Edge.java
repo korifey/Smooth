@@ -1,5 +1,8 @@
 package org.example.navigator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Dmitry.Ivanov on 10/26/2014.
  */
@@ -10,6 +13,8 @@ public class Edge {
 
     public double realDist;
     public double effectiveDist;
+
+    public final List<Obstacle> obstacles = new ArrayList<>();
 
     public Edge(Way way, Node start, Node end) {
         this.way = way;
@@ -24,5 +29,14 @@ public class Edge {
         if (!start.equals(n) && !end.equals(n)) throw new IllegalStateException("bad node "+n.id+"for edge "+start.id+"->"+end.id+" in way"+way.id);
         if (!start.equals(n)) return start;
         return end;
+    }
+
+    public boolean isBlocked() {
+        return obstacles.size() > 0;
+    }
+
+    //in meters
+    public double distTo(Node n) {
+        return n.vector().distToSegment2(start.vector(), end.vector());
     }
 }

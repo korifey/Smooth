@@ -11,16 +11,45 @@
     </servlet>
 
     <servlet>
-        <servlet-name>ObstacleServlet</servlet-name>
-        <servlet-class>org.example.navigator.ObstacleServlet</servlet-class>
+        <servlet-name>ObstacleGetServlet</servlet-name>
+        <servlet-class>org.example.navigator.obstacle.ObstacleGetServlet</servlet-class>
     </servlet>
+
+    <servlet>
+        <servlet-name>ObstacleAllServlet</servlet-name>
+        <servlet-class>org.example.navigator.obstacle.ObstacleAllServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>ObstacleRemoveServlet</servlet-name>
+        <servlet-class>org.example.navigator.obstacle.ObstacleRemoveServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>ObstacleAddServlet</servlet-name>
+        <servlet-class>org.example.navigator.obstacle.ObstacleAddServlet</servlet-class>
+    </servlet>
+
+
 
     <servlet-mapping>
         <servlet-name>MainServlet</servlet-name>
         <url-pattern>/path</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>ObstacleServlet</servlet-name>
-        <url-pattern>/obstacle</url-pattern>
+        <servlet-name>ObstacleGetServlet</servlet-name>
+        <url-pattern>/obstacle/get</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ObstacleAllServlet</servlet-name>
+        <url-pattern>/obstacle/all</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ObstacleRemoveServlet</servlet-name>
+        <url-pattern>/obstacle/remove</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ObstacleAddServlet</servlet-name>
+        <url-pattern>/obstacle/add</url-pattern>
     </servlet-mapping>
 </web-app>

@@ -6,13 +6,12 @@ import java.util.function.Consumer;
 /**
 * Created by Dmitry.Ivanov on 10/26/2014.
 */
-public class Node implements Comparable<Node> {
+public class Node {
 
     public int concomp;
 
     public final long id;
-    public final double lon;
-    public final double lat;
+    public final double lon, lat;
 
     double cachedDist;
 
@@ -23,9 +22,17 @@ public class Node implements Comparable<Node> {
 
 
     public Node(long id, double lon, double lat) {
-        this.id = id;
         this.lon = lon;
         this.lat = lat;
+        this.id = id;
+    }
+
+    public double dist(Node n) {
+        return vector().dist(n.vector());
+    }
+
+    public Vector vector() {
+        return new Vector(65555*lon, 111111*lat);
     }
 
     @Override
@@ -43,15 +50,6 @@ public class Node implements Comparable<Node> {
     @Override
     public int hashCode() {
         return (int)id;
-    }
-
-    public double dist(Node n) {
-        return Util.distByCoord(lon, lat, n.lon, n.lat);
-    }
-
-    @Override
-    public int compareTo(Node node) {
-        return Double.compare(cachedDist, node.cachedDist);
     }
 
     public String printCoords() {

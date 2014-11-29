@@ -10,6 +10,8 @@ public class Way {
     public final long id;
 
     public final ArrayList<Node> nodes = new ArrayList<>();
+    public final ArrayList<Edge> edges = new ArrayList<>();
+
     public RoadType roadType;
     public double dist;
     public Node start;
@@ -49,6 +51,7 @@ public class Way {
             nodes.get(i-1).edges.add(e);
             nodes.get(i).edges.add(e);
             d += e.realDist;
+            edges.add(e);
         }
         dist = d;
     }

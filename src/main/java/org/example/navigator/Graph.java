@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 /**
  * Created by Dmitry.Ivanov on 10/25/2014.
  */
+@SuppressWarnings("SpellCheckingInspection")
 public class Graph {
 
 
@@ -15,6 +16,8 @@ public class Graph {
     public HashMap<Long, Node> nodes = new HashMap<>();
     public List<Way> ways = new ArrayList<>();
 
+    public LinkedHashMap<Long, Obstacle> obstacles = new LinkedHashMap<>();
+
     public int nconcomp = 0;
     public ArrayList<List<Node>> concomp = new ArrayList<>();
 
@@ -23,6 +26,38 @@ public class Graph {
     public void addNode(Node n) {
         nodes.put(n.id, n);
     }
+
+    public void addObstacle(Obstacle o) {
+        obstacles.put(o.id, o);
+        List<Edge> edges = (ways.stream()
+                .flatMap(way -> way.edges.stream())
+                .filter(e -> e.distTo(o) < Obstacle.DistanceToEdge)
+                .collect(Collectors.toList()));
+
+        o.nearEdges.addAll(edges);
+        for (Edge e: edges) e.obstacles.add(o);
+    }
+
+    public Obstacle getObstacle(long id) {
+        return obstacles.get(id);
+    }
+
+    public Collection<Obstacle> allObstaclesSorted() {
+        return obstacles.values();
+    }
+
+    public boolean removeObstacle(long id) {
+        Obstacle o;
+        if ((o = obstacles.remove(id)) != null) {
+            for (Edge e: o.nearEdges) e.obstacles.remove(o);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+
 
     public void addWay(Way w) {
 //        w.start.ways.add(w);
@@ -125,6 +160,8 @@ public class Graph {
             q0.add(min);
             q1.remove(min);
             for (Edge e : min.edges) {
+                if (e.isBlocked()) continue;
+
                 Node nn = e.otherEnd(min);
                 if (q0.contains(nn)) continue;
                 if (nn.cachedDist == 0 || nn.cachedDist > min.cachedDist + e.effectiveDist) {
@@ -145,18 +182,14 @@ public class Graph {
     public Node find(double lon, double lat, double maxdist) {
         Node test = new Node(0, lon, lat);
 
+        List<Node> res = nodes.entrySet().stream().map(entry -> entry.getValue())
+                .filter(n -> (n.cachedDist = n.dist(test)) <= maxdist)
+                .filter(n -> n.edges.stream().anyMatch(e -> !e.isBlocked()))
+                .collect(Collectors.toList());
 
-
-        List<Node> res = nodes.entrySet().stream().map(e -> e.getValue()).filter(n -> (n.cachedDist = n.dist(test)) <= maxdist).collect(Collectors.toList());
-//        for (Node n: res) {
-//            n.cachedDist = n.realDist(test);
-//        }
-//                .map(n -> {n.cachedDist = n.realDist(test); return n;})
-                //.filter(n -> n.cachedDist <= maxdist)
-//                .collect(Collectors.toList());
         if (res.size() == 0) return null;
 
-        Collections.sort(res);
+        Collections.sort(res, (n1, n2) -> Double.compare(n1.cachedDist, n2.cachedDist));
 
         return res.get(0);
     }
