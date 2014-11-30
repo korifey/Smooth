@@ -4,6 +4,7 @@
 
 var map;
 var pins = [];
+var obstacles = [];
 var polys = [];
 var new_polys = {
     "pedestrian": [],
@@ -16,6 +17,7 @@ var walkPins = [];
 var positionPin;
 var positionIcon;
 var busIcon;
+var obstacleIcon;
 
 var workingArea = [[59.94486691748142, 30.304434299468994], [59.93431196599729, 30.335376262664795]];
 
@@ -47,9 +49,50 @@ function initializeMap() {
     map.on('click', function(e) {
         var coords = e.latlng;
 
+        var obstacleAdd = false;
+
         console.log(coords);
 
-        placeMarker(coords);
+        if ($('#obstacleToggle').prop('checked'))
+            obstacleAdd = true;
+
+        if (obstacleAdd) {
+            var url_string = '';
+            url_string += coords.lng + '&';
+            url_string += coords.lat;
+
+            console.log(url_string);
+
+            $.ajax({
+                type: 'post',
+                url: window.location.origin + window.location.pathname+'obstacle/add?' + url_string,
+                dataType: 'text',
+                success: function(msg) {
+                    if (msg == "error")
+                        handleError('Ошибка отправки информации о препятствии');
+                    else {
+                        $.ajax({
+                            url: window.location.origin + window.location.pathname+'obstacle/all',
+                            dataType: 'text',
+                            success: function(data) {
+                                $('.obstacle-list p').remove();
+                                var obs = data.split('\n');
+
+                                for (var i = 0; i < obs.length; i++) {
+                                    var p = $('<p/>');
+                                    p.text(obs[i]);
+                                    $('.obstacle-list').append(p);
+                                }
+
+                                placeObstacles(obs);
+                            }
+                        });
+                    }
+                }
+            });
+        } else {
+            placeMarker(coords);
+        }
     });
 
     positionIcon = L.icon({
@@ -65,6 +108,10 @@ function initializeMap() {
         iconSize: [24, 24],
         iconAnchor: [12, 12],
         className: 'busPin'
+    });
+
+    obstacleIcon = L.divIcon({
+        className: 'obstacle-marker'
     });
 }
 
@@ -91,6 +138,22 @@ var placeMarker = function(location) {
         handleError('Point is out of working area');
     }
 };
+
+function placeObstacles(obs) {
+    for (var i = 0; i < obstacles.length; i++) {
+        map.removeLayer(obstacles[i]);
+    }
+    for (var i = 0; i < obs.length; i++) {
+        console.log(obs[i]);
+        var obsData = obs[i].split(' ');
+
+        var obsMarker = L.marker([obsData[2], obsData[1]], {
+            icon: obstacleIcon
+        }).addTo(map);
+
+        obstacles.push(obsMarker);
+    }
+}
 
 var drawLine = function(p1_data, p2_data) {
     var point_type = p1_data[2];
@@ -371,6 +434,10 @@ function initializeInterface() {
         $('.header').toggleClass('opened');
     });
 
+    if (window.location.hash.indexOf('#test') >= 0) {
+        $('.obstacle-list').css('display', 'block');
+    }
+
     $('.tools-list button').click(function(e) {
         e.preventDefault();
 
@@ -446,6 +513,12 @@ function initializeInterface() {
 
             $p.toggleClass('opened');
         }
+
+        if ($p.hasClass('obstacle-list')) {
+            $p.transition({
+                marginLeft: '-200pt'
+            }, 500, 'cubic-bezier(.2,.27,.22,1)');
+        }
     });
 
     $('.get-route').click(function(e) {
@@ -463,7 +536,7 @@ function initializeInterface() {
             }
         }
 
-        var request_path = document.URL+"path?" + url_string;
+        var request_path = window.location.origin + window.location.pathname+"path?" + url_string;
         console.log(request_path);
 
         $.ajax({
@@ -489,7 +562,7 @@ function initializeInterface() {
 
                 $.ajax({
                     type: 'post',
-                    url: document.URL+'obstacle/add?' + url_string,
+                    url: window.location.origin + window.location.pathname+'obstacle/add?' + url_string,
                     dataType: 'text',
                     success: function(msg) {
                         if (msg == "error")
@@ -500,7 +573,7 @@ function initializeInterface() {
                             }, 500, 'cubic-bezier(.2,.27,.22,1)');
 
                             $.ajax({
-                                url: document.URL+'obstacle/all',
+                                url: window.location.origin + window.location.pathname+'obstacle/all',
                                 dataType: 'text',
                                 success: function(data) {
                                     $('.obstacle-list p').remove();
@@ -527,7 +600,7 @@ function initializeInterface() {
 
         $.ajax({
             type: 'post',
-            url: document.URL+'obstacle/all',
+            url: window.location.origin + window.location.pathname+'obstacle/all',
             dataType: 'text',
             success: function(data) {
                 $('.obstacle-list p').remove();
@@ -535,9 +608,11 @@ function initializeInterface() {
 
                 for (var i = 0; i < obs.length; i++) {
                     var p = $('<p/>');
-                    p.text(obs);
+                    p.text(obs[i]);
                     $('.obstacle-list').append(p);
                 }
+
+                placeObstacles(obs);
             }
         });
     });

@@ -380,4 +380,39 @@ body {
   border-radius: 5px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5); }
 
+.obstacle-list {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 120pt;
+  padding: 0 10pt;
+  width: 200pt;
+  min-height: 100pt;
+  background-color: #fff;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.22); }
+  .obstacle-list button.close {
+    position: absolute;
+    top: 5pt;
+    right: 5pt;
+    z-index: 200;
+    margin: 0;
+    padding: 0;
+    width: 21pt;
+    height: 21pt;
+    background-color: transparent;
+    border: none; }
+    .obstacle-list button.close img {
+      display: block;
+      margin-left: 3pt;
+      width: 15pt; }
+  .obstacle-list label {
+    margin-top: 10pt;
+    display: block;
+    font-size: 10pt; }
+
+.obstacle-marker {
+  width: 10pt;
+  height: 10pt;
+  background-color: #e00032; }
+
 /*# sourceMappingURL=style.css.map */

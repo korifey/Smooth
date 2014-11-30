@@ -3,7 +3,7 @@
     position:relative;
     margin-bottom:35pt;
 }
-input 				{
+.group input 				{
     font-size:14pt;
     padding:8pt 8pt 8pt 6pt;
     width: 100%;
@@ -12,20 +12,20 @@ input 				{
     border-bottom:1px solid #757575;
     color: #f5f5f5;
 }
-input:focus 		{ outline:none; }
+.group input:focus 		{ outline:none; }
 
 @media screen and (max-width:800px) {
     .group {
         margin-bottom: 20pt;
     }
-    input {
+    .group input {
         font-size: 10pt;
         padding: 5pt 4pt 2pt 3pt;
     }
 }
 
 /* LABEL ======================================= */
-label 				 {
+.group label 				 {
     color:#777;
     font-size:14pt;
     font-weight:normal;
@@ -39,7 +39,7 @@ label 				 {
 }
 
 @media screen and (max-width:800px) {
-    label {
+    .group label {
         top: 2pt;
         left: 3pt;
         font-size: 12pt;
@@ -47,13 +47,13 @@ label 				 {
 }
 
 /* active state */
-input:focus ~ label, input:valid ~ label 		{
+.group input:focus ~ label, .group input:valid ~ label 		{
     top:-16pt;
     font-size:10pt;
     color:#5264AE;
 }
 @media screen and (max-width:800px) {
-    input:focus ~ label, input:valid ~ label {
+    .group input:focus ~ label, input:valid ~ label {
         font-size: 8pt;
         top: -8pt;
     }
