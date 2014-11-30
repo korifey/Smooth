@@ -53,15 +53,15 @@ function initializeMap() {
     });
 
     positionIcon = L.icon({
-        iconUrl: 'scripts/images/person.png',
-        iconRetinaUrl: 'scripts/images/person-2x.png',
+        iconUrl: 'scripts/mapping/images/person.png',
+        iconRetinaUrl: 'scripts/mapping/images/person-2x.png',
         iconSize: [32, 32],
         iconAnchor: [16, 31]
     });
 
     busIcon = L.icon({
-        iconUrl: 'scripts/images/bus.png',
-        iconRetinaUrl: 'scripts/images/bus-2x.png',
+        iconUrl: 'scripts/mapping/images/bus.png',
+        iconRetinaUrl: 'scripts/mapping/images/bus-2x.png',
         iconSize: [24, 24],
         iconAnchor: [12, 12],
         className: 'busPin'
@@ -322,8 +322,8 @@ function displayDistance(walk, road, transport) {
     // Clear dists
     $dist_container.find('.value').empty();
 
-    $dist_container.find('.walk .value').text(walk + road);
-    $dist_container.find('.transport .value').text(transport);
+    $dist_container.find('.walk .value').text((walk + road) + 'м');
+    $dist_container.find('.transport .value').text(transport + 'м');
 
     $dist_container.css('display', 'block');
 }
@@ -350,22 +350,212 @@ var handleRouteResponse = function(msg) {
     removePolylines(formPolylines, points);
 };
 
-function setMapArea() {
-    var windowHeight = window.innerHeight;
-    var header = $('.header');
-    var tools = $('.tools');
-    var subm = $('.submit');
-    console.log(header.outerHeight(), tools.outerHeight());
-    var mapHeight = windowHeight - header.outerHeight() - tools.outerHeight() - subm.outerHeight();
-
-    $('#map-canvas').height(mapHeight).css('top', header.outerHeight());
-    $('.functions').css({
-        'top': '100px',
-        'right': '20px'
+function initializeInterface() {
+    var menuHeight = 0;
+    $('.menu-item').each(function() {
+        menuHeight += $(this).outerHeight();
     });
-    tools.css('top', mapHeight + header.outerHeight());
-    subm.css('top', mapHeight + header.outerHeight() + tools.outerHeight());
+    $('.menu-btn').click(function(e)  {
+        e.preventDefault();
+
+        if ($('.header').hasClass('opened')) {
+            $('.menu').transit({
+                maxHeight: 0
+            }, 500, 'cubic-bezier(.2,.27,.22,1)');
+        } else {
+            $('.menu').transit({
+                maxHeight: menuHeight
+            }, 500, 'cubic-bezier(.2,.27,.22,1)');
+        }
+
+        $('.header').toggleClass('opened');
+    });
+
+    $('.tools-list button').click(function(e) {
+        e.preventDefault();
+
+        var $t = $(this);
+        var $routing_div = $('.routing');
+        var $obstacle_div = $('.obstacle');
+
+        if ($t.hasClass('open-routing')) {
+            if ($routing_div.hasClass('opened')) {
+                $routing_div.transition({
+                    bottom: '-100%'
+                }, 500, 'cubic-bezier(.2,.27,.22,1)')
+            } else {
+                if ($obstacle_div.hasClass('opened')) {
+                    $obstacle_div.transition({
+                        bottom: '-100%'
+                    }, 500, 'cubic-bezier(.2,.27,.22,1)', function() {
+                        $routing_div.transition({
+                            bottom: 0
+                        }, 500, 'cubic-bezier(.2,.27,.22,1)')
+                    });
+                    $obstacle_div.toggleClass('opened');
+                } else {
+                    $routing_div.transition({
+                        bottom: 0
+                    }, 500, 'cubic-bezier(.2,.27,.22,1)')
+                }
+            }
+
+            $routing_div.toggleClass('opened');
+        }
+
+        if ($t.hasClass('open-obstacle')) {
+            if ($obstacle_div.hasClass('opened')) {
+                $obstacle_div.transition({
+                    bottom: '-100%'
+                }, 500, 'cubic-bezier(.2,.27,.22,1)')
+            } else {
+                if ($routing_div.hasClass('opened')) {
+                    $routing_div.transition({
+                        bottom: '-100%'
+                    }, 500, 'cubic-bezier(.2,.27,.22,1)', function() {
+                        $obstacle_div.transition({
+                            bottom: 0
+                        }, 500, 'cubic-bezier(.2,.27,.22,1)')
+                    });
+                    $routing_div.toggleClass('opened');
+                } else {
+                    $obstacle_div.transition({
+                        bottom: 0
+                    }, 500, 'cubic-bezier(.2,.27,.22,1)')
+                }
+            }
+
+            $obstacle_div.toggleClass('opened');
+        }
+    });
+
+    $('.close').click(function(e) {
+        e.preventDefault();
+
+        var $p = $(this).parent();
+        if ($p.hasClass('opened')) {
+            $p.transition({
+                bottom: '-100%'
+            }, 500, 'cubic-bezier(.2,.27,.22,1)');
+        }
+
+        if ($p.hasClass('obstacle')) {
+            $p.find('.obstacle-send-success').transition({
+                top: '100%'
+            }, 500, 'cubic-bezier(.2,.27,.22,1)');
+
+            $p.toggleClass('opened');
+        }
+    });
+
+    $('.get-route').click(function(e) {
+        e.preventDefault();
+        var url_string = '';
+
+        for (var i = 0; i < pins.length; i++) {
+            var lat = pins[i].getLatLng().lat;
+            var lng = pins[i].getLatLng().lng;
+
+            url_string += lng + '&' + lat;
+
+            if (i == 0) {
+                url_string += '&';
+            }
+        }
+
+        var request_path = document.URL+"path?" + url_string;
+        console.log(request_path);
+
+        $.ajax({
+            url: request_path,
+            dataType: 'text',
+            success: function(msg) {
+                handleRouteResponse(msg);
+            }
+        });
+    });
+
+    $('.send-obstacle').click(function(e) {
+        e.preventDefault();
+        console.log('send obstacle');
+        if("geolocation" in navigator) {
+            console.log('geo');
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var url_string = '';
+                url_string += position.coords.longitude + '&';
+                url_string += position.coords.latitude;
+
+                console.log(url_string);
+
+                $.ajax({
+                    type: 'post',
+                    url: document.URL+'obstacle/add?' + url_string,
+                    dataType: 'text',
+                    success: function(msg) {
+                        if (msg == "error")
+                            handleError('Ошибка отправки информации о препятствии');
+                        else {
+                            $('.obstacle-send-success').transition({
+                                top: 0
+                            }, 500, 'cubic-bezier(.2,.27,.22,1)');
+
+                            $.ajax({
+                                url: document.URL+'obstacle/all',
+                                dataType: 'text',
+                                success: function(data) {
+                                    $('.obstacle-list p').remove();
+                                    var obs = data.split('\n');
+
+                                    for (var i = 0; i < obs.length; i++) {
+                                        var p = $('<p/>');
+                                        p.text(obs[i]);
+                                        $('.obstacle-list').append(p);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            });
+        } else {
+            handleError("Невозможно получить информацию о текущем положении")
+        }
+    });
+
+    $('.get-obstacle-list').click(function(e) {
+        e.preventDefault();
+
+        $.ajax({
+            type: 'post',
+            url: document.URL+'obstacle/all',
+            dataType: 'text',
+            success: function(data) {
+                $('.obstacle-list p').remove();
+                var obs = data.split('\n');
+
+                for (var i = 0; i < obs.length; i++) {
+                    var p = $('<p/>');
+                    p.text(obs);
+                    $('.obstacle-list').append(p);
+                }
+            }
+        });
+    });
+}
+function setMapArea() {
+//    var windowHeight = window.innerHeight;
+//    var header = $('.header');
+//    var tools = $('.tools');
+//    var subm = $('.submit');
+//    console.log(header.outerHeight(), tools.outerHeight());
+//    var mapHeight = windowHeight - header.outerHeight() - tools.outerHeight() - subm.outerHeight();
+//
+////    $('#map-canvas').height(windowHeight).css('top', header.outerHeight());
+//
+//    tools.css('top', mapHeight + header.outerHeight());
+//    subm.css('top', mapHeight + header.outerHeight() + tools.outerHeight());
     initializeMap();
+    initializeInterface();
 }
 
 function setPositionPin(latitude, longitude) {
@@ -392,32 +582,6 @@ $(document).ready(function() {
 //        handleRouteResponse(dummyResponse);
 //    });
 
-    $('.submit').click(function(e) {
-        e.preventDefault();
-        var url_string = '';
-
-        for (var i = 0; i < pins.length; i++) {
-            var lat = pins[i].getLatLng().lat;
-            var lng = pins[i].getLatLng().lng;
-
-            url_string += lng + '&' + lat;
-
-            if (i == 0) {
-                url_string += '&';
-            }
-        }
-
-        var request_path = document.URL+"path?" + url_string;
-        console.log(request_path);
-
-        $.ajax({
-            url: request_path,
-            dataType: 'text',
-            success: function(msg) {
-                handleRouteResponse(msg);
-            }
-        });
-    });
 
     // Search
     $('.route-points a').click(function(e) {
@@ -451,30 +615,6 @@ $(document).ready(function() {
                 placeMarker(coords);
             }
         });
-    });
-
-    $('.inform').click(function(e) {
-        e.preventDefault();
-        if("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                var url_string = '';
-                url_string += position.coords.latitude + '&';
-                url_string += position.coords.longitude;
-
-                console.log(url_string);
-
-                $.ajax({
-                    url: document.URL+'obstacle?' + url_string,
-                    dataType: 'text',
-                    success: function(msg) {
-                        if (msg == "error")
-                            handleError('Ошибка отправки информации о препятствии');
-                    }
-                });
-            });
-        } else {
-            handleError("Невозможно получить информацию о текущем положении")
-        }
     });
 
     if ("geolocation" in navigator) {

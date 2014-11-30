@@ -9,7 +9,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
 
-    <script type="text/javascript" src="scripts/leaflet.js" ></script>
+    <script type="text/javascript" src="scripts/mapping/leaflet.js" ></script>
     <script type="text/javascript"
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKWD-hVZscJYssrnOe6h1bKcZyb1su56w">
     </script>
@@ -17,74 +17,115 @@
 <body>
 <div class="container">
     <div class="header">
-        <h3 class="text-muted">Smooth <sup>&#945;</sup></h3>
+        <div class="menu-btn left"></div>
+        <div class="menu-btn right"></div>
+        <img src="images/logo.svg" alt=""/>
+        <!--<sup>&#945;</sup>-->
+        <ul class="menu">
+            <li class="menu-item"><a href="#">О проекте</a></li>
+            <li class="menu-item"><a href="">Инструкция</a></li>
+        </ul>
     </div>
 
     <div id="map-canvas">
     </div>
+    
+    <div class="obstacle-list">
+        <button class="close">
+            <img src="images/close.svg" alt=""/>
+        </button>
+        <h3>Список препятствий</h3>
 
-    <div class="functions">
-        <a href="#" class="inform">!</a>
+        <button class="get-obstacle-list">
+            Получить
+        </button>
     </div>
 
     <div class="tools">
-        <div class="distance">
-            <div class="walk">
-                <strong>Пешком:</strong>
-                <span class="value"></span>
+        <div class="tools-list">
+            <button class="open-obstacle">
+                <img src="images/alert.svg" alt=""/>
+            </button>
+            <button class="open-routing">
+                <img src="images/walk.svg" alt=""/>
+            </button>
+        </div>
+        <div class="routing">
+            <button class="close">
+                <img src="images/close.svg" alt=""/>
+            </button>
+            <div class="points-input">
+                <div class="start-point">
+                    <form action="">
+                        <div class="group">
+                            <input type="text" class="start-address" required>
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label>Старт</label>
+                            <a class="voice-input" href="#">
+                                <img src="images/microphone.svg" alt=""/>
+                            </a>
+                            <a class="voice-input-stop" href="#">
+                                <img src="images/microphone-off.svg" alt=""/>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+                <div class="end-point">
+                    <form action="">
+                        <div class="group">
+                            <input type="text" class="finish-address" required>
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label>Финиш</label>
+                            <a class="voice-input" href="#">
+                                <img src="images/microphone.svg" alt=""/>
+                            </a>
+                            <a class="voice-input-stop" href="#">
+                                <img src="images/microphone-off.svg" alt=""/>
+                            </a>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="transport">
-                <strong>Транспортом:</strong>
-                <span class="value"></span>
+            <button class="get-route">
+                <img src="images/arrow-right.svg" alt=""/>
+            </button>
+            <div class="distance">
+                <div class="walk">
+                    <strong>Пешком:</strong>
+                    <span class="value"></span>
+                </div>
+                <div class="transport">
+                    <strong>Транспортом:</strong>
+                    <span class="value"></span>
+                </div>
             </div>
         </div>
-        <div class="route-points">
-            <div class="spoint">
-                <a href="#">Старт</a>
-
-                <form action="">
-                    <label>
-                        Точка начала маршрута
-                        <input type="text" class="start-address">
-                        <a class="voice-input" href="#">
-                            <img src="images/mic.png" alt=""/>
-                        </a>
-                        <a class="voice-input-stop" href="#">
-                            <img src="images/stop.png" alt=""/>
-                        </a>
-                    </label>
-                </form>
+        <div class="obstacle">
+            <button class="close">
+                <img src="images/close.svg" alt=""/>
+            </button>
+            <div class="obstacle-send-form">
+                <strong>Отправить информацию о препятствии</strong>
+                <button class="send-obstacle">
+                    <img src="images/alert-red.svg" alt=""/>
+                </button>
             </div>
-            <div class="fpoint">
-                <a href="#">Финиш</a>
-
-                <form action="">
-                    <label>
-                        Точка завершения маршрута
-                        <input type="text" class="finish-address">
-                        <a class="voice-input" href="#">
-                            <img src="images/mic.png" alt=""/>
-                        </a>
-                        <a class="voice-input-stop" href="#">
-                            <img src="images/stop.png" alt=""/>
-                        </a>
-                    </label>
-                </form>
+            <div class="obstacle-send-success">
+                <h3>Спасибо!</h3>
+                <strong>Информация о препятствии отправлена</strong>
             </div>
         </div>
     </div>
-
-    <button class="submit">Проложить маршрут</button>
-    <div class="points">
-    </div>
-    <div class="response"></div>
 
 </div>
 
 <script type="text/javascript" src="scripts/jquery-2.1.1.min.js"></script>
 <script src="scripts/jquery-ui.min.js"></script>
-<script src="scripts/webspeechkit.min.js"></script>
+<script src="scripts/ui/transit.min.js"></script>
+<script src="scripts/speechkit/webspeechkit.min.js"></script>
 <script type="text/javascript" src="scripts/main.js"></script>
-<script src="scripts/speechKitClient.js"></script>
+<script src="scripts/speechkit/speechKitClient.js"></script>
 </body>
 </html>
