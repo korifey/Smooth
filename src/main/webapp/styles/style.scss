@@ -567,6 +567,16 @@ body {
     display: block;
     font-size: 10pt;
   }
+
+  label[for="obstacleRemove"] {
+    margin-bottom: 10pt;
+
+    input {
+      margin-left: 10pt;
+      width: 30pt;
+      border-color: $red;
+    }
+  }
 }
 
 // Obstacle marker

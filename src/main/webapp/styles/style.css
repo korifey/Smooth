@@ -409,6 +409,12 @@ body {
     margin-top: 10pt;
     display: block;
     font-size: 10pt; }
+  .obstacle-list label[for="obstacleRemove"] {
+    margin-bottom: 10pt; }
+    .obstacle-list label[for="obstacleRemove"] input {
+      margin-left: 10pt;
+      width: 30pt;
+      border-color: #e00032; }
 
 .obstacle-marker {
   width: 10pt;

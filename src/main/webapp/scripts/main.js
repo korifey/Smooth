@@ -143,7 +143,7 @@ function placeObstacles(obs) {
     for (var i = 0; i < obstacles.length; i++) {
         map.removeLayer(obstacles[i]);
     }
-    for (var i = 0; i < obs.length; i++) {
+    for (var i = 0; i < obs.length - 1; i++) {
         console.log(obs[i]);
         var obsData = obs[i].split(' ');
 
@@ -413,6 +413,25 @@ var handleRouteResponse = function(msg) {
     removePolylines(formPolylines, points);
 };
 
+function getObstacleList() {
+    $.ajax({
+        type: 'get',
+        url: window.location.origin + window.location.pathname + 'obstacle/all',
+        dataType: 'text',
+        success: function (data) {
+            $('.obstacle-list p').remove();
+            var obs = data.split('\n');
+
+            for (var i = 0; i < obs.length; i++) {
+                var p = $('<p/>');
+                p.text(obs[i]);
+                $('.obstacle-list').append(p);
+            }
+
+            placeObstacles(obs);
+        }
+    });
+}
 function initializeInterface() {
     var menuHeight = 0;
     $('.menu-item').each(function() {
@@ -572,20 +591,7 @@ function initializeInterface() {
                                 top: 0
                             }, 500, 'cubic-bezier(.2,.27,.22,1)');
 
-                            $.ajax({
-                                url: window.location.origin + window.location.pathname+'obstacle/all',
-                                dataType: 'text',
-                                success: function(data) {
-                                    $('.obstacle-list p').remove();
-                                    var obs = data.split('\n');
-
-                                    for (var i = 0; i < obs.length; i++) {
-                                        var p = $('<p/>');
-                                        p.text(obs[i]);
-                                        $('.obstacle-list').append(p);
-                                    }
-                                }
-                            });
+                            getObstacleList();
                         }
                     }
                 });
@@ -598,21 +604,20 @@ function initializeInterface() {
     $('.get-obstacle-list').click(function(e) {
         e.preventDefault();
 
+        getObstacleList();
+    });
+
+    $('.remove-obstacle').click(function(e) {
+        e.preventDefault();
+
+        var id = $('#obstacleRemove').val();
+
         $.ajax({
-            type: 'post',
-            url: window.location.origin + window.location.pathname+'obstacle/all',
+            type: 'get',
+            url: window.location.origin + window.location.pathname+'obstacle/remove?id=' + id,
             dataType: 'text',
             success: function(data) {
-                $('.obstacle-list p').remove();
-                var obs = data.split('\n');
-
-                for (var i = 0; i < obs.length; i++) {
-                    var p = $('<p/>');
-                    p.text(obs[i]);
-                    $('.obstacle-list').append(p);
-                }
-
-                placeObstacles(obs);
+                getObstacleList();
             }
         });
     });
