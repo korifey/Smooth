@@ -4,7 +4,8 @@
 
 var map;
 var pins = [];
-var obstacles = [];
+var obstacle_circles = [];
+var obstacle_markers = [];
 var polys = [];
 var new_polys = {
     "pedestrian": [],
@@ -46,6 +47,11 @@ function initializeMap() {
         maxZoom: 18
     }).addTo(map);
 
+//    L.tileLayer('https://api.tiles.mapbox.com/v4/kascode.k35co93d/{x},{y},{z}/256x256.png?access_token=pk.eyJ1Ijoia2FzY29kZSIsImEiOiJoeXp2cENzIn0.HYtI1Pj7v372xyxg5kz3Kg#11', {
+//        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+//        maxZoom: 18
+//    }).addTo(map);
+
     map.on('click', function(e) {
         var coords = e.latlng;
 
@@ -75,16 +81,10 @@ function initializeMap() {
                             url: window.location.origin + window.location.pathname+'obstacle/all',
                             dataType: 'text',
                             success: function(data) {
-                                $('.obstacle-list p').remove();
                                 var obs = data.split('\n');
 
-                                for (var i = 0; i < obs.length; i++) {
-                                    var p = $('<p/>');
-                                    p.text(obs[i]);
-                                    $('.obstacle-list').append(p);
-                                }
-
                                 placeObstacles(obs);
+                                getObstacleList(obs);
                             }
                         });
                     }
@@ -111,7 +111,10 @@ function initializeMap() {
     });
 
     obstacleIcon = L.divIcon({
-        className: 'obstacle-marker'
+        iconSize: [20, 20],
+        iconAnchor: [10, 10],
+        className: 'obstacle-marker',
+        html:'<div></div>'
     });
 }
 
@@ -140,18 +143,27 @@ var placeMarker = function(location) {
 };
 
 function placeObstacles(obs) {
-    for (var i = 0; i < obstacles.length; i++) {
-        map.removeLayer(obstacles[i]);
+    for (var i = 0; i < obstacle_circles.length; i++) {
+        map.removeLayer(obstacle_circles[i]);
+        map.removeLayer(obstacle_markers[i]);
     }
     for (var i = 0; i < obs.length - 1; i++) {
         console.log(obs[i]);
         var obsData = obs[i].split(' ');
 
+        var obsCircle = L.circle([obsData[2], obsData[1]], 10, {
+            fillColor: '#e00032',
+            fillOpacity: 0.15,
+            color: '#e00032',
+            opacity: 0.08
+        }).addTo(map);
+
         var obsMarker = L.marker([obsData[2], obsData[1]], {
             icon: obstacleIcon
         }).addTo(map);
 
-        obstacles.push(obsMarker);
+        obstacle_circles.push(obsCircle);
+        obstacle_markers.push(obsMarker);
     }
 }
 
@@ -224,9 +236,8 @@ var removePolylines = function (cb) {
 };
 
 function drawLineLong() {
-    var i = 0;
     // Draw pedestrian lines
-    for (i = 0; i < new_polys.pedestrian.length; i++) {
+    for (var i = 0; i < new_polys.pedestrian.length; i++) {
         // outline
         var poly = L.polyline(new_polys.pedestrian[i], {
             color: '#fff',
@@ -413,22 +424,54 @@ var handleRouteResponse = function(msg) {
     removePolylines(formPolylines, points);
 };
 
+function printObstacleList(obs) {
+    var obsLen = obs.length;
+
+    $('.obstacle-list p').remove();
+
+    for (var i = 0; i < obsLen; i++) {
+        if (obs[i] != '') {
+            var obsData = obs[i].split(' ');
+            var p = $('<p/>');
+            var btn = $('<button/>').addClass('remove-obstacle')
+                .attr('obstacle-id', obsData[0])
+                .text('x');
+            p.text(obs[i]);
+            $('.obstacle-list').append(p);
+            p.append(btn);
+        }
+    }
+
+    $('.remove-obstacle').click(function(e) {
+        e.preventDefault();
+
+        removeObstacle($(this));
+    });
+}
 function getObstacleList() {
     $.ajax({
         type: 'get',
         url: window.location.origin + window.location.pathname + 'obstacle/all',
         dataType: 'text',
         success: function (data) {
-            $('.obstacle-list p').remove();
             var obs = data.split('\n');
 
-            for (var i = 0; i < obs.length; i++) {
-                var p = $('<p/>');
-                p.text(obs[i]);
-                $('.obstacle-list').append(p);
-            }
+            printObstacleList(obs);
 
             placeObstacles(obs);
+        }
+    });
+}
+function removeObstacle(el) {
+    $.ajax({
+        type: 'get',
+        url: window.location.origin + window.location.pathname + 'obstacle/remove?id=' + el.attr('obstacle-id'),
+        dataType: 'text',
+        success: function (data) {
+            if (data.indexOf('error' >= 0))
+                handleError(data);
+            else
+                getObstacleList();
         }
     });
 }
@@ -523,6 +566,8 @@ function initializeInterface() {
             $p.transition({
                 bottom: '-100%'
             }, 500, 'cubic-bezier(.2,.27,.22,1)');
+
+            $p.toggleClass('opened');
         }
 
         if ($p.hasClass('obstacle')) {
@@ -605,21 +650,6 @@ function initializeInterface() {
         e.preventDefault();
 
         getObstacleList();
-    });
-
-    $('.remove-obstacle').click(function(e) {
-        e.preventDefault();
-
-        var id = $('#obstacleRemove').val();
-
-        $.ajax({
-            type: 'get',
-            url: window.location.origin + window.location.pathname+'obstacle/remove?id=' + id,
-            dataType: 'text',
-            success: function(data) {
-                getObstacleList();
-            }
-        });
     });
 }
 function setMapArea() {
