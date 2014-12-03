@@ -42,15 +42,19 @@ function initializeMap() {
         lineJoin: 'round'
     }).addTo(map);
 
-    L.tileLayer('http://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-        maxZoom: 18
-    }).addTo(map);
-
-//    L.tileLayer('https://api.tiles.mapbox.com/v4/kascode.k35co93d/{x},{y},{z}/256x256.png?access_token=pk.eyJ1Ijoia2FzY29kZSIsImEiOiJoeXp2cENzIn0.HYtI1Pj7v372xyxg5kz3Kg#11', {
+//    L.tileLayer('http://a.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 //        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
 //        maxZoom: 18
 //    }).addTo(map);
+    var hdpi_string= '';
+    if (window.devicePixelRatio > 1.5) {
+        hdpi_string = '@2x';
+    }
+
+    L.tileLayer('https://api.tiles.mapbox.com/v4/kascode.k35co93d/{z}/{x}/{y}' + hdpi_string + '.png?access_token=pk.eyJ1Ijoia2FzY29kZSIsImEiOiJoeXp2cENzIn0.HYtI1Pj7v372xyxg5kz3Kg#11', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+        maxZoom: 18
+    }).addTo(map);
 
     map.on('click', function(e) {
         var coords = e.latlng;
@@ -468,6 +472,7 @@ function removeObstacle(el) {
         url: window.location.origin + window.location.pathname + 'obstacle/remove?id=' + el.attr('obstacle-id'),
         dataType: 'text',
         success: function (data) {
+            console.log(data);
             if (data.indexOf('error' >= 0))
                 handleError(data);
             else
