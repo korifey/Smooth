@@ -244,7 +244,7 @@ function drawLineLong() {
     for (var i = 0; i < new_polys.pedestrian.length; i++) {
         // outline
         var poly = L.polyline(new_polys.pedestrian[i], {
-            color: '#fff',
+            color: '#2baf2b',
             weight: 6,
             opacity: 1,
             lineJoin: 'round',
@@ -256,8 +256,8 @@ function drawLineLong() {
 
         // fill
         var polyone = L.polyline(new_polys.pedestrian[i], {
-            color: "#25a92f",
-            weight: 4,
+            color: "#12c700",
+            weight: 3,
             opacity: 1,
             lineJoin: 'round',
             lineCap: 'round'
@@ -271,8 +271,8 @@ function drawLineLong() {
     for (i = 0; i < new_polys.road.length; i++) {
         // outline
         var poly = L.polyline(new_polys.road[i], {
-            color: '#fff',
-            weight: 6,
+            color: '#bd50f9',
+            weight: 7,
             opacity: 1,
             lineJoin: 'round',
             lineCap: 'round'
@@ -298,7 +298,7 @@ function drawLineLong() {
     for (i = 0; i < new_polys.transport.length; i++) {
         // outline
         var poly = L.polyline(new_polys.transport[i], {
-            color: '#fff',
+            color: '#0288d1',
             weight: 8,
             opacity: 1,
             lineJoin: 'round',
@@ -310,7 +310,7 @@ function drawLineLong() {
 
         // fill
         var polyone = L.polyline(new_polys.transport[i], {
-            color: "#4663A1",
+            color: "#03a9f4",
             weight: 6,
             opacity: 1,
             lineJoin: 'round',
@@ -350,19 +350,19 @@ var formPolylines = function (points) {
 
             lastPointType = point1[2];
 
-            if (point1[2] == 1) {  // line is pedestrian
+            if (point1[2] == 1 || point1[2] == 2) {  // line is pedestrian
                 var array_length = new_polys.pedestrian.length;
 
                 new_polys.pedestrian[array_length] = [L.latLng(point1[1], point1[0]), L.latLng(point2[1], point2[0])];
                 continue;
             }
 
-            if (point1[2] == 2) {  // line is road
-                var array_length = new_polys.road.length;
-
-                new_polys.road[array_length] = [L.latLng(point1[1], point1[0]), L.latLng(point2[1], point2[0])];
-                continue;
-            }
+//            if (point1[2] == 2) {  // line is road
+//                var array_length = new_polys.road.length;
+//
+//                new_polys.road[array_length] = [L.latLng(point1[1], point1[0]), L.latLng(point2[1], point2[0])];
+//                continue;
+//            }
 
             if (point1[2] == 3) {  // line is transport
                 var array_length = new_polys.transport.length;
@@ -372,17 +372,17 @@ var formPolylines = function (points) {
             }
         } else { // continue existing line
 
-            if (point1[2] == 1) {  // line is pedestrian
+            if (point1[2] == 1 || point1[2] == 2) {  // line is pedestrian
                 var array_length = new_polys.pedestrian.length;
                 new_polys.pedestrian[array_length - 1].push(L.latLng(point2[1], point2[0]));
                 continue;
             }
 
-            if (point1[2] == 2) {  // line is road
-                var array_length = new_polys.road.length;
-                new_polys.road[array_length - 1].push(L.latLng(point2[1], point2[0]));
-                continue;
-            }
+//            if (point1[2] == 2) {  // line is road
+//                var array_length = new_polys.road.length;
+//                new_polys.road[array_length - 1].push(L.latLng(point2[1], point2[0]));
+//                continue;
+//            }
 
             if (point1[2] == 3 ) {  // line is transport
                 var array_length = new_polys.transport.length;
@@ -425,7 +425,7 @@ var handleRouteResponse = function(msg) {
 
     console.log('points: ' + points);
 
-    removePolylines(formPolylines, points);
+    removePolylines(formPolylines, points.reverse());
 };
 
 function printObstacleList(obs) {
