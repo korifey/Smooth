@@ -473,7 +473,7 @@ function removeObstacle(el) {
         dataType: 'text',
         success: function (data) {
             console.log(data);
-            if (data.indexOf('error' >= 0))
+            if (data.indexOf('error') >= 0)
                 handleError(data);
             else
                 getObstacleList();
