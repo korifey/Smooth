@@ -1,5 +1,6 @@
 @import "mixins";
 @import "forms.css";
+@import url(http://fonts.googleapis.com/css?family=EB+Garamond&subset=latin,cyrillic);
 
 $dark: #212121;
 $salmon: #f97d75;
@@ -49,6 +50,11 @@ body {
   background-color: #fff;
   text-align: center;
   box-shadow: 0 1px 6px rgba(0,0,0,.22);
+  -webkit-transition: box-shadow 0.8s, max-height 0.5s cubic-bezier(.2,.27,.22,1);
+  -moz-transition: box-shadow 0.8s, max-height 0.5s cubic-bezier(.2,.27,.22,1);
+  -ms-transition: box-shadow 0.8s, max-height 0.5s cubic-bezier(.2,.27,.22,1);
+  -o-transition: box-shadow 0.8s, max-height 0.5s cubic-bezier(.2,.27,.22,1);
+  transition: box-shadow 0.8s, max-height 0.5s cubic-bezier(.2,.27,.22,1);
 
   @media screen and (max-width: 800px) {
     height: 30pt;
@@ -592,4 +598,94 @@ body {
   background-color: transparent;
   background-size: 100%;
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24.00 24.00"><path d="M13 13L11 13L11 7L13 7M12 17.3C11.28 17.3 10.7 16.72 10.7 16C10.7 15.28 11.28 14.7 12 14.7C12.72 14.7 13.3 15.28 13.3 16C13.3 16.72 12.72 17.3 12 17.3ZM15.73 3L8.27 3L3 8.27L3 15.73L8.27 21L15.73 21L21 15.73L21 8.27L15.73 3Z" fill="#e00032"/></svg>');
+}
+
+/*
+*   =====
+*   About
+*   =====
+*/
+
+.header.about {
+  box-shadow: none;
+}
+
+.about-content {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 80;
+  width: 80%;
+  max-height: 90%;
+  overflow-y: auto;
+  margin-top: -100%;
+  margin-left: -40%;
+  padding: 100pt 20pt 60pt 20pt;
+  background-color: #fff;
+  box-shadow: 0 2px 12px rgba(0,0,0,.22);
+  -webkit-transition: margin-top 0.8s cubic-bezier(.2,.27,.22,1);
+  -moz-transition: margin-top 0.8s cubic-bezier(.2,.27,.22,1);
+  -ms-transition: margin-top 0.8s cubic-bezier(.2,.27,.22,1);
+  -o-transition: margin-top 0.8s cubic-bezier(.2,.27,.22,1);
+  transition: margin-top 0.8s cubic-bezier(.2,.27,.22,1);
+
+  &.opened {
+    margin-top: 0;
+  }
+
+  @media screen and (max-width: 800px) {
+    margin-top: -160%;
+    left: 0;
+    margin-left: 0;
+    padding: 50pt 10pt;
+    width: 90%;
+  }
+
+  .close {
+    position: absolute;
+    right: 20pt;
+    top: 20pt;
+    background-color: transparent;
+    border:none;
+
+    @media screen and (max-width: 800px) {
+      top: 35pt;
+    }
+  }
+}
+
+.about-text {
+  margin: 0 auto;
+  width: 70%;
+  font-family: 'EB Garamond', serif;
+  font-size: 1.5rem;
+  line-height: 1.5;
+
+  @media screen and (max-width: 800px) {
+    font-size: 1rem;
+    width: 100%;
+  }
+
+  .slogan {
+    margin-top: 4rem;
+    margin-bottom: 0;
+    text-align: center;
+    font-size: 4rem;
+    line-height: 1;
+
+    @media screen and (max-width: 800px) {
+      margin-top: 2rem;
+    }
+  }
+
+  figure {
+    margin-top: 2em;
+    text-align: center;
+    font-size: 1rem;
+
+    img {
+      margin: 0 auto;
+      display: block;
+    }
+  }
 }

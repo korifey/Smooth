@@ -114,6 +114,13 @@ function initializeMap() {
         className: 'busPin'
     });
 
+    walkIcon = L.icon({
+        iconUrl: 'scripts/mapping/images/walk.svg',
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        className: 'busPin'
+    });
+
     obstacleIcon = L.divIcon({
         iconSize: [20, 20],
         iconAnchor: [10, 10],
@@ -219,12 +226,20 @@ var handleError = function(errorText) {
 };
 
 var removePolylines = function (cb) {
-    for (var i = 0; i < polys.length; i++) {
+    var polysLength = polys.length;
+    var busPinsLength = busPins.length;
+    var walkPinsLength = walkPins.length;
+
+    for (var i = 0; i < polysLength; i++) {
         map.removeLayer(polys[i]);
     }
 
-    for (i = 0; i < busPins.length; i++) {
+    for (i = 0; i < busPinsLength; i++) {
         map.removeLayer(busPins[i]);
+    }
+
+    for (var i = 0; i < walkPinsLength; i++) {
+        map.removeLayer(walkPins[i]);
     }
 
     polys = [];
@@ -328,6 +343,13 @@ function addBusPin(lat, lng) {
 
     busPins.push(pin);
 }
+function addWalkPin(lat, lng) {
+    var pin = L.marker([lat, lng], {
+        icon: walkIcon
+    }).addTo(map);
+
+    walkPins.push(pin);
+}
 var formPolylines = function (points) {
     for (var i = 0; i < points.length - 1; i++) {
         if (points[i].trim() == "" || points[i+1].trim() == "") continue;
@@ -354,6 +376,9 @@ var formPolylines = function (points) {
                 var array_length = new_polys.pedestrian.length;
 
                 new_polys.pedestrian[array_length] = [L.latLng(point1[1], point1[0]), L.latLng(point2[1], point2[0])];
+
+                if (point1[2] == 1)
+                    addWalkPin(point1[1], point1[0]);
                 continue;
             }
 
@@ -488,15 +513,15 @@ function initializeInterface() {
     $('.menu-btn').click(function(e)  {
         e.preventDefault();
 
-        if ($('.header').hasClass('opened')) {
-            $('.menu').transit({
-                maxHeight: 0
-            }, 500, 'cubic-bezier(.2,.27,.22,1)');
-        } else {
-            $('.menu').transit({
-                maxHeight: menuHeight
-            }, 500, 'cubic-bezier(.2,.27,.22,1)');
-        }
+//        if ($('.header').hasClass('opened')) {
+//            $('.menu').transition({
+//                maxHeight: 0
+//            }, 500, 'cubic-bezier(.2,.27,.22,1)');
+//        } else {
+//            $('.menu').transition({
+//                maxHeight: menuHeight
+//            }, 500, 'cubic-bezier(.2,.27,.22,1)');
+//        }
 
         $('.header').toggleClass('opened');
     });
@@ -567,7 +592,7 @@ function initializeInterface() {
         e.preventDefault();
 
         var $p = $(this).parent();
-        if ($p.hasClass('opened')) {
+        if ($p.hasClass('routing')) {
             $p.transition({
                 bottom: '-100%'
             }, 500, 'cubic-bezier(.2,.27,.22,1)');
@@ -576,6 +601,9 @@ function initializeInterface() {
         }
 
         if ($p.hasClass('obstacle')) {
+            $p.transition({
+                bottom: '-100%'
+            }, 500, 'cubic-bezier(.2,.27,.22,1)');
             $p.find('.obstacle-send-success').transition({
                 top: '100%'
             }, 500, 'cubic-bezier(.2,.27,.22,1)');
@@ -587,6 +615,11 @@ function initializeInterface() {
             $p.transition({
                 marginLeft: '-200pt'
             }, 500, 'cubic-bezier(.2,.27,.22,1)');
+        }
+
+        if ($p.hasClass('about-content')) {
+            $('.header').removeClass('about');
+            $('.about-content').removeClass('opened');
         }
     });
 
@@ -655,6 +688,25 @@ function initializeInterface() {
         e.preventDefault();
 
         getObstacleList();
+    });
+
+    // Header Menu
+    $('.open-about').click(function(e) {
+        e.preventDefault();
+
+        var $about_container = $('.about-content');
+
+        if (!$about_container.hasClass('opened')) {
+            $about_container.addClass('opened');
+            $('.header').removeClass('opened');
+//            $about_container.transition({
+//                marginTop: '0'
+//            }, 500, 'cubic-bezier(.2,.27,.22,1)');
+//            $('.header').addClass('about').removeClass('opened');
+//            $('.menu').transition({
+//                maxHeight: 0
+//            }, 10, 'cubic-bezier(.2,.27,.22,1)');
+        }
     });
 }
 function setMapArea() {
