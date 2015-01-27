@@ -14,12 +14,15 @@
           <element id="library" level="project" name="Maven: org.springframework:spring-aop:3.2.3.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-beans:3.2.3.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-context:3.2.3.RELEASE" />
-          <element id="library" level="project" name="Maven: org.springframework:spring-expression:3.2.3.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-webmvc:3.2.3.RELEASE" />
+          <element id="library" level="project" name="Maven: org.springframework:spring-expression:3.2.3.RELEASE" />
           <element id="library" level="project" name="Maven: javax:javaee-api:7.0" />
           <element id="library" level="project" name="Maven: com.sun.mail:javax.mail:1.5.0" />
           <element id="library" level="project" name="Maven: javax.activation:activation:1.1" />
         </element>
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="C:\java\Smooth\target/MANIFEST.MF" />
       </element>
       <element id="javaee-facet-resources" facet="smooth/web/Web" />
     </root>

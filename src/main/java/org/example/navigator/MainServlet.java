@@ -43,6 +43,7 @@ public class MainServlet extends HttpServlet {
         Node __dst = new Node(0, long2, lat2);
 
 
+        //OsmParser.INSTANCE.graph = OsmParser.Parse("spb-full.zip");
 
         Node src = OsmParser.INSTANCE.graph.find(__src, maxdist);
         Node dst = OsmParser.INSTANCE.graph.find(__dst, maxdist);
@@ -62,25 +63,14 @@ public class MainServlet extends HttpServlet {
             return;
         }
 
-        OsmParser.INSTANCE.graph.djikstra(src.id, dst.id);
+        Graph graph = OsmParser.INSTANCE.graph;
+        try {
+            Path path = graph.aStar(src, dst);
+            path.print(new PrintStream(out));
+        } catch (Exception e) {
+            graph.clear();
+        }
 
-        HashMap<RoadType, Double> dist = new HashMap<>();
-        for (RoadType rt: RoadType.values()) dist.put(rt, 0.0);
-
-        dst.traversePrev(n -> {
-            try {
-                out.print(n.printCoords());
-                if (n.prevEdge != null) {
-                    RoadType rt = n.prevEdge.way.roadType;
-                    out.println(" "+rt.typeId);
-                    dist.put(rt, dist.get(rt) + n.prevEdge.realDist);
-                }
-                else out.println();
-            } catch (IOException e) {}
-        });
-
-        out.print("dist: "+ Arrays.stream(RoadType.values()).map(rt -> Long.toString((long)(double)dist.get(rt))).reduce((str, l) -> str+" "+l).get());
-        out.println();
     }
 
 

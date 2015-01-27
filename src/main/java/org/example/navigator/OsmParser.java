@@ -6,8 +6,13 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.*;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collections;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Created by Dmitry.Ivanov on 10/25/2014.
@@ -16,10 +21,10 @@ public class OsmParser {
 
     public static OsmParser INSTANCE = new OsmParser();
 
-    public final Graph graph;
+    public Graph graph;
 
     {
-        graph = Parse("spb.osm");
+        graph = Parse("spb-full.zip");
     }
 
     private static void PrecomputedWays(Graph g) {
@@ -36,10 +41,7 @@ public class OsmParser {
         Way nevskyBus = new Way(++idGen);
         nevskyBus.roadType = RoadType.BUS;
 
-        for (Node n: ns) {
-            nevskyBus.nodes.add(n);
-
-        }
+        Collections.addAll(nevskyBus.nodes, ns);
         nevskyBus.finish();
         g.addWay(nevskyBus);
     }
@@ -49,10 +51,11 @@ public class OsmParser {
         Graph res;
         Way enclosingWay = null;
         boolean enclosingWayIsHighway;
+        private int badNodes;
 
         @Override
         public void startDocument() throws SAXException {
-            res = new Graph();
+
         }
 
         @Override
@@ -64,6 +67,14 @@ public class OsmParser {
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
             switch (qName) {
+                case "bounds":
+                    double minlon = Double.parseDouble(attributes.getValue("minlon"));
+                    double minlat = Double.parseDouble(attributes.getValue("minlat"));
+                    double maxlon = Double.parseDouble(attributes.getValue("maxlon"));
+                    double maxlat = Double.parseDouble(attributes.getValue("maxlat"));
+
+                    res = new Graph(minlon, minlat, maxlon, maxlat);
+                    break;
                 case "node":
                     String id = attributes.getValue("id");
                     String lon = attributes.getValue("lon");
@@ -88,7 +99,11 @@ public class OsmParser {
                 case "nd":
                     if (enclosingWay == null) throw new IllegalStateException("<nd>: enclosing way == null");
                     long ndId = Long.parseLong(attributes.getValue("ref"));
-                    enclosingWay.nodes.add(res.nodes.get(ndId));
+                    Node n = res.nodes.get(ndId);
+                    if (n != null)
+                        enclosingWay.nodes.add(n);
+                    else
+                        badNodes++;
                     break;
 
                 case "tag":
@@ -134,13 +149,25 @@ public class OsmParser {
     public static Graph Parse(String filePath) {
 
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(OsmParser.class.getClassLoader().getResourceAsStream(filePath)));
+            InputStream is = OsmParser.class.getClassLoader().getResourceAsStream(filePath);
+            if (filePath.endsWith(".zip")) {
+                ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is, 100000));
+                ZipEntry ze;
+                while ((ze =  zis.getNextEntry()) != null) {
+                    if (ze.getName().endsWith(".osm")) {
+                        is = zis;
+                        break;
+                    }
+                }
+            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             SAXParserFactory spf = SAXParserFactory.newInstance();
             spf.setNamespaceAware(false);
             SAXParser saxParser = spf.newSAXParser();
 
             MySaxHandler parser = new MySaxHandler();
             saxParser.parse(new InputSource(reader), parser);
+            reader.close();
             return parser.res;
 
         } catch (Exception e) {
