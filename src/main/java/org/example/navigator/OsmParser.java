@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collections;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -19,13 +20,17 @@ import java.util.zip.ZipInputStream;
  */
 public class OsmParser {
 
+    private static Logger logger = Logger.getLogger(OsmParser.class.getName());
     public static OsmParser INSTANCE = new OsmParser();
 
     public Graph graph;
 
     {
-        graph = Parse("spb-full.zip");
+        String path = "spb-full.zip";
+        logger.info("Start parsing: "+path);
+        graph = Parse(path);
     }
+
 
     private static void PrecomputedWays(Graph g) {
         double maxdist = 100.0;
@@ -44,6 +49,7 @@ public class OsmParser {
         Collections.addAll(nevskyBus.nodes, ns);
         nevskyBus.finish();
         g.addWay(nevskyBus);
+        logger.info("Added precomputed way: nevskyBus");
     }
 
     public static class MySaxHandler extends DefaultHandler {
@@ -55,12 +61,12 @@ public class OsmParser {
 
         @Override
         public void startDocument() throws SAXException {
-
+            logger.info("SAXParser.startDocument()");
         }
 
         @Override
         public void endDocument() throws SAXException {
-            res.finishLoading();
+            res.removeUnconnectedComponents();
             PrecomputedWays(res);
         }
 
@@ -85,7 +91,7 @@ public class OsmParser {
                     double _lat = Double.parseDouble(lat);
 
                     Node node = new Node(_id, _lon, _lat);
-                    res.addNode(node);
+                    res.addNodePreliminary(node);
 
                     break;
 

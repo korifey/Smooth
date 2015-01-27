@@ -8,13 +8,11 @@ import java.util.function.Consumer;
 */
 public class Node {
 
-    public int concomp;
 
     public final long id;
     public final double lon, lat;
 
     ArrayList<Edge> edges = new ArrayList<>();
-    ArrayList<Way> insideWays = new ArrayList<>();
 
     //cached
     Edge prevEdge;

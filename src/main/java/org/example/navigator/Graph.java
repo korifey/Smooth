@@ -1,6 +1,11 @@
 package org.example.navigator;
 
+
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.set.hash.THashSet;
+
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -19,16 +24,14 @@ public class Graph {
     private ArrayList<Node>[] cells = new ArrayList[ncells*ncells];
 
 
-    private int bestcomp;
 
-
-    public HashMap<Long, Node> nodes = new HashMap<>();
+    public TLongObjectHashMap<Node> nodes = new TLongObjectHashMap<>();
     public List<Way> ways = new ArrayList<>();
+
 
     public LinkedHashMap<Long, Obstacle> obstacles = new LinkedHashMap<>();
 
-    public int nconcomp = 0;
-    public ArrayList<List<Node>> concomp = new ArrayList<>();
+    private Logger logger = Logger.getLogger(getClass().getName());
 
 
     public Graph(double minlon, double minlat, double maxlon, double maxlat) {
@@ -48,17 +51,17 @@ public class Graph {
         return i*ncells + j;
     }
 
-    public void addNode(Node n) {
+    public void addNodePreliminary(Node n) {
         nodes.put(n.id, n);
-
+        //do no place into cell yet
     }
 
     public void addObstacle(Obstacle o) {
         obstacles.put(o.id, o);
-        List<Edge> edges = (ways.stream()
-                .flatMap(way -> way.edges.stream())
+        Set<Edge> edges = (cells[findCell(o)].stream()
+                .flatMap(n -> n.edges.stream())
                 .filter(e -> e.distTo(o) < Obstacle.DistanceToEdge)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toSet()));
 
         o.nearEdges.addAll(edges);
         for (Edge e: edges) e.obstacles++;
@@ -91,13 +94,13 @@ public class Graph {
         ways.add(w);
 
         //inner
-        for (Node n: w.nodes) {
-            if (n == w.start || n == w.end) continue;
-            n.insideWays.add(w);
-        }
+//        for (Node n: w.nodes) {
+//            if (n == w.start || n == w.end) continue;
+//            n.insideWays.add(w);
+//        }
     }
 
-    public void finishLoading() {
+    public synchronized void removeUnconnectedComponents() {
 
 //        //correctness
 //        for (Node node: nodes.values()) {
@@ -106,48 +109,81 @@ public class Graph {
 //            }
 //        }
 
-        //connectivity components
-        for (Node node: nodes.values()) {
-            if (node.concomp == 0) {
-                int mark = ++nconcomp;
-                concomp.add(new ArrayList<>());
+        //connected components
+        ArrayList<List<Node>> conComps = new ArrayList<>();
+        int numberOfComp = 0;
 
-                LinkedList<Node> nodes = new LinkedList<>();
-                nodes.add(node);
-                while (!nodes.isEmpty()) {
+        logger.info("-> removeUnconnectedComponents()");
+        logger.info(String.format("nodes: %d, ways: %d, edges: %d",
+                  nodes.size()
+                , ways.size()
+                , ways.stream().map(w -> w.edges.size()).reduce(Integer::sum).get()
+        ));
 
-                    Node n = nodes.removeFirst();
-                    n.concomp = mark;
-                    concomp.get(mark-1).add(n);
+
+        for (Node node: nodes.valueCollection()) {
+            if (node.number == 0) {
+                int mark = ++numberOfComp;
+                conComps.add(new ArrayList<>());
+
+                LinkedList<Node> bfsFront = new LinkedList<>();
+                bfsFront.add(node);
+                while (!bfsFront.isEmpty()) {
+
+                    Node n = bfsFront.removeFirst();
+                    n.number = mark;
+                    conComps.get(mark - 1).add(n);
 
                     for (Edge e: n.edges) {
                         Node nn = e.otherEnd(n);
-                        if (nn.concomp == 0) {
-                            nodes.addLast(nn);
-                            nn.concomp = -1;
+                        if (nn.number == 0) {
+                            bfsFront.addLast(nn);
+                            nn.number = -1;
                         }
                     }
                 }
             }
         }
-        Collections.sort(concomp, (lst1, lst2) -> -Integer.compare(lst1.size(), lst2.size()));
-        bestcomp = concomp.get(0).get(0).concomp;
+
+        Collections.sort(conComps, (lst1, lst2) -> -Integer.compare(lst1.size(), lst2.size()));
+        final int bestcomp = conComps.get(0).get(0).number;
 
         //assertion check
-        int ncount = concomp.stream().map(lst -> lst.size()).reduce((a, b) -> a + b).get();
-        if (ncount != nodes.size()) throw new IllegalStateException(ncount+"!="+nodes.size());
+        int assertionNodesCount = conComps.stream().map(List::size).reduce(Integer::sum).get();
+        if (assertionNodesCount != nodes.size()) throw new IllegalStateException(assertionNodesCount+"!="+nodes.size());
+
+        logger.info("Connected components: " + conComps.size());
+        conComps = null; //for better GC
 
         //clear nodes without ways;
-        HashMap<Long, Node> newNodes = new HashMap<>();
-        for (HashMap.Entry<Long, Node> entry: nodes.entrySet()) {
+        final TLongObjectHashMap<Node> survivedNodes = new TLongObjectHashMap<>();
+        final THashSet<Way> survivedWays = new THashSet<>();
+        nodes.forEachEntry((idx, n) -> {
+        //for (HashMap.Entry<Long, Node> entry: nodes.entrySet()) {
 //            if (entry.getValue().ways.size() > 0) {
-            Node n = entry.getValue();
-            if (n.concomp == bestcomp) {
-                newNodes.put(entry.getKey(), n);
+            //Node n = entry.getValue();
+            if (n.number == bestcomp) {
+                survivedNodes.put(idx, n);
                 cells[findCell(n)].add(n);
+                n.edges.stream().map(e -> e.way).forEach(survivedWays::add);
             }
-        }
-        nodes = newNodes;
+            n.number = 0; //light clear right here to save time
+            return true;
+        });
+
+        survivedNodes.trimToSize();
+        nodes = survivedNodes;
+        ways = new ArrayList<>(survivedWays.size() + 1000); //for buses ways etc.
+        ways.addAll(survivedWays);
+
+
+        logger.info(String.format("nodes: %d, ways: %d, edges: %d",
+                nodes.size()
+                , ways.size()
+                , ways.stream().map(w -> w.edges.size()).reduce(Integer::sum).get()
+        ));
+
+
     }
 
 
@@ -268,8 +304,6 @@ public class Graph {
     }
 
     public synchronized void clear() {
-        for (Node n: nodes.values()) {
-            n.clearCached();
-        }
+        nodes.forEachValue(n -> {n.clearCached(); return true;});
     }
 }

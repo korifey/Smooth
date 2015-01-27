@@ -1,11 +1,13 @@
 package org.example.navigator;
 
 
+import java.io.IOException;
+
 /**
  * Created by Dmitry.Ivanov on 10/25/2014.
  */
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 //        Node __src = new Node(0, 30.31252384185791, 59.937472354745424);
 //        Node __dst = new Node(0, 30.323853492736816, 59.93980482945983);
 
@@ -48,6 +50,9 @@ public class Main {
 
 
         System.out.println((graph[0].allObstaclesSorted().toArray(new Obstacle[0])[0].print()));
+
+        System.gc();
+        System.in.read();
     }
 
     private static void printTime(Runnable rn) {
