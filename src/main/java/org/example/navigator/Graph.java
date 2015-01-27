@@ -61,7 +61,7 @@ public class Graph {
                 .collect(Collectors.toList()));
 
         o.nearEdges.addAll(edges);
-        for (Edge e: edges) e.obstacles.add(o);
+        for (Edge e: edges) e.obstacles++;
     }
 
     public Obstacle getObstacle(long id) {
@@ -75,7 +75,7 @@ public class Graph {
     public boolean removeObstacle(long id) {
         Obstacle o;
         if ((o = obstacles.remove(id)) != null) {
-            for (Edge e: o.nearEdges) e.obstacles.remove(o);
+            for (Edge e: o.nearEdges) e.obstacles--;
             return true;
         } else {
             return false;

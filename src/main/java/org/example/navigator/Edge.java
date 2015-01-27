@@ -14,7 +14,7 @@ public class Edge {
     public double realDist;
     public double effectiveDist;
 
-    public final List<Obstacle> obstacles = new ArrayList<>();
+    public int obstacles;
 
     public Edge(Way way, Node start, Node end) {
         this.way = way;
@@ -32,7 +32,7 @@ public class Edge {
     }
 
     public boolean isBlocked() {
-        return obstacles.size() > 0;
+        return obstacles > 0;
     }
 
     //in meters
