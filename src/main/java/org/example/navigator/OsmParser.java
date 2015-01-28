@@ -6,10 +6,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.*;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Collections;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -91,7 +88,7 @@ public class OsmParser {
                     double _lat = Double.parseDouble(lat);
 
                     Node node = new Node(_id, _lon, _lat);
-                    res.addNodePreliminary(node);
+                    res.addNode(node, false);
 
                     break;
 
@@ -155,27 +152,49 @@ public class OsmParser {
     public static Graph Parse(String filePath) {
 
         try {
-            InputStream is = OsmParser.class.getClassLoader().getResourceAsStream(filePath);
-            if (filePath.endsWith(".zip")) {
-                ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is, 100000));
-                ZipEntry ze;
-                while ((ze =  zis.getNextEntry()) != null) {
-                    if (ze.getName().endsWith(".osm")) {
-                        is = zis;
-                        break;
+            String binaryPath = filePath + ".bin";
+            File binary = new File(binaryPath);
+            File osm = new File(filePath);
+
+            final Graph res;
+            if (!binary.exists() || (osm.exists() && osm.lastModified() >= binary.lastModified())) {
+                InputStream is = OsmParser.class.getClassLoader().getResourceAsStream(filePath);
+                if (filePath.endsWith(".zip")) {
+                    ZipInputStream zis = new ZipInputStream(new BufferedInputStream(is, 100000));
+                    ZipEntry ze;
+                    while ((ze = zis.getNextEntry()) != null) {
+                        if (ze.getName().endsWith(".osm")) {
+                            is = zis;
+                            break;
+                        }
                     }
                 }
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                SAXParserFactory spf = SAXParserFactory.newInstance();
+                spf.setNamespaceAware(false);
+                SAXParser saxParser = spf.newSAXParser();
+
+                MySaxHandler parser = new MySaxHandler();
+                saxParser.parse(new InputSource(reader), parser);
+                reader.close();
+
+                res =  parser.res;
+
+                logger.info("Graph constructed, serializing to '"+binary.getAbsolutePath()+"'");
+                try (DataOutputStream os = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(binary)))) {
+                    res.serialize(os);
+                }
+                return res;
+
+            } else {
+                logger.info("Deserializing graph from binary location: '"+binary.getAbsolutePath()+"'");
+                try (DataInputStream is = new DataInputStream(new BufferedInputStream(new FileInputStream(binary)))) {
+                    res = Graph.deserialize(is);
+                }
             }
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setNamespaceAware(false);
-            SAXParser saxParser = spf.newSAXParser();
 
-            MySaxHandler parser = new MySaxHandler();
-            saxParser.parse(new InputSource(reader), parser);
-            reader.close();
-            return parser.res;
-
+            logger.info("Initialization complete");
+            return  res;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

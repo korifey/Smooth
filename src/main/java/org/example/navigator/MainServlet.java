@@ -2,6 +2,7 @@ package org.example.navigator;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -16,8 +17,11 @@ public class MainServlet extends HttpServlet {
 
     private final double maxdist = 500;
 
+    private Logger logger = Logger.getLogger(getClass().getName());
+
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         ServletOutputStream out = resp.getOutputStream();
+        logger.info(req.getRequestURI()+"?"+req.getQueryString());
 
         List<Double> lst = new ArrayList<>();
         for (Enumeration<String> en = req.getParameterNames(); en.hasMoreElements(); ) {

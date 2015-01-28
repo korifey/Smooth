@@ -26,18 +26,21 @@ public class Path {
     }
 
     public void print(PrintStream out) {
+
         HashMap<RoadType, Double> dist = new HashMap<>();
         for (RoadType rt: RoadType.values()) dist.put(rt, 0.0);
 
-        edges.stream().forEach(e -> {
-            Node n = e.start;
-            out.print(n.printCoords());
+        if (edges.size() > 0) {
+            edges.stream().forEach(e -> {
+                Node n = e.start;
+                out.print(n.printCoords());
 
-            RoadType rt = e.way.roadType;
-            out.println(" " + rt.typeId);
-            dist.put(rt, dist.get(rt) + e.realDist);
-        });
-        out.println(edges.get(edges.size() - 1).end.printCoords());
+                RoadType rt = e.way.roadType;
+                out.println(" " + rt.typeId);
+                dist.put(rt, dist.get(rt) + e.realDist);
+            });
+            out.println(edges.get(edges.size() - 1).end.printCoords());
+        }
 
         out.print("dist: "+ Arrays.stream(RoadType.values()).map(rt -> Long.toString((long)(double)dist.get(rt))).reduce((str, l) -> str+" "+l).get());
         out.println();

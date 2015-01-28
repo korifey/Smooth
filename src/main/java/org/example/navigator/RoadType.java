@@ -14,14 +14,24 @@ enum RoadType {
     int typeId;
     double coeff;
 
+
     RoadType(int typeId, double coeff) {
         this.typeId = typeId;
         this.coeff = coeff;
+    }
+
+    public static RoadType fromTypeId(int typeId) {
+        for (RoadType rt: RoadType.values()) {
+            if (rt.typeId == typeId) return rt;
+        }
+        throw new RuntimeException("Illegal RoadType: "+typeId);
     }
 
     public static final double HeuristicsCoeff;
     static {
         HeuristicsCoeff = Arrays.stream(RoadType.values()).map(rt -> rt.coeff).min(Comparator.<Double>naturalOrder()).get();
     }
+
+
 }
 

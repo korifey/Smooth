@@ -4,6 +4,7 @@ package org.example.navigator;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.hash.THashSet;
 
+import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -51,8 +52,9 @@ public class Graph {
         return i*ncells + j;
     }
 
-    public void addNodePreliminary(Node n) {
+    public void addNode(Node n, boolean addToCell) {
         nodes.put(n.id, n);
+        if (addToCell) cells[findCell(n)].add(n);
         //do no place into cell yet
     }
 
@@ -305,5 +307,76 @@ public class Graph {
 
     public synchronized void clear() {
         nodes.forEachValue(n -> {n.clearCached(); return true;});
+    }
+
+    public void serialize(DataOutputStream os) throws Exception {
+        os.writeDouble(minlon);
+        os.writeDouble(minlat);
+        os.writeDouble(maxlon);
+        os.writeDouble(maxlat);
+
+        os.writeInt(nodes.size());
+        nodes.forEachValue(n -> {
+            try {
+                os.writeLong(n.id);
+                os.writeDouble(n.lon);
+                os.writeDouble(n.lat);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return true;
+        });
+        os.writeInt(ways.size());
+        ways.stream().forEach(w -> {
+            try {
+                os.writeLong(w.id);
+                os.writeInt(w.roadType.typeId);
+
+                os.writeInt(w.edges.size() + 1);
+
+                os.writeLong(w.edges.get(0).start.id);
+                for (Edge e: w.edges) {
+                    os.writeLong(e.end.id);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        });
+    }
+
+    public static Graph deserialize(DataInputStream is) throws Exception {
+        double minlon = is.readDouble();
+        double minlat = is.readDouble();
+        double maxlon = is.readDouble();
+        double maxlat = is.readDouble();
+
+        Graph res = new Graph(minlon, minlat, maxlon, maxlat);
+        int nNodes = is.readInt();
+
+        for (int i=0; i<nNodes; i++) {
+            long id = is.readLong();
+            double lon = is.readDouble();
+            double lat = is.readDouble();
+            res.addNode(new Node(id, lon, lat), true);
+        }
+
+        int nWays = is.readInt();
+        for (int i = 0; i < nWays; i++) {
+            long id = is.readLong();
+            Way w = new Way(id);
+
+            int roadType = is.readInt();
+            w.roadType = RoadType.fromTypeId(roadType);
+
+            nNodes = is.readInt();
+            for (int j = 0; j < nNodes; j++) {
+                Node n = res.nodes.get(is.readLong());
+                w.nodes.add(n);
+            }
+            w.finish();
+            res.addWay(w);
+        }
+        return res;
     }
 }
