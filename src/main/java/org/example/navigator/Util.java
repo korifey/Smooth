@@ -8,7 +8,13 @@ public class Util {
         return x*x;
     }
 
+    public static int bound(int x, int min, int max) {
+        if (x<min) return min;
+        if (x > max) return max;
+        return x;
+    }
+
     public static double distByCoord(double long1, double lat1, double long2, double lat2) {
-        return Math.sqrt(sqr((long1-long2)*65555) + sqr((lat1-lat2)*111111));
+        return Math.sqrt(sqr((long1 - long2) * 65555) + sqr((lat1 - lat2) * 111111));
     }
 }

@@ -8,18 +8,24 @@ import java.util.function.Consumer;
 */
 public class Node {
 
-    public int concomp;
 
     public final long id;
     public final double lon, lat;
 
-    double cachedDist;
-
     ArrayList<Edge> edges = new ArrayList<>();
-    ArrayList<Way> insideWays = new ArrayList<>();
 
+    //cached
     Edge prevEdge;
+    double cachedDist;
+    double heurictics;
+    public int number;
 
+    public void clearCached() {
+        prevEdge = null;
+        cachedDist = 0;
+        heurictics = 0;
+        number = 0;
+    }
 
     public Node(long id, double lon, double lat) {
         this.lon = lon;
@@ -42,9 +48,8 @@ public class Node {
 
         Node node = (Node) o;
 
-        if (id != node.id) return false;
+        return id == node.id;
 
-        return true;
     }
 
     @Override
