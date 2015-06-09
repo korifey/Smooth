@@ -64,7 +64,6 @@ public class OsmParser {
         @Override
         public void endDocument() throws SAXException {
             res.removeUnconnectedComponents();
-            PrecomputedWays(res);
         }
 
         @Override
