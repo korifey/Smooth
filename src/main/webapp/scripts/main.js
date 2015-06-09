@@ -693,23 +693,6 @@ function initializeInterface() {
     });
 
     // Header Menu
-    $('.open-about').click(function(e) {
-        e.preventDefault();
-
-        var $about_container = $('.about-content');
-
-        if (!$about_container.hasClass('opened')) {
-            $about_container.addClass('opened');
-            $('.header').removeClass('opened');
-//            $about_container.transition({
-//                marginTop: '0'
-//            }, 500, 'cubic-bezier(.2,.27,.22,1)');
-//            $('.header').addClass('about').removeClass('opened');
-//            $('.menu').transition({
-//                maxHeight: 0
-//            }, 10, 'cubic-bezier(.2,.27,.22,1)');
-        }
-    });
 }
 function setMapArea() {
 //    var windowHeight = window.innerHeight;
