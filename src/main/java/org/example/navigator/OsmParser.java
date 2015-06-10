@@ -64,7 +64,6 @@ public class OsmParser {
         @Override
         public void endDocument() throws SAXException {
             res.removeUnconnectedComponents();
-            PrecomputedWays(res);
         }
 
         @Override
@@ -94,6 +93,7 @@ public class OsmParser {
 
                 case "way":
                     if (enclosingWay != null) throw new IllegalStateException("<way>: enclosing way != null");
+                    if (attributes.getValue("foot").equals("no")) break;
                     _id = Long.parseLong(attributes.getValue("id"));
                     enclosingWay = new Way(_id);
                     enclosingWayIsHighway = false;
