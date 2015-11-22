@@ -30,6 +30,11 @@
         <servlet-class>org.example.navigator.obstacle.ObstacleAddServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>ObstacleTryServlet</servlet-name>
+        <servlet-class>org.example.navigator.obstacle.ObstacleTryServlet</servlet-class>
+    </servlet>
+
 
 
     <servlet-mapping>
@@ -51,5 +56,9 @@
     <servlet-mapping>
         <servlet-name>ObstacleAddServlet</servlet-name>
         <url-pattern>/obstacle/add</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ObstacleTryServlet</servlet-name>
+        <url-pattern>/obstacle/try</url-pattern>
     </servlet-mapping>
 </web-app>

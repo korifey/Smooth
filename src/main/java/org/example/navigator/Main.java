@@ -42,14 +42,30 @@ public class Main {
         System.out.println("AStar:");
         printTime(() -> graph[0].aStar(src[0], dst[0]).print(System.out));
 
-        System.out.println("Add obstacle:");
-        printTime(() -> graph[0].addObstacle(new Obstacle(30.3125342000, 59.9371094000)));
+        System.out.println("Add aoe obstacle:");
+        printTime(() -> graph[0].addObstacle(new Obstacle(30.3125342000, 59.9371094000, true)));
 
         System.out.println("AStar:");
         printTime(() -> graph[0].aStar(src[0], dst[0]).print(System.out));
 
-
+        System.out.println("Obstacles:");
         System.out.println((graph[0].allObstaclesSorted().toArray(new Obstacle[0])[0].print()));
+
+        //remove
+        for (Obstacle o: graph[0].allObstaclesSorted()) graph[0].removeObstacle(o.id);
+        System.out.println();
+        System.out.println("Try way obstacle:");
+        Obstacle obs = new Obstacle(30.3125342000, 59.9371094000, false);
+        printTime(() -> {
+            new Path(graph[0].findClosestPedestrian(obs).orElse(null)).print(System.out);
+        });
+
+        System.out.println();
+        System.out.println("Add way obstacle:");
+        printTime(() -> { graph[0].addObstacle(obs);});
+
+
+
 
         System.gc();
         System.in.read();

@@ -3,6 +3,7 @@ package org.example.navigator;
 
 import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.hash.THashSet;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.util.*;
@@ -58,15 +59,30 @@ public class Graph {
         //do no place into cell yet
     }
 
+    private Stream<Edge> closestEdges(Node node, double dist) {
+        return cells[findCell(node)].stream()
+                .flatMap(n -> n.edges.stream())
+                .filter(e -> e.distTo(node) < dist);
+    }
+
+
     public void addObstacle(Obstacle o) {
         obstacles.put(o.id, o);
-        Set<Edge> edges = (cells[findCell(o)].stream()
-                .flatMap(n -> n.edges.stream())
-                .filter(e -> e.distTo(o) < Obstacle.DistanceToEdge)
-                .collect(Collectors.toSet()));
+        Collection<Edge> edges = o.isDistanceBlocking ?
+                closestEdges(o, Obstacle.AoeDistanceToEdge).collect(Collectors.toSet()) :
+                findClosestPedestrian(o).map(w -> w.edges).orElse(new ArrayList<>());
 
         o.nearEdges.addAll(edges);
         for (Edge e: edges) e.obstacles++;
+    }
+
+
+
+    public Optional<Way> findClosestPedestrian(Node n) {
+        return closestEdges(n, Obstacle.MaxDistanceToEdge)
+                .filter(e -> e.way.roadType == RoadType.PEDESTRIAN)
+                .min((e1,e2) -> Double.compare(e1.distTo(n), e2.distTo(n)))
+                .map(e -> e.way);
     }
 
     public Obstacle getObstacle(long id) {

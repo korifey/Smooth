@@ -20,6 +20,10 @@ public class Path {
     public Path() {
     }
 
+    public Path(Way way) {
+        edges.addAll(way.edges);
+    }
+
     public Stream<Node> nodes() {
         if (edges.size() == 0) return Stream.empty();
         return Stream.concat(Stream.of(edges.get(0).start), edges.stream().map(e -> e.end));
