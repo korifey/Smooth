@@ -1,0 +1,135 @@
+<link rel='stylesheet' href='/stylesheets/style.css' />
+
+<div class="app">
+  <div class="app-container">
+    <div class="app-ui">
+      <div class="header">
+        <div class="logo">
+          <h1>{{title}}</h1>
+          <img src="/images/logo.svg" alt=""/>
+        </div>
+        <!--<div class="menu-toggle">-->
+          <!--<img src="/images/menu.svg" alt=""/>-->
+        <!--</div>-->
+        <nav class="menu"></nav>
+      </div>
+      <div class="close-panel"><img src="/images/cross.png" alt=""/></div>
+      <div class="panel-dash">
+        <div class="dash-select">
+          <a class="all-obstacles">
+            —
+          </a>
+          <a class="add-obstacle" data-target="panel-obstacle">
+            <img src="/images/block.png" alt=""/>
+          </a>
+          <a class="routing" data-target="panel-route">
+            <img src="/images/route.png" alt=""/>
+          </a>
+        </div>
+        <div class="panel panel-route">
+          <form class="route-form">
+            <button class="calculate-route">Проложить маршрут</button>
+            <div class="route-address">
+              <div class="route-point-name">
+                <span>S</span>
+              </div>
+              <input type="text" class="route-address-input start" data-point-type="start" placeholder="Введите адрес"/>
+              <!--<button class="route-address-confirm"><img src="/images/check.png"/></button>-->
+            </div>
+            <div class="route-address">
+              <div class="route-point-name">
+                <span>F</span>
+              </div>
+              <input type="text" class="route-address-input finish" data-point-type="finish"
+                     placeholder="Введите адрес"/>
+              <!--<button class="route-address-confirm"><img src="/images/check.png"/></button>-->
+            </div>
+          </form>
+        </div>
+        <div class="panel panel-obstacle panel-multistep">
+          <form action="/uploads" method="post" enctype="multipart/form-data" class="obstacle-form">
+            <div class="step1">
+              <button class="button obstacle-confirm">Подтвердить расположение</button>
+              <span class="description"><strong>Шаг 1</strong>: установите точку как можно точнее</span>
+            </div>
+            <!--<div class="step2">-->
+              <!--<span class="button button-file">-->
+                <!--Сделать фото-->
+                <!--<input type="file" accept="image/*;capture=camera" name="obstacleImage" required>-->
+              <!--</span>-->
+              <!--<span class="description"><strong>Шаг 2</strong>: сфотографируйте препятствие</span>-->
+            <!--</div>-->
+            <div class="step2">
+              <span class="button send-obstacle">Отправить препятствие</span>
+              <span class="description"><strong>Шаг 3</strong>: подтвердите отправление информации</span>
+            </div>
+            <input type="hidden" name="lat"/>
+            <input type="hidden" name="lng"/>
+            <input type="hidden" name="address"/>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-container">
+    <div id="map"></div>
+  </div>
+  <div class="intro">
+    <div class="shadow"></div>
+    <div class="intro__left help-development">
+      <span class="h2">Помочь в развитии сервиса</span>
+      <span class="h4">В любое время, когда удобно. Осторожно, очень затягивает!</span>
+    </div>
+    <div class="intro__right to-routing">
+        <span class="h2">Перейти к приложению</span>
+    </div>
+    <div class="intro__full contribute typeset">
+      <h1>Как помочь в развитии сервиса?</h1>
+      <p>Нам очень нужны тротуары! Наш сервис основан на данных
+        <attr title="Это потрясающий картографический проект, созданный и поддерживающийся силами пользователей.">OpenStreetMap.org</attr>.
+        Там очень много данных, но петербургские тротуары нанесены далеко не все.</p>
+      <p>Вы можете очень сильно помочь проету Smooth и любым другим сервисам, которые когда-либо ещё будут созданы,
+        добавляя ещё не нанесённые пешеходные пути на карту OSM. Даже в центре Санкт-Петербурга ещё есть белые пятна.
+        Smooth держится молодцом, но без знания всех тротуаров не может построить оптимальный маршрут. Мы сейчас тут
+        делаем очень прикольную функцию, которая позволит каждому остаться в истории и показать, что именно он сделал.
+      </p>
+      <div class="osm-form-container">
+        <span class="open-osm-form">Просто скажите нам свой ник, который вы используете в OSM.</span>
+        <div class="osm-form">
+          <input type="text" id="osm-login" placeholder="Мой ник на OSM"/>
+          <button class="btn osm-form__submit">Сказать</button>
+        </div>
+      </div>
+      <button class="toggle">Кладём? Краткая инструкция.</button>
+
+      <div class="toggle-content">
+        <h3>Как исправить ситуацию</h3>
+        <ol>
+          <li>Зарегистрироваться на сайте <a href="http://openstreetmap.org" target="_blank">openstreetmap.org</a></li>
+          <li>Найти интересное место</li>
+          <li>Нажать кнопку “Правка”</li>
+          <li>Выбрать инструмент “Линия”. И нанести линию тротуара. Каждый клик - точка излома линии. Двойной клик - конец линии</li>
+          <li>В боковой панели выбрать тип объекта - Тротуар (или иной более подходящий - пешеходная дорога,
+            пешеходный преход и т.п.) и заполнить известные вам параметры. Особенно важны следующие: покрытие, ширина.
+            <em>Процесс нанесения тротуара можно увидеть на нашем видео</em>:<br/>
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/q2plOdDxY4c" frameborder="0" allowfullscreen></iframe>
+          </li>
+          <li>Нажать кнопку “Сохранить”</li>
+          <li>Кратко описать свои правки и подтвердить их</li>
+        </ol>
+
+        <p>Возможно вы знаете о наносимом объекте больше чем эти два параметра. В этом случае рассмотрите другие поля в
+          боковой панели. Рядом с каждым из них есть кнопка “i”, которая позволит подробно узнать назначение каждого.
+          Чем подробнее и точнее информация будет на карте, тем больше пользы вы принесёте нашему сервису и многим
+          другим проектам.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/javascripts/libs/jquery/jquery.min.js"></script>
+<script src="/javascripts/libs/leaflet/leaflet.js"></script>
+<script src="/javascripts/obstacle.js"></script>
+<script src="/javascripts/map.js"></script>
+<script src="/javascripts/ui.js"></script>
+<script src="/javascripts/app.js"></script>

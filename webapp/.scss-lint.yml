@@ -1,0 +1,5 @@
+scss_files: 'public/stylesheets/*.scss'
+
+linters:
+  PropertySortOrder:
+    enabled: false
