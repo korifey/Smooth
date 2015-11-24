@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Smooth</title>
+    <link rel="stylesheet" href="styles/leaflet.css"/>
+    <link rel="stylesheet" href="styles/style.css">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+
+    <script type="text/javascript" src="scripts/mapping/leaflet.js" ></script>
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBKWD-hVZscJYssrnOe6h1bKcZyb1su56w">
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="menu-btn left"></div>
+        <div class="menu-btn right"></div>
+        <img src="images/logo.svg" alt=""/>
+        <!--<sup>&#945;</sup>-->
+        <ul class="menu">
+            <li class="menu-item"><a href="/about" class="open-about">О проекте</a></li>
+        </ul>
+    </div>
+
+    <div class="about-content">
+        <button class="close">
+            <img src="images/close-black.svg" alt=""/>
+        </button>
+        <div class="about-text">
+            <p>SMOOTH — сервис для прокладки гладких маршрутов. Ваш путь без барьеров, без разбитых тротуаров, без непреодолимых <abbr title="да, мы из Санкт-Петербурга">поребриков</abbr>.</p>
+            <p>Если вы родитель, гуляющий с маленьким ребёнком в коляске, вам, конечно, не хочется рисковать падением маленького родственника при спуске с полуметрового поребрика. Или рисковать разбудить ребёнка на трясучем разбитом тротуаре.</p>
+            <p>Если вы пользователь инвалидной коляски, несомненно вам не хочется преодолевать лишние сотни метров в поисках доступного маршрута после того как вы столкнулись с установленным посреди узкого тротуара дорожным знаком.</p>
+            <p>Сервис SMOOTH построит маршрут избегая подобных препятствий. И вы доберётесь до места назначения безопасно, удобно и быстро.</p>
+            <p class="slogan">SMOOTH — safe in a fastest way</p>
+            <a href="http://te-st.ru/"><figure>
+                <img src="images/teplitsa.svg" alt="Теплица Социальных Технологий"/>
+                <caption>При поддержке Теплицы Социальных Технологий</caption>
+            </figure></a>
+        </div>
+    </div>
+    <div id="map-canvas">
+    </div>
+    
+    <div class="obstacle-list">
+        <button class="close">
+            <img src="images/close-black.svg" alt=""/>
+        </button>
+        <h3>Список препятствий</h3>
+
+        <button class="get-obstacle-list">
+            Получить
+        </button>
+        <label>
+            <input type="checkbox" name="obstacleToggle" id="obstacleToggle"/>
+            Режим добавления препятствий
+        </label>
+    </div>
+
+    <div class="tools">
+        <div class="tools-list">
+            <button class="open-obstacle">
+                <img src="images/alert.svg" alt=""/>
+            </button>
+            <button class="open-routing">
+                <img src="images/walk.svg" alt=""/>
+            </button>
+        </div>
+        <div class="routing">
+            <button class="close">
+                <img src="images/close.svg" alt=""/>
+            </button>
+            <div class="points-input">
+                <div class="start-point">
+                    <form action="">
+                        <div class="group">
+                            <input type="text" class="start-address" required>
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label>Старт</label>
+                            <a class="voice-input" href="#">
+                                <img src="images/microphone.svg" alt=""/>
+                            </a>
+                            <a class="voice-input-stop" href="#">
+                                <img src="images/microphone-off.svg" alt=""/>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+                <div class="end-point">
+                    <form action="">
+                        <div class="group">
+                            <input type="text" class="finish-address" required>
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label>Финиш</label>
+                            <a class="voice-input" href="#">
+                                <img src="images/microphone.svg" alt=""/>
+                            </a>
+                            <a class="voice-input-stop" href="#">
+                                <img src="images/microphone-off.svg" alt=""/>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <button class="get-route">
+                <img src="images/arrow-right.svg" alt=""/>
+            </button>
+            <div class="distance">
+                <div class="walk">
+                    <strong>Пешком:</strong>
+                    <span class="value"></span>
+                </div>
+                <div class="transport">
+                    <strong>Транспортом:</strong>
+                    <span class="value"></span>
+                </div>
+            </div>
+        </div>
+        <div class="obstacle">
+            <button class="close">
+                <img src="images/close.svg" alt=""/>
+            </button>
+            <div class="obstacle-send-form">
+                <strong>Отправить информацию о препятствии</strong>
+                <button class="send-obstacle">
+                    <img src="images/alert-red.svg" alt=""/>
+                </button>
+            </div>
+            <div class="obstacle-send-success">
+                <h3>Спасибо!</h3>
+                <strong>Информация о препятствии отправлена</strong>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript" src="scripts/jquery-2.1.1.min.js"></script>
+<script src="scripts/jquery-ui.min.js"></script>
+<script src="scripts/ui/transit.min.js"></script>
+<script src="scripts/speechkit/webspeechkit.min.js"></script>
+<script type="text/javascript" src="scripts/main.js"></script>
+<script src="scripts/speechkit/speechKitClient.js"></script>
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-6229540-6', 'auto');
+    ga('send', 'pageview');
+
+</script>
+</body>
+</html>

@@ -1,0 +1,691 @@
+@import "mixins";
+@import "forms.css";
+@import url(http://fonts.googleapis.com/css?family=EB+Garamond&subset=latin,cyrillic);
+
+$dark: #212121;
+$salmon: #f97d75;
+$green: #12c700;
+$green-light: #64dd17;
+$blue: #03a9f4;
+$red: #e00032;
+
+* {
+  box-sizing: border-box;
+}
+
+.browsehappy {
+  margin: 0.2em 0;
+  background: #ccc;
+  color: #000;
+  padding: 0.2em 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+input[type=text] {
+  background-color: transparent;
+}
+
+/* Space out content a bit */
+body {
+  margin: 0;
+  font-family: 'Open Sans', sans-serif;
+}
+
+/* Custom page header */
+.header {
+  position: absolute;
+  top: 10pt;
+  left: 50%;
+  z-index: 100;
+  margin-left:-30%;
+  padding: 10pt 0 0;
+  width: 60%;
+  background-color: #fff;
+  text-align: center;
+  box-shadow: 0 1px 6px rgba(0,0,0,.22);
+  -webkit-transition: box-shadow 0.8s, max-height 0.5s cubic-bezier(.2,.27,.22,1);
+  -moz-transition: box-shadow 0.8s, max-height 0.5s cubic-bezier(.2,.27,.22,1);
+  -ms-transition: box-shadow 0.8s, max-height 0.5s cubic-bezier(.2,.27,.22,1);
+  -o-transition: box-shadow 0.8s, max-height 0.5s cubic-bezier(.2,.27,.22,1);
+  transition: box-shadow 0.8s, max-height 0.5s cubic-bezier(.2,.27,.22,1);
+
+  @media screen and (max-width: 800px) {
+    height: 30pt;
+  }
+
+  .menu-btn {
+    display: block;
+    position: absolute;
+    top:10pt;
+    height: 30pt;
+    width: 30pt;
+    background: url(../images/menu.svg);
+    background-size: cover;
+  }
+  .menu-btn.left {
+    left: 10pt;
+  }
+  .menu-btn.right {
+    right: 10pt;
+  }
+
+  &.opened {
+    .menu-btn {
+      background: url(../images/menu-green.svg);
+      background-size: cover;
+    }
+
+    .menu {
+      max-height: 100pt;
+    }
+  }
+
+  img {
+    display: block;
+    position: relative;
+    left:50%;
+    margin-left: -100px;
+    width: 200px;
+    height: 30pt;
+    max-height: 100%;
+  }
+
+  .menu {
+    overflow: hidden;
+    margin: 15pt 0 0 0;
+    padding: 0;
+    max-height: 0;
+    list-style: none;
+
+//    -webkit-transition: max-height 0.5s cubic-bezier(.2,.27,.22,1);
+//    -moz-transition: max-height 0.5s cubic-bezier(.2,.27,.22,1);
+//    -ms-transition: max-height 0.5s cubic-bezier(.2,.27,.22,1);
+//    -o-transition: max-height 0.5s cubic-bezier(.2,.27,.22,1);
+//    transition: max-height 0.5s cubic-bezier(.2,.27,.22,1);
+
+  }
+
+  .menu-item {
+    padding: 0;
+    text-align: left;
+
+    a {
+      display: block;
+      padding: 0 60pt;
+      color: #fff;
+      line-height: 40pt;
+      background-color: $green;
+      text-transform: uppercase;
+      -webkit-transition: background-color 0.3s;
+      -moz-transition: background-color 0.3s;
+      -ms-transition: background-color 0.3s;
+      -o-transition: background-color 0.3s;
+      transition: background-color 0.3s;
+
+      &:hover, &:active {
+//        color: #efefef;
+        background-color: $green-light;
+      }
+    }
+  }
+
+  h3 {
+    display: inline-block;
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 400px;
+    line-height: 30pt;
+    padding-bottom: 0;
+    background: url(../images/logo.svg);
+    background-size: cover;
+    color: transparent;
+    font-size: 16pt;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: 800;
+
+    sup {
+      text-transform: lowercase;
+      font-weight: normal;
+    }
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .header {
+    top: 0;
+    left: 0;
+    margin-left: 0;
+    padding: 6pt 0 0 0;
+    width: 100%;
+
+    .menu-btn {
+      top:6pt;
+      width: 15pt;
+      height: 15pt;
+    }
+    .menu-btn.left {
+      display: none;
+    }
+
+    img {
+      left: 10pt;
+      margin-left: 0;
+      width: auto;
+      height: 15pt;
+    }
+
+    ul.menu {
+      margin-top: 5pt;
+    }
+
+    .menu-item {
+      a {
+        padding: 0 10pt;
+        font-size: 10pt;
+        line-height: 30pt;
+      }
+    }
+
+    h3 {
+      font-size: 12pt;
+      line-height: 25pt;
+    }
+  }
+}
+
+// App styles
+
+.container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#map-canvas {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  @media screen and (max-width:800px) {
+    top:25pt;
+  }
+}
+
+.tools {
+  @extend .clearfix;
+  position: absolute;
+  bottom:0;
+  right: 0;
+  width: 90%;
+  height: 180pt;
+  z-index: 150;
+//  overflow: hidden;
+  pointer-events: none;
+
+  @media screen and (max-width: 800px) {
+    width: 100%;
+  }
+
+  .tools-list {
+    position: absolute;
+    top:0;
+    right: 0;
+    z-index: 150;
+    width: 50pt;
+    height: 180pt;
+
+    @media screen and (max-width: 800px) {
+      top: 5pt;
+    }
+
+    & > button {
+      margin-bottom: 10pt;
+      width: 40pt;
+      height: 40pt;
+      border-radius: 50%;
+      background-color: #fff;
+      text-align: center;
+      box-shadow: 0 1px 6px rgba(0,0,0,.22);
+      border: none;
+      pointer-events: all;
+
+      img {
+        margin: 9pt auto 10pt auto;
+        width: 20pt;
+        height: 20pt;
+      }
+    }
+  }
+
+  .routing, .obstacle {
+    position: absolute;
+    bottom: -100%;
+    right: 60pt;
+    z-index: 100;
+    height: 100%;
+    max-width: 640pt;
+    padding: 30pt 20pt 20pt 20pt;
+    box-shadow: 0 1px 6px rgba(0,0,0,.22);
+    pointer-events: all;
+
+    @media screen and (max-width: 800px) {
+      right: 0;
+      width: 100%;
+      height: 80pt;
+      max-width: auto;
+      padding: 15pt 10pt 10pt 10pt;
+    }
+
+    button.close {
+      position: absolute;
+      top: 5pt;
+      right: 5pt;
+      z-index: 200;
+      margin: 0;
+      padding: 0;
+      width: 21pt;
+      height: 21pt;
+      background-color: transparent;
+      border: none;
+
+      @media screen and (max-width: 800px) {
+        top: 5pt;
+        right: 5pt;
+        width: 12pt;
+        height: 12pt;
+      }
+
+      img {
+        display: block;
+        margin-left: 3pt;
+        width: 15pt;
+
+        @media screen and (max-width: 800px) {
+          width: 10pt;
+        }
+      }
+    }
+  }
+
+  .routing {
+    @extend .clearfix;
+    width: 560pt;
+    background-color: $blue;
+
+    @media screen and (max-width: 800px) {
+      width: 100%;
+    }
+
+    .group {
+      height: 30pt;
+
+      @media screen and (max-width: 800px) {
+        height: 15pt;
+      }
+    }
+
+    label {
+      color: #f5f5f5;
+    }
+    input {
+      border-color: #f5f5f5;
+    }
+    .bar {
+      background-color: #f5f5f5;
+    }
+
+    button.get-route {
+      margin-left: 20pt;
+      width: 97pt;
+      height: 97pt;
+      background-color: transparent;
+      border: 1px solid #f5f5f5;
+      border-radius: 50%;
+
+      @media screen and (max-width: 800px) {
+        margin-top: 12pt;
+        width: 40pt;
+        height: 40pt;
+      }
+
+      img {
+        width: 40pt;
+
+        @media screen and (max-width: 800px) {
+          width: 16pt;
+        }
+      }
+    }
+  }
+
+  .obstacle {
+    background-color: $red;
+    color: #fff;
+//    border: 4px solid $red;
+
+    @media screen and (max-width: 800px) {
+      text-align: center;
+    }
+
+    strong {
+      display: block;
+    }
+
+    button {
+      display: block;
+      margin: 20pt auto;
+      width: 60pt;
+      height: 60pt;
+      background-color: #fff;
+      border-radius: 50%;
+      border:none;
+
+      @media screen and (max-width: 800px) {
+        margin-top: 5pt;
+        width: 40pt;
+        height: 40pt;
+      }
+
+      img {
+        width: 20pt;
+      }
+    }
+  }
+  .obstacle-send-success {
+    position: absolute;
+    top:100%;
+    height: 100%;
+    background-color: $red;
+  }
+
+  .distance {
+    display: none;
+//    display: block;
+    position: absolute;
+    top: -40pt;
+    left: 10%;
+    width: 80%;
+    height: 30pt;
+    background-color: #fff;
+    text-align: center;
+    line-height: 30pt;
+    border-radius: 15pt;
+    box-shadow: 0 1px 2px rgba(0,0,0,.3);
+
+    @media screen and (max-width: 800px) {
+      padding-left: 10pt;
+      font-size: 10pt;
+      text-align: left;
+      line-height: 32pt;
+    }
+
+    div {
+      display: inline-block;
+      padding: 0 20px;
+      max-width: 50%;
+
+      @media screen and (max-width: 800px) {
+        padding: 0 10px;
+      }
+    }
+
+    .walk {
+      color: #25a92f;
+    }
+    .transport {
+      color: #4663A1;
+    }
+  }
+}
+
+.points-input {
+  float: left;
+  width: 400pt;
+
+  @media screen and (max-width: 800px) {
+    width: 70%;
+  }
+}
+
+.start-point, .end-point {
+  margin-bottom: 15pt;
+  position: relative;
+
+  @media screen and (max-width: 800px) {
+    height: 20pt;
+  }
+
+  a {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+
+  form {
+    margin-bottom: 10pt;
+    width: 100%;
+  }
+
+  &.active {
+    & > a {
+      display: none;
+    }
+    form {
+      display: block
+    }
+  }
+
+  *[class^="voice-input"] {
+    display: block;
+    position: absolute;
+    top: -2pt;
+    right:10pt;
+    width: 20pt;
+    height: 20pt;
+
+    @media screen and (max-width: 800px) {
+      width: 12pt;
+      height: 12pt;
+      top: 2pt;
+      right: 4pt;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  .voice-input-stop {
+    display: none;
+  }
+}
+
+.container {
+  max-width: 100%;
+}
+
+.points {
+  .point {
+    padding: 5px 10px;
+
+    & > span {
+      margin-right: 5px;
+    }
+  }
+}
+
+
+// Pin styles
+.busPin {
+  background-color: #fff;
+  border: 3px solid #fff;
+  border-radius: 5px;
+  box-shadow: 0 1px 1px rgba(0,0,0,.5);
+}
+
+
+.obstacle-list {
+  display: none;
+  position: absolute;
+  left:0;
+  top:120pt;
+  padding: 0 10pt;
+  width: 200pt;
+  min-height: 100pt;
+  background-color: #fff;
+  box-shadow: 0 1px 6px rgba(0,0,0,.22);
+
+  button.close {
+    position: absolute;
+    top: 5pt;
+    right: 5pt;
+    z-index: 200;
+    margin: 0;
+    padding: 0;
+    width: 21pt;
+    height: 21pt;
+    background-color: transparent;
+    border: none;
+
+    img {
+      display: block;
+      margin-left: 3pt;
+      width: 15pt;
+    }
+  }
+
+  label {
+    margin-top: 10pt;
+    display: block;
+    font-size: 10pt;
+  }
+
+  p {
+    position: relative;
+  }
+
+  .remove-obstacle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: transparent;
+    border-radius: 50%;
+    width: 20pt;
+    height: 20pt;
+    border: 1px solid $red;
+    font-weight: bold;
+  }
+}
+
+// Obstacle marker
+.obstacle-marker div{
+  width: 20px;
+  height: 20px;
+  background-color: transparent;
+  background-size: 100%;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24.00 24.00"><path d="M13 13L11 13L11 7L13 7M12 17.3C11.28 17.3 10.7 16.72 10.7 16C10.7 15.28 11.28 14.7 12 14.7C12.72 14.7 13.3 15.28 13.3 16C13.3 16.72 12.72 17.3 12 17.3ZM15.73 3L8.27 3L3 8.27L3 15.73L8.27 21L15.73 21L21 15.73L21 8.27L15.73 3Z" fill="#e00032"/></svg>');
+}
+
+/*
+*   =====
+*   About
+*   =====
+*/
+
+.header.about {
+  box-shadow: none;
+}
+
+.about-content {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 80;
+  width: 80%;
+  max-height: 90%;
+  overflow-y: auto;
+  margin-top: -100%;
+  margin-left: -40%;
+  padding: 100pt 20pt 60pt 20pt;
+  background-color: #fff;
+  box-shadow: 0 2px 12px rgba(0,0,0,.22);
+  -webkit-transition: margin-top 0.8s cubic-bezier(.2,.27,.22,1);
+  -moz-transition: margin-top 0.8s cubic-bezier(.2,.27,.22,1);
+  -ms-transition: margin-top 0.8s cubic-bezier(.2,.27,.22,1);
+  -o-transition: margin-top 0.8s cubic-bezier(.2,.27,.22,1);
+  transition: margin-top 0.8s cubic-bezier(.2,.27,.22,1);
+
+  &.opened {
+    margin-top: 0;
+  }
+
+  @media screen and (max-width: 800px) {
+    margin-top: -160%;
+    left: 0;
+    margin-left: 0;
+    padding: 50pt 10pt;
+    width: 90%;
+  }
+
+  .close {
+    position: absolute;
+    right: 20pt;
+    top: 20pt;
+    background-color: transparent;
+    border:none;
+
+    @media screen and (max-width: 800px) {
+      top: 35pt;
+    }
+  }
+}
+
+.about-text {
+  margin: 0 auto;
+  width: 70%;
+  font-family: 'EB Garamond', serif;
+  font-size: 1.5rem;
+  line-height: 1.5;
+
+  @media screen and (max-width: 800px) {
+    font-size: 1rem;
+    width: 100%;
+  }
+
+  .slogan {
+    margin-top: 4rem;
+    margin-bottom: 0;
+    text-align: center;
+    font-size: 4rem;
+    line-height: 1;
+
+    @media screen and (max-width: 800px) {
+      margin-top: 2rem;
+    }
+  }
+
+  figure {
+    margin-top: 2em;
+    text-align: center;
+    font-size: 1rem;
+
+    img {
+      margin: 0 auto;
+      display: block;
+    }
+  }
+}
