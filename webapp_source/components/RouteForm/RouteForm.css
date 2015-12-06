@@ -1,0 +1,64 @@
+.RouteForm {
+    position: absolute;
+    left: 0;
+    bottom: -100%;
+    z-index: 20;
+    margin: 0;
+    padding: 1.5em 1.5em 2em 1.5em;
+    width: 450px;
+    background-color: #03A9F4;
+    border-radius: 0 3px 0 0;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    transition: bottom .25s;
+}
+.RouteForm.active {
+    bottom: 0;
+}
+
+.RouteForm__input {
+    margin-bottom: 1em;
+    padding: 0 .5em;
+    width: 100%;
+    background-color: #03A9F4;
+    border: 0;
+    color: #fff;
+    font-size: 12pt;
+    line-height: 2em;
+    border-bottom: 2px solid;
+}
+
+::-webkit-input-placeholder {
+    color: #dfdfdf;
+}
+
+:-moz-placeholder { /* Firefox 18- */
+    color: #dfdfdf;
+}
+
+::-moz-placeholder {  /* Firefox 19+ */
+    color: #dfdfdf;
+}
+
+:-ms-input-placeholder {
+    color: #dfdfdf;
+}
+
+.RouteForm__button {
+    width: 100%;
+    padding: .5em 0;
+    background-color: #fff;
+    border: 0;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    font-size: 12pt;
+    line-height: 1.75;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.RouteForm__text {
+    margin: 0 0 1em 0;
+    padding: 0 .5em;
+    color: #fff;
+    font-size: 12pt;
+    line-height: 1.25;
+}

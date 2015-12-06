@@ -1,0 +1,8 @@
+.ModeToggle {
+    position: absolute;
+    right: -4px;
+    bottom: .5em;
+    z-index: 20;
+    max-width: 250pt;
+    text-align: right;
+}
