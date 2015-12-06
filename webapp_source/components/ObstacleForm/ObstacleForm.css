@@ -1,0 +1,14 @@
+.ObstacleForm {
+  position: absolute;
+  bottom: 1em;
+  left: 50%;
+  z-index: 20;
+  transform: translateX(-50%);
+  padding: 1em;
+  width: 400px;
+  background-color: #FFEB3B;
+}
+
+.ObstacleForm__text {
+  margin-bottom: 2em;
+}
