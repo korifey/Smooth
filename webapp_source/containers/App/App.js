@@ -10,7 +10,9 @@ import { setStartRoutePoint,
   setFinishRoutePin,
   setIsFetchingRoute,
   setRoute,
-  setRouteOnMap } from '../../actions/Actions';
+  clearRoute,
+  setRouteOnMap,
+  removeRouteFromMap } from '../../actions/Actions';
 //import SomeApp from './SomeApp';
 // import { createStore, combineReducers } from 'redux';
 // import { Provider } from 'react-redux';
@@ -62,7 +64,7 @@ export default class App extends Component {
 
       let markers = [];
 
-      for (var i = 0; i < this.state.routeState.route.length; i++) {
+      for (let i = 0; i < this.state.routeState.route.length; i++) {
         var point = this.state.routeState.route[i];
         markers[i] = L.marker(point, {
           icon: homerIcon,
@@ -70,7 +72,15 @@ export default class App extends Component {
         });
         markers[i].addTo(this.state.mapState.mapObject);
       }
-      Store.dispatch(setRouteOnMap(r));
+
+      Store.dispatch(setIsFetchingRoute(false));
+      Store.dispatch(setRouteOnMap(r, markers));
+    }
+
+    console.log("redrawRoute", this.state.routeState.route.length, this.state.mapState.route);
+
+    if (!this.state.routeState.route.length && this.state.mapState.route) {
+      clearMap.bind(this)();
     }
   }
 
@@ -86,35 +96,40 @@ export default class App extends Component {
 
     if (this.state.routeState.start.length && this.state.routeState.finish.length) {
 
-      Store.dispatch(setIsFetchingRoute(true));
+      // Clear route if there is one
+      if (this.state.routeState.route.length) {
+        Store.dispatch(clearRoute());
+      } else {
+        Store.dispatch(setIsFetchingRoute(true));
 
-      let queryString = this.state.routeState.start[1] + '&' + this.state.routeState.start[0] +
-        '&' + this.state.routeState.finish[1] + '&' + this.state.routeState.finish[0];
-      let request = new Request('http://smooth.lc/path?' + queryString, {
-        headers: new Headers({
-          'Content-Type': 'text/plain'
-        })
-      });
-
-      fetch(request)
-        .then((response) => {
-          return response.text();
-        })
-        .then((response) => {
-          Store.dispatch(setRoute(parseRouteResponse(response)));
+        let queryString = this.state.routeState.start[1] + '&' + this.state.routeState.start[0] +
+            '&' + this.state.routeState.finish[1] + '&' + this.state.routeState.finish[0];
+        let request = new Request('http://smooth.lc/path?' + queryString, {
+          headers: new Headers({
+            'Content-Type': 'text/plain'
+          })
         });
+
+        fetch(request)
+            .then((response) => {
+              return response.text();
+            })
+            .then((response) => {
+              Store.dispatch(setRoute(parseRouteResponse(response)));
+            });
+      }
 
     } else if (!this.state.routeState.start.length) {
 
       Store.dispatch(setStartRoutePoint(event.latlng));
       Store.dispatch(setStartRoutePin(pin));
-      this.state.routeState.startPin.addTo(this.state.mapState.mapObject);
+      this.state.mapState.startPin.addTo(this.state.mapState.mapObject);
 
     } else {
 
       Store.dispatch(setFinishRoutePoint(event.latlng));
       Store.dispatch(setFinishRoutePin(pin));
-      this.state.routeState.finishPin.addTo(this.state.mapState.mapObject);
+      this.state.mapState.finishPin.addTo(this.state.mapState.mapObject);
 
     }
   }
@@ -127,7 +142,7 @@ export default class App extends Component {
              onMapClick={this.onMapClick.bind(this)}
         />
         <ModeToggle />
-        <RouteForm visibility={this.state.uiState.routeFormVisibility}/>
+        <RouteForm visibility={this.state.uiState.routeFormVisibility} />
         <ObstacleForm />
       </div>
     );
@@ -160,4 +175,18 @@ function parseRouteResponse(response) {
 
   //console.log(points);
   return points;
+}
+
+function clearMap() {
+  this.state.mapState.mapObject.removeLayer(this.state.mapState.route);
+
+  for (let i = 0; i < this.state.mapState.routeNodes.length; i++) {
+    this.state.mapState.mapObject.removeLayer(this.state.mapState.routeNodes[i]);
+  }
+
+  this.state.mapState.mapObject.removeLayer(this.state.mapState.startPin);
+  this.state.mapState.mapObject.removeLayer(this.state.mapState.finishPin);
+
+  Store.dispatch(removeRouteFromMap());
+  Store.dispatch(clearRoute());
 }
