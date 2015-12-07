@@ -7,6 +7,9 @@
     <file type="web" url="file://$PROJECT_DIR$" />
   </component>
   <component name="IdProvider" IDEtalkID="9640154BACD9C2573407307E6EF125BF" />
+  <component name="JavaScriptSettings">
+    <option name="languageLevel" value="JSX" />
+  </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
@@ -18,4 +21,3 @@
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>
-
