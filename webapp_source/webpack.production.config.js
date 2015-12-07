@@ -32,7 +32,7 @@ module.exports = {
   module: {
     loaders: [{
       test: /\.js$/,
-      loaders: ['react-hot', 'babel'],
+      loaders: ['babel'],
       exclude: /node_modules/,
       include: __dirname
     }, {
@@ -47,7 +47,7 @@ module.exports = {
       test: /\.(png|jpe?g|gif|svg)$/i,
       loaders: [
           'file?hash=sha512&digest=hex&name=[hash].[ext]',
-          'image-webpack?{progressive:true, optimizationLevel:2}'
+          'image-webpack?{progressive:true, optimizationLevel:7}'
       ]
     }]
   }
