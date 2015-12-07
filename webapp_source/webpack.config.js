@@ -4,8 +4,8 @@ var webpack = require('webpack');
 module.exports = {
   devtool: 'eval',
   entry: [
-    'webpack-dev-server/client?http://127.0.0.1:3000',
-    'webpack/hot/only-dev-server',
+    //'webpack-dev-server/client?http://127.0.0.1:3000',
+    //'webpack/hot/only-dev-server',
     './index'
   ],
   output: {
@@ -15,12 +15,12 @@ module.exports = {
   },
   plugins: [
     //new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin(),
-    new webpack.ProvidePlugin({
-      $: "jquery",
-      jQuery: "jquery",
-      "window.jQuery": "jquery"
-    })
+    new webpack.NoErrorsPlugin()
+    //new webpack.ProvidePlugin({
+    //  $: "jquery",
+    //  jQuery: "jquery",
+    //  "window.jQuery": "jquery"
+    //})
   ],
   resolve: {
     alias: {
