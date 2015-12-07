@@ -100,23 +100,7 @@ export default class App extends Component {
       if (this.state.routeState.route.length) {
         Store.dispatch(clearRoute());
       } else {
-        Store.dispatch(setIsFetchingRoute(true));
-
-        let queryString = this.state.routeState.start[1] + '&' + this.state.routeState.start[0] +
-            '&' + this.state.routeState.finish[1] + '&' + this.state.routeState.finish[0];
-        let request = new Request('http://smooth.lc/path?' + queryString, {
-          headers: new Headers({
-            'Content-Type': 'text/plain'
-          })
-        });
-
-        fetch(request)
-            .then((response) => {
-              return response.text();
-            })
-            .then((response) => {
-              Store.dispatch(setRoute(parseRouteResponse(response)));
-            });
+        //fetchRoute.bind(this)();
       }
 
     } else if (!this.state.routeState.start.length) {
@@ -134,6 +118,10 @@ export default class App extends Component {
     }
   }
 
+  onRouteClick() {
+    fetchRoute.bind(this)();
+  }
+
   render() {
     return (
       <div className="app">
@@ -141,7 +129,7 @@ export default class App extends Component {
              store={Store}
              onMapClick={this.onMapClick.bind(this)}
         />
-        <ModeToggle />
+        <ModeToggle onRouteClick={this.onRouteClick.bind(this)} />
         <RouteForm visibility={this.state.uiState.routeFormVisibility} />
         <ObstacleForm />
       </div>
@@ -189,4 +177,24 @@ function clearMap() {
 
   Store.dispatch(removeRouteFromMap());
   Store.dispatch(clearRoute());
+}
+
+function fetchRoute() {
+  Store.dispatch(setIsFetchingRoute(true));
+
+  let queryString = this.state.routeState.start[1] + '&' + this.state.routeState.start[0] +
+      '&' + this.state.routeState.finish[1] + '&' + this.state.routeState.finish[0];
+  let request = new Request('http://smooth.lc/path?' + queryString, {
+    headers: new Headers({
+      'Content-Type': 'text/plain'
+    })
+  });
+
+  fetch(request)
+      .then((response) => {
+        return response.text();
+      })
+      .then((response) => {
+        Store.dispatch(setRoute(parseRouteResponse(response)));
+      });
 }

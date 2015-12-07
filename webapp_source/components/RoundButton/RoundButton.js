@@ -9,12 +9,13 @@ require('./RoundButton.css');
 export default class RoundButton extends Component {
 
     render() {
-        return <a
+        let clickFunc = this.props.onClick;
+        return <div
             className={'RoundButton' + ' ' + this.props.className}
             href={this.props.href}
-            onclick={this.props.onclick ? this.props.onclick.bind(this) : null}>
+            onClick={clickFunc}>
             {this.props.text}
-        </a>
+        </div>
     }
 }
 
