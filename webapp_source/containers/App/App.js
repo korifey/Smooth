@@ -21,7 +21,7 @@ import { setStartRoutePoint,
 // const reducer = combineReducers(reducers);
 // const store = createStore(reducer);
 require('./App.css');
-let Leaflet = require('leaflet');
+require('leaflet');
 require('leaflet_css');
 let marker_icon_img = require('../../components/Map/images/marker-icon.png');
 let homer_marker_icon_img = require('../../components/Map/images/homers.png');
@@ -73,8 +73,8 @@ export default class App extends Component {
         markers[i].addTo(this.state.mapState.mapObject);
       }
 
-      Store.dispatch(setIsFetchingRoute(false));
       Store.dispatch(setRouteOnMap(r, markers));
+      Store.dispatch(setIsFetchingRoute(false));
     }
 
     console.log("redrawRoute", this.state.routeState.route.length, this.state.mapState.route);
