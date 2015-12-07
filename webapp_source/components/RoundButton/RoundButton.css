@@ -22,5 +22,6 @@
     border-color: #8BC34A;
 }
 .RoundButton.warning {
+    display: none;
     border-color: #FFEB3B;
 }
