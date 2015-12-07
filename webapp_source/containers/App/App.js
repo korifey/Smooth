@@ -64,14 +64,17 @@ export default class App extends Component {
 
       let markers = [];
 
+      console.log("Drawing route markers");
       for (let i = 0; i < this.state.routeState.route.length; i++) {
         var point = this.state.routeState.route[i];
+        console.log("draw marker " + i, point);
         markers[i] = L.marker(point, {
           icon: homerIcon,
           title: i + ': ' + point.lat + ' ' + point.lng
         });
         markers[i].addTo(this.state.mapState.mapObject);
       }
+      console.log("Done with markers");
 
       Store.dispatch(setRouteOnMap(r, markers));
       Store.dispatch(setIsFetchingRoute(false));
