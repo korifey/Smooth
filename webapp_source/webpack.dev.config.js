@@ -2,25 +2,25 @@ var path = require('path');
 var webpack = require('webpack');
 
 module.exports = {
-  devtool: 'source-map',
+  devtool: 'eval',
   entry: [
-    //'webpack-dev-server/client?http://127.0.0.1:3000',
-    //'webpack/hot/only-dev-server',
+    'webpack-dev-server/client?http://localhost:3000',
+    'webpack/hot/only-dev-server',
     './index'
   ],
   output: {
-    path: path.join(__dirname, '../src/main/webapp/app/static'),
+    path: path.join(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: 'static/'
+    publicPath: '/static/'
   },
   plugins: [
-    //new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin()
-    //new webpack.ProvidePlugin({
-    //  $: "jquery",
-    //  jQuery: "jquery",
-    //  "window.jQuery": "jquery"
-    //})
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NoErrorsPlugin(),
+    new webpack.ProvidePlugin({
+      $: "jquery",
+      jQuery: "jquery",
+      "window.jQuery": "jquery"
+    })
   ],
   resolve: {
     alias: {

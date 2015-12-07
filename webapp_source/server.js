@@ -1,6 +1,8 @@
 var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
-var config = require('./webpack.config');
+var config = require('./webpack.dev.config');
+
+console.log(config);
 
 new WebpackDevServer(webpack(config), {
   publicPath: config.output.publicPath,
@@ -9,7 +11,7 @@ new WebpackDevServer(webpack(config), {
   stats: {
     colors: true
   }
-}).listen(3000, '0.0.0.0', function (err) {
+}).listen(3000, 'localhost', function (err) {
   if (err) {
     console.log(err);
   }
