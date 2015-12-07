@@ -8,10 +8,11 @@ require('./ObstacleForm.css');
 
 export default class ObstacleForm extends Component {
   render() {
+    let confirm = this.props.onObstacleConfirm;
     return <div className="card ObstacleForm">
       <p className="card__text ObstacleForm__text">Подтвердите пренадлежность препятствия выделенному участку
         или передвинте препятствие</p>
-      <button className="ObstacleForm__button card__button">Подтвердить</button>
+      <button className="ObstacleForm__button card__button" onClick={confirm} >Подтвердить</button>
     </div>
   }
 }

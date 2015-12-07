@@ -7,12 +7,22 @@ export function setObstaclesVisibility(obstaclesVisibility) {
   }
 }
 
-export function setObstacle(obstacle) {
+export function setObstacle(coords, pin) {
   return {
     type: types.SET_OBSTACLE,
-    obstacle
+    coords,
+    pin
   }
 }
+
+export function setObstacleGuess(way, polyline) {
+  return {
+    type: types.SET_GUESS,
+    way,
+    polyline
+  }
+}
+
 // TODO: Obstacle actions
 
 // TODO: Map actions

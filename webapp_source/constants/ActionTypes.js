@@ -1,8 +1,6 @@
 // export const SOME_ACTION = 'SOME_ACTION';
 
 // UI
-export const SET_OBSTACLES_VISIBILITY = 'CHANGE_OBSTACLES_VISIBILITY';
-export const SET_OBSTACLE = 'CHANGE_OBSTACLE';
 export const DISABLE_ROUTE_FORM = 'DISABLE_ROUTE_FORM';
 export const ENABLE_ROUTE_FORM = 'ENABLE_ROUTE_FORM';
 // TODO: UI action types
@@ -22,3 +20,9 @@ export const CLEAR_ROUTE_NODES = 'CLEAR_ROUTE_NODES';
 export const SET_MAP = 'SET_MAP';
 export const SET_MAP_ROUTE = 'SET_MAP_ROUTE';
 export const CLEAR_MAP_ROUTE = 'SET_MAP_ROUTE';
+
+// Obstacle
+export const SET_OBSTACLES_VISIBILITY = 'CHANGE_OBSTACLES_VISIBILITY';
+export const SET_OBSTACLE = 'CHANGE_OBSTACLE';
+export const SET_GUESS = 'SET_GUESS';
+export const SET_GUESS_POLYLINE = 'SET_GUESS_POLYLINE';

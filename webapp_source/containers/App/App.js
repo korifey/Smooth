@@ -13,11 +13,15 @@ import { setStartRoutePoint,
   clearRoute,
   setRouteOnMap,
   removeRouteFromMap,
-  setMap } from '../../actions/Actions';
+  setMap,
+  setObstacle,
+  setObstacleGuess } from '../../actions/Actions';
 //import SomeApp from './SomeApp';
 // import { createStore, combineReducers } from 'redux';
 // import { Provider } from 'react-redux';
 // import * as reducers from '../reducers';
+
+let Promise = require('es6-promise').Promise;
 
 // const reducer = combineReducers(reducers);
 // const store = createStore(reducer);
@@ -28,15 +32,23 @@ let marker_icon_img = require('../../components/Map/images/marker-icon.png');
 const start_marker_icon = L.divIcon({
   iconSize: [21, 21],
   iconAnchor: [11, 11],
-  className: 'RouteIcon',
+  className: 'RoundPin RouteIcon',
   html: '<div>S</div>'
 });
 const finish_marker_icon = L.divIcon({
   iconSize: [21, 21],
   iconAnchor: [11, 11],
-  className: 'RouteIcon',
+  className: 'RoundPin RouteIcon',
   html: '<div>F</div>'
 });
+
+const obstacle_marker_icon = L.divIcon({
+  iconSize: [21, 21],
+  iconAnchor: [11, 11],
+  className: 'RoundPin ObstacleIcon',
+  html: '<div>!</div>'
+});
+
 let homer_marker_icon_img = require('../../components/Map/images/homers.png');
 
 let markerIcon = L.icon({
@@ -63,16 +75,16 @@ export default class App extends Component {
   updateApp() {
     this.forceUpdate();
     this.setState(Store.getState());
-    this.redrawRoute();
+    this.redrawMap();
   }
 
   componentWillUnmount() {
     this.unsubscribe();
   }
 
-  redrawRoute() {
+  redrawMap() {
     if (this.state.routeState.route.length && this.state.mapState.route == null) {
-      console.log("redrawRoute", this.state.routeState.route);
+      console.log("redrawMap", this.state.routeState.route);
       let r = L.polyline(this.state.routeState.route);
       console.log(r);
       r.addTo(this.state.mapState.mapObject);
@@ -95,7 +107,7 @@ export default class App extends Component {
       Store.dispatch(setIsFetchingRoute(false));
     }
 
-    console.log("redrawRoute", this.state.routeState.route.length, this.state.mapState.route);
+    console.log("redrawMap", this.state.routeState.route.length, this.state.mapState.route);
 
     if (!this.state.routeState.route.length && this.state.mapState.route) {
       clearMap.bind(this)();
@@ -159,14 +171,77 @@ export default class App extends Component {
 
   onObstacleClick() {
     console.log("onObstacleClick");
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
+    //if ('geolocation' in navigator) {
+    //  navigator.geolocation.getCurrentPosition((position) => {
+        const coords = this.state.mapState.mapObject.getCenter();
 
-        this.state.mapState.mapObject.setView([lat, lng]);
+        //this.state.mapState.mapObject.setView([lat, lng]);
+
+        let marker = L.marker(coords, {
+          icon: obstacle_marker_icon,
+          draggable: true
+        });
+
+        if (this.state.obstaclesState.obstaclePin) {
+          this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.obstaclePin);
+        }
+
+        marker.addTo(this.state.mapState.mapObject);
+
+        marker.on('dragend', (event) => {
+          Store.dispatch(setObstacle(marker.getLatLng(), marker));
+          fetchObstacleWayGuess.bind(this)(marker.getLatLng())
+              .then((way) => {
+                let r = L.polyline(way, {
+                  color: '#c0392b',
+                  opacity: 0.8
+                });
+
+                if (this.state.obstaclesState.guessedPolyline) {
+                  this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.guessedPolyline);
+                }
+
+                r.addTo(this.state.mapState.mapObject);
+
+                Store.dispatch(setObstacleGuess(way, r));
+              });
+        });
+
+        Store.dispatch(setObstacle(marker.getLatLng(), marker));
+        fetchObstacleWayGuess.bind(this)(marker.getLatLng())
+          .then((way) => {
+            let r = L.polyline(way, {
+              color: '#c0392b'
+            });
+
+            if (this.state.obstaclesState.guessedPolyline) {
+              this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.guessedPolyline);
+            }
+
+            r.addTo(this.state.mapState.mapObject);
+
+            Store.dispatch(setObstacleGuess(way, r));
+          });
+      //});
+    //}
+  }
+
+  onObstacleConfirm() {
+    let queryString = this.state.obstaclesState.obstacleCoords.lng + '&' + this.state.obstaclesState.obstacleCoords.lat;
+
+    let request = new Request('http://smooth.lc/obstacle/add?' + queryString, {
+      headers: new Headers({
+        'Content-Type': 'text/plain'
+      })
+    });
+
+    fetch(request)
+      .then((response) => {
+        return response.text();
+      })
+      .then((response) => {
+        console.log(response);
       });
-    }
   }
 
   render() {
@@ -182,7 +257,7 @@ export default class App extends Component {
             onObstacleClick={this.onObstacleClick.bind(this)}
          />
         <RouteForm visibility={this.state.uiState.routeFormVisibility} />
-        <ObstacleForm />
+        <ObstacleForm onObstacleConfirm={this.onObstacleConfirm.bind(this)} />
       </div>
     );
   }
@@ -248,4 +323,24 @@ function fetchRoute() {
       .then((response) => {
         Store.dispatch(setRoute(parseRouteResponse(response)));
       });
+}
+
+function fetchObstacleWayGuess(coords) {
+  return new Promise((resolve, reject) => {
+    let queryString = coords.lng + '&' + coords.lat;
+
+    let request = new Request('http://smooth.lc/obstacle/try?' + queryString, {
+      headers: new Headers({
+        'Content-Type': 'text/plain'
+      })
+    });
+
+    fetch(request)
+        .then((response) => {
+          return response.text();
+        })
+        .then((response) => {
+          resolve(parseRouteResponse(response));
+        });
+  });
 }

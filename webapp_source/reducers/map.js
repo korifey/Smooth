@@ -29,14 +29,14 @@ export default function mapReducer(state = initialMapState, action) {
       newState = Object.assign({}, state, {
         startPin: action.pin
       });
-      //console.log("mapReducer", action.type, state, newState);
+      console.log("mapReducer", action.type, state, newState);
       return newState;
 
     case ActionTypes.SET_FINISH_ROUTE_PIN:
       newState = Object.assign({}, state, {
         finishPin: action.pin
       });
-      //console.log("mapReducer", action.type, state, newState);
+      console.log("mapReducer", action.type, state, newState);
       return newState;
 
     case ActionTypes.SET_MAP_ROUTE:
@@ -44,7 +44,7 @@ export default function mapReducer(state = initialMapState, action) {
         route: action.route,
         routeNodes: action.routeNodes
       });
-      //console.log("mapReducer", action.type, state, newState);
+      console.log("mapReducer", action.type, state, newState);
       return newState;
 
     case ActionTypes.CLEAR_MAP_ROUTE:
@@ -54,7 +54,7 @@ export default function mapReducer(state = initialMapState, action) {
         startPin: null,
         finishPin: null
       });
-      //console.log("mapReducer", action.type, state, newState);
+      console.log("mapReducer", action.type, state, newState);
       return newState;
 
     default:
