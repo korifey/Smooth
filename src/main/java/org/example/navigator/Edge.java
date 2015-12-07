@@ -39,4 +39,8 @@ public class Edge {
     public double distTo(Node n) {
         return n.vector().distToSegment2(start.vector(), end.vector());
     }
+
+    public boolean contains(Node n) {
+        return start.equals(n) || end.equals(n);
+    }
 }

@@ -7,7 +7,32 @@ import java.io.IOException;
  * Created by Dmitry.Ivanov on 10/25/2014.
  */
 public class Main {
+
+    private static void bugMikhailovsky() {
+        Node __src = new Node(0, 30.33019959926605, 59.93963822956377);
+        Node __dst = new Node(0, 30.332559943199158, 59.93918679338046);
+
+        System.out.println("Building graph:");
+        Graph[] graph = new Graph[1];
+        printTime(() -> graph[0] = OsmParser.INSTANCE.graph);
+
+        System.out.println("Find src:");
+        final Node src[] = new Node[1];
+        printTime(() -> src[0] = graph[0].find(__src, 100));
+
+        System.out.println("Find dst:");
+        final Node dst[] = new Node[1];
+        printTime(() -> dst[0] = graph[0].find(__dst, 100));
+
+        System.out.println("AStar:");
+        Path path = graph[0].aStar(src[0], dst[0]);
+        path.print(System.out);
+    }
+
     public static void main(String[] args) throws IOException {
+        bugMikhailovsky();
+//        if (true) return;
+
 //        Node __src = new Node(0, 30.31252384185791, 59.937472354745424);
 //        Node __dst = new Node(0, 30.323853492736816, 59.93980482945983);
 

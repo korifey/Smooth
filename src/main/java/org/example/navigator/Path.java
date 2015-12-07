@@ -35,15 +35,22 @@ public class Path {
         for (RoadType rt: RoadType.values()) dist.put(rt, 0.0);
 
         if (edges.size() > 0) {
+            Node start = edges.get(0).start;
+            if (edges.size() > 1 && edges.get(1).contains(start)) {
+                start = edges.get(0).otherEnd(start);
+                assert !edges.get(1).contains(start);
+            }
+            final Node[] n = {start};
+
             edges.stream().forEach(e -> {
-                Node n = e.start;
-                out.print(n.printCoords());
+                out.print(n[0].printCoords());
 
                 RoadType rt = e.way.roadType;
                 out.println(" " + rt.typeId);
                 dist.put(rt, dist.get(rt) + e.realDist);
+                n[0] = e.otherEnd(n[0]);
             });
-            out.println(edges.get(edges.size() - 1).end.printCoords());
+            out.println(n[0].printCoords());
         }
 
         out.print("dist: "+ Arrays.stream(RoadType.values()).map(rt -> Long.toString((long)(double)dist.get(rt))).reduce((str, l) -> str+" "+l).get());
