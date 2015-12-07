@@ -25,6 +25,18 @@ require('./App.css');
 require('leaflet');
 require('leaflet_css');
 let marker_icon_img = require('../../components/Map/images/marker-icon.png');
+const start_marker_icon = L.divIcon({
+  iconSize: [21, 21],
+  iconAnchor: [11, 11],
+  className: 'RouteIcon',
+  html: '<div>S</div>'
+});
+const finish_marker_icon = L.divIcon({
+  iconSize: [21, 21],
+  iconAnchor: [11, 11],
+  className: 'RouteIcon',
+  html: '<div>F</div>'
+});
 let homer_marker_icon_img = require('../../components/Map/images/homers.png');
 
 let markerIcon = L.icon({
@@ -45,7 +57,7 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = Store.subscribe(this.updateApp);
+    this.unsubscribe = Store.subscribe(this.updateApp.bind(this));
   }
 
   updateApp() {
@@ -71,11 +83,11 @@ export default class App extends Component {
       for (let i = 0; i < this.state.routeState.route.length; i++) {
         var point = this.state.routeState.route[i];
         console.log("draw marker " + i, point);
-        markers[i] = L.marker(point, {
-          icon: homerIcon,
-          title: i + ': ' + point.lat + ' ' + point.lng
-        });
-        markers[i].addTo(this.state.mapState.mapObject);
+        //markers[i] = L.marker(point, {
+        //  icon: homerIcon,
+        //  title: i + ': ' + point.lat + ' ' + point.lng
+        //});
+        //markers[i].addTo(this.state.mapState.mapObject);
       }
       console.log("Done with markers");
 
@@ -97,11 +109,11 @@ export default class App extends Component {
       maxZoom: 19
     }).addTo(map);
 
-    map.on('click', this.props.onMapClick);
+    map.on('click', this.onMapClick.bind(this));
 
     Store.dispatch(setMap(map));
     this.forceUpdate();
-    this.updateApp();
+    this.updateApp.bind(this)();
   }
 
   /**
@@ -109,9 +121,6 @@ export default class App extends Component {
    * @param event {latlng, layerPoint, containerPoint, originalEvent}
    */
   onMapClick(event) {
-    let pin = L.marker(event.latlng, {
-      icon: markerIcon
-    });
     console.log(event.latlng);
 
     if (this.state.routeState.start.length && this.state.routeState.finish.length) {
@@ -124,12 +133,18 @@ export default class App extends Component {
       }
 
     } else if (!this.state.routeState.start.length) {
+      let pin = L.marker(event.latlng, {
+        icon: start_marker_icon
+      });
 
       Store.dispatch(setStartRoutePoint(event.latlng));
       Store.dispatch(setStartRoutePin(pin));
       this.state.mapState.startPin.addTo(this.state.mapState.mapObject);
 
     } else {
+      let pin = L.marker(event.latlng, {
+        icon: finish_marker_icon
+      });
 
       Store.dispatch(setFinishRoutePoint(event.latlng));
       Store.dispatch(setFinishRoutePin(pin));
