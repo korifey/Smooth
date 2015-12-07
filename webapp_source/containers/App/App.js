@@ -12,7 +12,8 @@ import { setStartRoutePoint,
   setRoute,
   clearRoute,
   setRouteOnMap,
-  removeRouteFromMap } from '../../actions/Actions';
+  removeRouteFromMap,
+  setMap } from '../../actions/Actions';
 //import SomeApp from './SomeApp';
 // import { createStore, combineReducers } from 'redux';
 // import { Provider } from 'react-redux';
@@ -44,11 +45,13 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = Store.subscribe(() => {
-      this.forceUpdate();
-      this.setState(Store.getState());
-      this.redrawRoute();
-    });
+    this.unsubscribe = Store.subscribe(this.updateApp);
+  }
+
+  updateApp() {
+    this.forceUpdate();
+    this.setState(Store.getState());
+    this.redrawRoute();
   }
 
   componentWillUnmount() {
@@ -85,6 +88,20 @@ export default class App extends Component {
     if (!this.state.routeState.route.length && this.state.mapState.route) {
       clearMap.bind(this)();
     }
+  }
+
+  mapDidMount() {
+    let map = L.map('map').setView([this.state.mapState.lat, this.state.mapState.lng], 16);
+    L.tileLayer('https://api.tiles.mapbox.com/v4/kascode.k35co93d/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoia2FzY29kZSIsImEiOiJoeXp2cENzIn0.HYtI1Pj7v372xyxg5kz3Kg#11', {
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+      maxZoom: 19
+    }).addTo(map);
+
+    map.on('click', this.props.onMapClick);
+
+    Store.dispatch(setMap(map));
+    this.forceUpdate();
+    this.updateApp();
   }
 
   /**
@@ -125,14 +142,30 @@ export default class App extends Component {
     fetchRoute.bind(this)();
   }
 
+  onObstacleClick() {
+    console.log("onObstacleClick");
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        this.state.mapState.mapObject.setView([lat, lng]);
+      });
+    }
+  }
+
   render() {
     return (
       <div className="app">
         <Map state={{mapState: this.state.mapState, routeState: this.state.routeState}}
              store={Store}
              onMapClick={this.onMapClick.bind(this)}
+             onMapDidMount={this.mapDidMount.bind(this)}
         />
-        <ModeToggle onRouteClick={this.onRouteClick.bind(this)} />
+        <ModeToggle
+            onRouteClick={this.onRouteClick.bind(this)}
+            onObstacleClick={this.onObstacleClick.bind(this)}
+         />
         <RouteForm visibility={this.state.uiState.routeFormVisibility} />
         <ObstacleForm />
       </div>
