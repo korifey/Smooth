@@ -1,6 +1,6 @@
 .ObstacleForm {
   position: absolute;
-  bottom: 1em;
+  bottom: -100%;
   left: 50%;
   z-index: 20;
   transform: translateX(-50%);
@@ -8,6 +8,11 @@
   width: 400px;
   background-color: #FFEB3B;
   border-radius: 4px;
+  transition: bottom .25s;
+}
+
+.ObstacleForm.active {
+  bottom: 1em;
 }
 
 .ObstacleForm__text {

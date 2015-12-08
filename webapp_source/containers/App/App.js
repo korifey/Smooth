@@ -15,7 +15,12 @@ import { setStartRoutePoint,
   removeRouteFromMap,
   setMap,
   setObstacle,
-  setObstacleGuess } from '../../actions/Actions';
+  setObstacleGuess,
+  setUiMode,
+  enableObstacleForm,
+  enableRouteForm,
+  disableObstacleForm,
+  disableRouteForm } from '../../actions/Actions';
 //import SomeApp from './SomeApp';
 // import { createStore, combineReducers } from 'redux';
 // import { Provider } from 'react-redux';
@@ -171,59 +176,67 @@ export default class App extends Component {
 
   onObstacleClick() {
     console.log("onObstacleClick");
-    //if ('geolocation' in navigator) {
-    //  navigator.geolocation.getCurrentPosition((position) => {
-        const coords = this.state.mapState.mapObject.getCenter();
 
-        //this.state.mapState.mapObject.setView([lat, lng]);
+    if (!this.state.uiState.obstacleFormVisibility) {
 
-        let marker = L.marker(coords, {
-          icon: obstacle_marker_icon,
-          draggable: true
-        });
+      Store.dispatch(setUiMode('OBSTACLE'));
+      Store.dispatch(enableObstacleForm());
+      Store.dispatch(disableRouteForm());
 
-        if (this.state.obstaclesState.obstaclePin) {
-          this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.obstaclePin);
-        }
+      const coords = this.state.mapState.mapObject.getCenter();
 
-        marker.addTo(this.state.mapState.mapObject);
+      //this.state.mapState.mapObject.setView([lat, lng]);
 
-        marker.on('dragend', (event) => {
-          Store.dispatch(setObstacle(marker.getLatLng(), marker));
-          fetchObstacleWayGuess.bind(this)(marker.getLatLng())
-              .then((way) => {
-                let r = L.polyline(way, {
-                  color: '#c0392b',
-                  opacity: 0.8
-                });
+      let marker = L.marker(coords, {
+        icon: obstacle_marker_icon,
+        draggable: true
+      });
 
-                if (this.state.obstaclesState.guessedPolyline) {
-                  this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.guessedPolyline);
-                }
+      if (this.state.obstaclesState.obstaclePin) {
+        this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.obstaclePin);
+      }
 
-                r.addTo(this.state.mapState.mapObject);
+      marker.addTo(this.state.mapState.mapObject);
 
-                Store.dispatch(setObstacleGuess(way, r));
-              });
-        });
-
+      marker.on('dragend', (event) => {
         Store.dispatch(setObstacle(marker.getLatLng(), marker));
         fetchObstacleWayGuess.bind(this)(marker.getLatLng())
-          .then((way) => {
-            let r = L.polyline(way, {
-              color: '#c0392b'
+            .then((way) => {
+              let r = L.polyline(way, {
+                color: '#c0392b',
+                opacity: 0.8
+              });
+
+              if (this.state.obstaclesState.guessedPolyline) {
+                this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.guessedPolyline);
+              }
+
+              r.addTo(this.state.mapState.mapObject);
+
+              Store.dispatch(setObstacleGuess(way, r));
             });
+      });
 
-            if (this.state.obstaclesState.guessedPolyline) {
-              this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.guessedPolyline);
-            }
-
-            r.addTo(this.state.mapState.mapObject);
-
-            Store.dispatch(setObstacleGuess(way, r));
+      Store.dispatch(setObstacle(marker.getLatLng(), marker));
+      fetchObstacleWayGuess.bind(this)(marker.getLatLng())
+        .then((way) => {
+          let r = L.polyline(way, {
+            color: '#c0392b'
           });
-      //});
-    //}
+
+          if (this.state.obstaclesState.guessedPolyline) {
+            this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.guessedPolyline);
+          }
+
+          r.addTo(this.state.mapState.mapObject);
+
+          Store.dispatch(setObstacleGuess(way, r));
+        });
+    } else {
+      Store.dispatch(setUiMode('MODE_CHOOSE'));
+      Store.dispatch(disableObstacleForm());
+      clearMap.bind(this)();
+    }
   }
 
   onObstacleConfirm() {
@@ -255,9 +268,14 @@ export default class App extends Component {
         <ModeToggle
             onRouteClick={this.onRouteClick.bind(this)}
             onObstacleClick={this.onObstacleClick.bind(this)}
+            routeButtonActive={this.state.uiState.routeFormVisibility}
+            obstacleButtonActive={this.state.uiState.obstacleFormVisibility}
          />
         <RouteForm visibility={this.state.uiState.routeFormVisibility} />
-        <ObstacleForm onObstacleConfirm={this.onObstacleConfirm.bind(this)} />
+        <ObstacleForm
+            visibility={this.state.uiState.obstacleFormVisibility}
+            onObstacleConfirm={this.onObstacleConfirm.bind(this)}
+        />
       </div>
     );
   }
@@ -292,14 +310,23 @@ function parseRouteResponse(response) {
 }
 
 function clearMap() {
-  this.state.mapState.mapObject.removeLayer(this.state.mapState.route);
+
+  if (this.state.mapState.route)
+    this.state.mapState.mapObject.removeLayer(this.state.mapState.route);
 
   for (let i = 0; i < this.state.mapState.routeNodes.length; i++) {
     this.state.mapState.mapObject.removeLayer(this.state.mapState.routeNodes[i]);
   }
 
-  this.state.mapState.mapObject.removeLayer(this.state.mapState.startPin);
-  this.state.mapState.mapObject.removeLayer(this.state.mapState.finishPin);
+  if (this.state.mapState.startPin)
+    this.state.mapState.mapObject.removeLayer(this.state.mapState.startPin);
+  if (this.state.mapState.finishPin)
+    this.state.mapState.mapObject.removeLayer(this.state.mapState.finishPin);
+
+  if (this.state.obstaclesState.obstaclePin)
+    this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.obstaclePin);
+  if (this.state.obstaclesState.guessedWay)
+    this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.guessedPolyline);
 
   Store.dispatch(removeRouteFromMap());
   Store.dispatch(clearRoute());

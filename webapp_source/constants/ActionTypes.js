@@ -3,6 +3,9 @@
 // UI
 export const DISABLE_ROUTE_FORM = 'DISABLE_ROUTE_FORM';
 export const ENABLE_ROUTE_FORM = 'ENABLE_ROUTE_FORM';
+export const DISABLE_OBSTACLE_FORM = 'DISABLE_OBSTACLE_FORM';
+export const ENABLE_OBSTACLE_FORM = 'ENABLE_OBSTACLE_FORM';
+export const SET_UI_MODE = 'SET_UI_MODE';
 // TODO: UI action types
 
 // Route

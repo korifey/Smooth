@@ -81,6 +81,34 @@ export function removeRouteFromMap() {
 //}
 
 // TODO: UI actions
+export function setUiMode(mode) {
+  return {
+    type: types.SET_UI_MODE,
+    mode
+  }
+}
+
+export function enableObstacleForm() {
+  return {
+    type: types.ENABLE_OBSTACLE_FORM
+  }
+}
+export function disableObstacleForm() {
+  return {
+    type: types.DISABLE_OBSTACLE_FORM
+  }
+}
+
+export function enableRouteForm() {
+  return {
+    type: types.ENABLE_ROUTE_FORM
+  }
+}
+export function disableRouteForm() {
+  return {
+    type: types.DISABLE_ROUTE_FORM
+  }
+}
 
 // TODO: Route actions
 /**
