@@ -99,6 +99,13 @@ export function disableObstacleForm() {
   }
 }
 
+export function setObstacleFormState(state) {
+  return {
+    type: types.SET_OBSTACLE_FORM_STATE,
+    state
+  }
+}
+
 export function enableRouteForm() {
   return {
     type: types.ENABLE_ROUTE_FORM

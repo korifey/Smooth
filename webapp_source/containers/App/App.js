@@ -20,7 +20,8 @@ import { setStartRoutePoint,
   enableObstacleForm,
   enableRouteForm,
   disableObstacleForm,
-  disableRouteForm } from '../../actions/Actions';
+  disableRouteForm,
+  setObstacleFormState } from '../../actions/Actions';
 //import SomeApp from './SomeApp';
 // import { createStore, combineReducers } from 'redux';
 // import { Provider } from 'react-redux';
@@ -254,6 +255,15 @@ export default class App extends Component {
       })
       .then((response) => {
         console.log(response);
+        clearMap.bind(this)();
+        Store.dispatch(setUiMode('MODE_CHOOSE'));
+        Store.dispatch(setObstacleFormState('SUCCESS'));
+        setTimeout(() => {
+          Store.dispatch(disableObstacleForm());
+        }, 3000);
+        setTimeout(() => {
+          Store.dispatch(setObstacleFormState('BASIC'));
+        }, 3500);
       });
   }
 
@@ -275,6 +285,7 @@ export default class App extends Component {
         <ObstacleForm
             visibility={this.state.uiState.obstacleFormVisibility}
             onObstacleConfirm={this.onObstacleConfirm.bind(this)}
+            state={this.state.uiState.obstacleFormState}
         />
       </div>
     );
@@ -314,8 +325,10 @@ function clearMap() {
   if (this.state.mapState.route)
     this.state.mapState.mapObject.removeLayer(this.state.mapState.route);
 
-  for (let i = 0; i < this.state.mapState.routeNodes.length; i++) {
-    this.state.mapState.mapObject.removeLayer(this.state.mapState.routeNodes[i]);
+  if (this.state.mapState.routeNodes) {
+    for (let i = 0; i < this.state.mapState.routeNodes.length; i++) {
+      this.state.mapState.mapObject.removeLayer(this.state.mapState.routeNodes[i]);
+    }
   }
 
   if (this.state.mapState.startPin)
@@ -325,7 +338,7 @@ function clearMap() {
 
   if (this.state.obstaclesState.obstaclePin)
     this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.obstaclePin);
-  if (this.state.obstaclesState.guessedWay)
+  if (this.state.obstaclesState.guessedWay.length)
     this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.guessedPolyline);
 
   Store.dispatch(removeRouteFromMap());

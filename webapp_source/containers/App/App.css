@@ -157,3 +157,17 @@ code {
 .card__button:hover {
   box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
 }
+
+.card .success, .card .error {
+  display: none;
+}
+.card .success {
+  text-align: center;
+}
+
+.card.SUCCESS .basic {
+  display: none;
+}
+.card.SUCCESS .success {
+  display: block;
+}

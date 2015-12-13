@@ -9,10 +9,15 @@ require('./ObstacleForm.css');
 export default class ObstacleForm extends Component {
   render() {
     let confirm = this.props.onObstacleConfirm;
-    return <div className={"card ObstacleForm " + (this.props.visibility ? "active" : "")}>
-      <p className="card__text ObstacleForm__text">Подтвердите пренадлежность препятствия выделенному участку
-        или передвинте препятствие</p>
-      <button className="ObstacleForm__button card__button" onClick={confirm} >Подтвердить</button>
+    return <div className={"card ObstacleForm " + (this.props.visibility ? "active " : " ") + (this.props.state ? this.props.state : "") + " " + this.props.state}>
+      <div className="basic">
+        <p className="card__text ObstacleForm__text">Подтвердите пренадлежность препятствия выделенному участку
+          или передвинте препятствие</p>
+        <button className="ObstacleForm__button card__button" onClick={confirm} >Подтвердить</button>
+      </div>
+      <div className="success">
+        <p className="card__text">Спасибо! Препятствие успешно отправлено.</p>
+      </div>
     </div>
   }
 }

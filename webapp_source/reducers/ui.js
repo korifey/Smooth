@@ -8,6 +8,7 @@ const initialUiState = {
   routeFormVisibility: false,
   modeToggleVisibility: true,
   obstacleFormVisibility: false,
+  obstacleFormState: 'BASIC',  // ['BASIC', 'SUCCESS', 'ERROR']
   uiMode: 'MODE_CHOOSE' // ['MODE_CHOOSE', 'ROUTING', 'OBSTACLE']
 };
 
@@ -31,6 +32,13 @@ export default function uiReducer(state = initialUiState, action) {
     case ActionTypes.DISABLE_OBSTACLE_FORM:
       newState = Object.assign({}, state, {
         obstacleFormVisibility: false
+      });
+      console.log("uiReducer", action.type, state, newState);
+      return newState;
+
+    case ActionTypes.SET_OBSTACLE_FORM_STATE:
+      newState = Object.assign({}, state, {
+        obstacleFormState: action.state
       });
       console.log("uiReducer", action.type, state, newState);
       return newState;
