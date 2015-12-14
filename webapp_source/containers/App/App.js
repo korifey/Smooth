@@ -4,24 +4,7 @@ import ModeToggle from '../../components/ModeToggle/ModeToggle';
 import RouteForm from '../../components/RouteForm/RouteForm';
 import ObstacleForm from '../../components/ObstacleForm/ObstacleForm';
 import Store from '../../store/store';
-import { setStartRoutePoint,
-  setStartRoutePin,
-  setFinishRoutePoint,
-  setFinishRoutePin,
-  setIsFetchingRoute,
-  setRoute,
-  clearRoute,
-  setRouteOnMap,
-  removeRouteFromMap,
-  setMap,
-  setObstacle,
-  setObstacleGuess,
-  setUiMode,
-  enableObstacleForm,
-  enableRouteForm,
-  disableObstacleForm,
-  disableRouteForm,
-  setObstacleFormState } from '../../actions/Actions';
+import * as Actions from '../../actions/Actions';
 //import SomeApp from './SomeApp';
 // import { createStore, combineReducers } from 'redux';
 // import { Provider } from 'react-redux';
@@ -109,8 +92,8 @@ export default class App extends Component {
       }
       console.log("Done with markers");
 
-      Store.dispatch(setRouteOnMap(r, markers));
-      Store.dispatch(setIsFetchingRoute(false));
+      Store.dispatch(Actions.setRouteOnMap(r, markers));
+      Store.dispatch(Actions.setIsFetchingRoute(false));
     }
 
     console.log("redrawMap", this.state.routeState.route.length, this.state.mapState.route);
@@ -129,7 +112,7 @@ export default class App extends Component {
 
     map.on('click', this.onMapClick.bind(this));
 
-    Store.dispatch(setMap(map));
+    Store.dispatch(Actions.setMap(map));
     this.forceUpdate();
     this.updateApp.bind(this)();
   }
@@ -145,7 +128,7 @@ export default class App extends Component {
 
       // Clear route if there is one
       if (this.state.routeState.route.length) {
-        Store.dispatch(clearRoute());
+        Store.dispatch(Actions.clearRoute());
       } else {
         //fetchRoute.bind(this)();
       }
@@ -155,8 +138,8 @@ export default class App extends Component {
         icon: start_marker_icon
       });
 
-      Store.dispatch(setStartRoutePoint(event.latlng));
-      Store.dispatch(setStartRoutePin(pin));
+      Store.dispatch(Actions.setStartRoutePoint(event.latlng));
+      Store.dispatch(Actions.setStartRoutePin(pin));
       this.state.mapState.startPin.addTo(this.state.mapState.mapObject);
 
     } else {
@@ -164,14 +147,37 @@ export default class App extends Component {
         icon: finish_marker_icon
       });
 
-      Store.dispatch(setFinishRoutePoint(event.latlng));
-      Store.dispatch(setFinishRoutePin(pin));
+      Store.dispatch(Actions.setFinishRoutePoint(event.latlng));
+      Store.dispatch(Actions.setFinishRoutePin(pin));
       this.state.mapState.finishPin.addTo(this.state.mapState.mapObject);
 
     }
   }
 
   onRouteClick() {
+    switch (this.state.uiState.uiMode) {
+      case 'ROUTING':
+        Store.dispatch(Actions.setUiMode('MODE_CHOOSE'));
+        Store.dispatch(Actions.disableRouteForm());
+        Store.dispatch(Actions.clearRoute());
+        clearMap.bind(this)();
+        break;
+
+      case 'OBSTACLE':
+        Store.dispatch(Actions.setUiMode('ROUTING'));
+        Store.dispatch(Actions.enableRouteForm());
+        Store.dispatch(Actions.disableObstacleForm());
+        Store.dispatch(Actions.resetObstacle());
+        clearMap.bind(this)();
+        break;
+
+      default:
+        Store.dispatch(Actions.setUiMode('ROUTING'));
+        Store.dispatch(Actions.enableRouteForm());
+    }
+  }
+
+  onRouteSubmit() {
     fetchRoute.bind(this)();
   }
 
@@ -180,9 +186,10 @@ export default class App extends Component {
 
     if (!this.state.uiState.obstacleFormVisibility) {
 
-      Store.dispatch(setUiMode('OBSTACLE'));
-      Store.dispatch(enableObstacleForm());
-      Store.dispatch(disableRouteForm());
+      Store.dispatch(Actions.setUiMode('OBSTACLE'));
+      Store.dispatch(Actions.enableObstacleForm());
+      Store.dispatch(Actions.disableRouteForm());
+      clearMap.bind(this)();
 
       const coords = this.state.mapState.mapObject.getCenter();
 
@@ -200,7 +207,7 @@ export default class App extends Component {
       marker.addTo(this.state.mapState.mapObject);
 
       marker.on('dragend', (event) => {
-        Store.dispatch(setObstacle(marker.getLatLng(), marker));
+        Store.dispatch(Actions.setObstacle(marker.getLatLng(), marker));
         fetchObstacleWayGuess.bind(this)(marker.getLatLng())
             .then((way) => {
               let r = L.polyline(way, {
@@ -214,11 +221,11 @@ export default class App extends Component {
 
               r.addTo(this.state.mapState.mapObject);
 
-              Store.dispatch(setObstacleGuess(way, r));
+              Store.dispatch(Actions.setObstacleGuess(way, r));
             });
       });
 
-      Store.dispatch(setObstacle(marker.getLatLng(), marker));
+      Store.dispatch(Actions.setObstacle(marker.getLatLng(), marker));
       fetchObstacleWayGuess.bind(this)(marker.getLatLng())
         .then((way) => {
           let r = L.polyline(way, {
@@ -231,11 +238,12 @@ export default class App extends Component {
 
           r.addTo(this.state.mapState.mapObject);
 
-          Store.dispatch(setObstacleGuess(way, r));
+          Store.dispatch(Actions.setObstacleGuess(way, r));
         });
     } else {
-      Store.dispatch(setUiMode('MODE_CHOOSE'));
-      Store.dispatch(disableObstacleForm());
+      Store.dispatch(Actions.setUiMode('MODE_CHOOSE'));
+      Store.dispatch(Actions.disableObstacleForm());
+      Store.dispatch(Actions.resetObstacle());
       clearMap.bind(this)();
     }
   }
@@ -256,13 +264,13 @@ export default class App extends Component {
       .then((response) => {
         console.log(response);
         clearMap.bind(this)();
-        Store.dispatch(setUiMode('MODE_CHOOSE'));
-        Store.dispatch(setObstacleFormState('SUCCESS'));
+        Store.dispatch(Actions.setUiMode('MODE_CHOOSE'));
+        Store.dispatch(Actions.setObstacleFormState('SUCCESS'));
         setTimeout(() => {
-          Store.dispatch(disableObstacleForm());
+          Store.dispatch(Actions.disableObstacleForm());
         }, 3000);
         setTimeout(() => {
-          Store.dispatch(setObstacleFormState('BASIC'));
+          Store.dispatch(Actions.setObstacleFormState('BASIC'));
         }, 3500);
       });
   }
@@ -281,7 +289,7 @@ export default class App extends Component {
             routeButtonActive={this.state.uiState.routeFormVisibility}
             obstacleButtonActive={this.state.uiState.obstacleFormVisibility}
          />
-        <RouteForm visibility={this.state.uiState.routeFormVisibility} />
+        <RouteForm visibility={this.state.uiState.routeFormVisibility} onSubmit={this.onRouteSubmit.bind(this)} />
         <ObstacleForm
             visibility={this.state.uiState.obstacleFormVisibility}
             onObstacleConfirm={this.onObstacleConfirm.bind(this)}
@@ -341,12 +349,12 @@ function clearMap() {
   if (this.state.obstaclesState.guessedWay.length)
     this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.guessedPolyline);
 
-  Store.dispatch(removeRouteFromMap());
-  Store.dispatch(clearRoute());
+  Store.dispatch(Actions.removeRouteFromMap());
+  Store.dispatch(Actions.clearRoute());
 }
 
 function fetchRoute() {
-  Store.dispatch(setIsFetchingRoute(true));
+  Store.dispatch(Actions.setIsFetchingRoute(true));
 
   let queryString = this.state.routeState.start[1] + '&' + this.state.routeState.start[0] +
       '&' + this.state.routeState.finish[1] + '&' + this.state.routeState.finish[0];
@@ -361,7 +369,7 @@ function fetchRoute() {
         return response.text();
       })
       .then((response) => {
-        Store.dispatch(setRoute(parseRouteResponse(response)));
+        Store.dispatch(Actions.setRoute(parseRouteResponse(response)));
       });
 }
 

@@ -8,21 +8,14 @@ import RoundButton from '../RoundButton/RoundButton';
 require('./RouteForm.css');
 
 export default class RouteForm extends Component {
-    constructor() {
-        super();
-    }
+  constructor() {
+    super();
+  }
 
-    hideRouteForm() {
-
-    }
-
-    render() {
-        return <form className={"RouteForm " + (this.props.visibility ? "active" : "")}>
-            <p className="RouteForm__text">Введите адреса точек маршрута или поставьте точки прямо на карте</p>
-            <input type="text" id="routeStart" className="RouteForm__input" placeholder="Адрес начала маршрута" />
-            <input type="text" id="routeFinish" className="RouteForm__input" placeholder="Адрес конца маршрута" />
-            <button className="RouteForm__button">Расчитать</button>
-            <a onclick=""></a>
-        </form>
-    }
+  render() {
+    return <form className={"RouteForm " + (this.props.visibility ? "active" : "")}>
+      <p className="RouteForm__text">Поставьте точки старта и финиша на карте</p>
+      <button className="RouteForm__button" onClick={ (e) => {e.preventDefault(); this.props.onSubmit()} }>Расчитать</button>
+    </form>
+  }
 }

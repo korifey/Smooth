@@ -23,6 +23,12 @@ export function setObstacleGuess(way, polyline) {
   }
 }
 
+export function resetObstacle() {
+  return {
+    type: types.RESET_OBSTACLE
+  }
+}
+
 // TODO: Obstacle actions
 
 // TODO: Map actions
