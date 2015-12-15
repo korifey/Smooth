@@ -124,33 +124,36 @@ export default class App extends Component {
   onMapClick(event) {
     console.log(event.latlng);
 
-    if (this.state.routeState.start.length && this.state.routeState.finish.length) {
+    switch(this.state.uiState.uiMode) {
+      case 'MODE_CHOOSE':
+        break;
 
-      // Clear route if there is one
-      if (this.state.routeState.route.length) {
-        Store.dispatch(Actions.clearRoute());
-      } else {
-        //fetchRoute.bind(this)();
-      }
+      case 'ROUTING':
+        if (this.state.routeState.start.length && this.state.routeState.finish.length) {
+          // Clear route if there is one
+          if (this.state.routeState.route.length) {
+            Store.dispatch(Actions.clearRoute());
+          }
+        } else if (!this.state.routeState.start.length) {
+          let pin = L.marker(event.latlng, {
+            icon: start_marker_icon
+          });
 
-    } else if (!this.state.routeState.start.length) {
-      let pin = L.marker(event.latlng, {
-        icon: start_marker_icon
-      });
+          Store.dispatch(Actions.setStartRoutePoint(event.latlng));
+          Store.dispatch(Actions.setStartRoutePin(pin));
+          this.state.mapState.startPin.addTo(this.state.mapState.mapObject);
 
-      Store.dispatch(Actions.setStartRoutePoint(event.latlng));
-      Store.dispatch(Actions.setStartRoutePin(pin));
-      this.state.mapState.startPin.addTo(this.state.mapState.mapObject);
+        } else {
+          let pin = L.marker(event.latlng, {
+            icon: finish_marker_icon
+          });
 
-    } else {
-      let pin = L.marker(event.latlng, {
-        icon: finish_marker_icon
-      });
+          Store.dispatch(Actions.setFinishRoutePoint(event.latlng));
+          Store.dispatch(Actions.setFinishRoutePin(pin));
+          this.state.mapState.finishPin.addTo(this.state.mapState.mapObject);
 
-      Store.dispatch(Actions.setFinishRoutePoint(event.latlng));
-      Store.dispatch(Actions.setFinishRoutePin(pin));
-      this.state.mapState.finishPin.addTo(this.state.mapState.mapObject);
-
+        }
+        break;
     }
   }
 
