@@ -254,7 +254,7 @@ export default class App extends Component {
   onObstacleConfirm() {
     let queryString = this.state.obstaclesState.obstacleCoords.lng + '&' + this.state.obstaclesState.obstacleCoords.lat;
 
-    let request = new Request('http://smooth.lc/obstacle/add?' + queryString, {
+    let request = new Request('/obstacle/add?' + queryString, {
       headers: new Headers({
         'Content-Type': 'text/plain'
       })
@@ -361,7 +361,7 @@ function fetchRoute() {
 
   let queryString = this.state.routeState.start[1] + '&' + this.state.routeState.start[0] +
       '&' + this.state.routeState.finish[1] + '&' + this.state.routeState.finish[0];
-  let request = new Request('http://smooth.lc/path?' + queryString, {
+  let request = new Request('/path?' + queryString, {
     headers: new Headers({
       'Content-Type': 'text/plain'
     })
@@ -380,7 +380,7 @@ function fetchObstacleWayGuess(coords) {
   return new Promise((resolve, reject) => {
     let queryString = coords.lng + '&' + coords.lat;
 
-    let request = new Request('http://smooth.lc/obstacle/try?' + queryString, {
+    let request = new Request('/obstacle/try?' + queryString, {
       headers: new Headers({
         'Content-Type': 'text/plain'
       })
