@@ -110,6 +110,23 @@ public class Vector {
         }
     }
 
+    //return 0<= alpha <= 1, such as closestVector = v1*(1-alpha) + v2*alpha
+    public double closestPointInSegment(Vector v1, Vector v2) {
+        if (v1.same(v2)) return dist(v1);
+
+        Vector v = this.sub(v1);
+        Vector p = v2.sub(v1).norm();
+
+        Vector proj = p.mul(v.dot(p)).add(v1);
+        if (proj.inBoundingBox(v1, v2)) {
+            return Math.abs(v2.x - v1.x) > EPS ?
+                    (proj.x - v1.x) / (v2.x - v1.x)
+                    : (proj.y - v1.y) / (v2.y - v1.y);
+        } else {
+            return dist(v1) <  dist(v2) ? 0 : 1;
+        }
+    }
+
     @Override
     public String toString() {
         return "Vector{" +

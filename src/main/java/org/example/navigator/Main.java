@@ -18,11 +18,11 @@ public class Main {
 
         System.out.println("Find src:");
         final Node src[] = new Node[1];
-        printTime(() -> src[0] = graph[0].find(__src, 100));
+        printTime(() -> src[0] = graph[0].findNodeOrEdge(__src, 100));
 
         System.out.println("Find dst:");
         final Node dst[] = new Node[1];
-        printTime(() -> dst[0] = graph[0].find(__dst, 100));
+        printTime(() -> dst[0] = graph[0].findNodeOrEdge(__dst, 100));
 
         System.out.println("AStar:");
         Path path = graph[0].aStar(src[0], dst[0]);
@@ -31,7 +31,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         bugMikhailovsky();
-//        if (true) return;
+        if (true) return;
 
 //        Node __src = new Node(0, 30.31252384185791, 59.937472354745424);
 //        Node __dst = new Node(0, 30.323853492736816, 59.93980482945983);
@@ -48,11 +48,11 @@ public class Main {
 
         System.out.println("Find src:");
         final Node src[] = new Node[1];
-        printTime(() -> src[0] = graph[0].find(__src, 100));
+        printTime(() -> src[0] = graph[0].findNodeOrEdge(__src, 100));
 
         System.out.println("Find dst:");
         final Node dst[] = new Node[1];
-        printTime(() -> dst[0] = graph[0].find(__dst, 100));
+        printTime(() -> dst[0] = graph[0].findNodeOrEdge(__dst, 100));
 
         System.out.println("__src:" + __src);
         System.out.println("src:" + src[0]);

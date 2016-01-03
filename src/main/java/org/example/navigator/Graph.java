@@ -3,7 +3,6 @@ package org.example.navigator;
 
 import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.hash.THashSet;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.util.*;
@@ -13,9 +12,6 @@ import java.util.stream.Stream;
 
 import static org.example.navigator.Util.*;
 
-/**
- * Created by Dmitry.Ivanov on 10/25/2014.
- */
 @SuppressWarnings("SpellCheckingInspection")
 public class Graph {
     public static final int ncells = 10;
@@ -79,10 +75,14 @@ public class Graph {
 
 
     public Optional<Way> findClosestPedestrian(Node n) {
+        return findClosestEdge(n)
+                .map(e -> e.way);
+    }
+
+    private Optional<Edge> findClosestEdge(Node n) {
         return closestEdges(n, Obstacle.MaxDistanceToEdge)
                 .filter(e -> e.way.roadType == RoadType.PEDESTRIAN)
-                .min((e1,e2) -> Double.compare(e1.distTo(n), e2.distTo(n)))
-                .map(e -> e.way);
+                .min((e1,e2) -> Double.compare(e1.distTo(n), e2.distTo(n)));
     }
 
     public Obstacle getObstacle(long id) {
@@ -252,8 +252,18 @@ public class Graph {
     }
 
 
-    public Node find(Node n, double maxdist) {
-        return find(n.lon, n.lat, maxdist);
+    public Node findNodeOrEdge(Node n, double maxdist) {
+        Node closestNode = find(n.lon, n.lat, maxdist);
+
+        Optional<Edge> closestPedestrian = findClosestEdge(n);
+        if (!closestPedestrian.isPresent()) return closestNode;
+
+        EdgeNode edgeNode = EdgeNode.create(n, closestPedestrian.get());
+
+        //some magic here to prefer pedastrian over roads
+        double dist = n.dist(edgeNode);
+        if (dist < 10 || dist < n.dist(closestNode)) return edgeNode;
+        else return closestNode;
     }
 
     public synchronized Node find(double lon, double lat, double maxdist) {
