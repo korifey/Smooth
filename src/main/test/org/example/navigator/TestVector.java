@@ -14,8 +14,13 @@ public class TestVector {
         double dist1 = v.distToSegment1(v1, v2);
         double dist2 = v.distToSegment2(v1, v2);
 
+        double alpha = v.closestPointInSegment(v1, v2);
+        Vector proj = v1.mul(1-alpha).add(v2.mul(alpha));
+        double distPoint = v.dist(proj);
+
         Assert.assertEquals(referenceDist, dist1, Vector.EPS);
         Assert.assertEquals(referenceDist, dist2, Vector.EPS);
+        Assert.assertEquals(referenceDist,  distPoint, Vector.EPS);
     }
 
     @Test
