@@ -5,11 +5,11 @@ import * as ActionTypes from '../constants/ActionTypes';
 import { combineReducers } from 'redux';
 
 const initialUiState = {
-  routeFormVisibility: false,
+  routeFormVisibility: true,
   modeToggleVisibility: true,
   obstacleFormVisibility: false,
   obstacleFormState: 'BASIC',  // ['BASIC', 'SUCCESS', 'ERROR']
-  uiMode: 'MODE_CHOOSE' // ['MODE_CHOOSE', 'ROUTING', 'OBSTACLE']
+  uiMode: 'ROUTING' // ['MODE_CHOOSE', 'ROUTING', 'OBSTACLE']
 };
 
 export default function uiReducer(state = initialUiState, action) {

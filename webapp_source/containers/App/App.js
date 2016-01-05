@@ -80,17 +80,17 @@ export default class App extends Component {
 
       let markers = [];
 
-      console.log("Drawing route markers");
-      for (let i = 0; i < this.state.routeState.route.length; i++) {
-        var point = this.state.routeState.route[i];
-        console.log("draw marker " + i, point);
+      //console.log("Drawing route markers");
+      //for (let i = 0; i < this.state.routeState.route.length; i++) {
+      //  var point = this.state.routeState.route[i];
+      //  console.log("draw marker " + i, point);
         //markers[i] = L.marker(point, {
         //  icon: homerIcon,
         //  title: i + ': ' + point.lat + ' ' + point.lng
         //});
         //markers[i].addTo(this.state.mapState.mapObject);
-      }
-      console.log("Done with markers");
+      //}
+      //console.log("Done with markers");
 
       Store.dispatch(Actions.setRouteOnMap(r, markers));
       Store.dispatch(Actions.setIsFetchingRoute(false));
@@ -122,7 +122,8 @@ export default class App extends Component {
    * @param event {latlng, layerPoint, containerPoint, originalEvent}
    */
   onMapClick(event) {
-    console.log(event.latlng);
+    console.log("Event latlng:", event.latlng);
+    let latLng = Object.assign({}, event.latlng);
 
     switch(this.state.uiState.uiMode) {
       case 'MODE_CHOOSE':
@@ -139,16 +140,16 @@ export default class App extends Component {
             icon: start_marker_icon
           });
 
-          Store.dispatch(Actions.setStartRoutePoint(event.latlng));
+          Store.dispatch(Actions.setStartRoutePoint(latLng));
           Store.dispatch(Actions.setStartRoutePin(pin));
           this.state.mapState.startPin.addTo(this.state.mapState.mapObject);
 
         } else {
-          let pin = L.marker(event.latlng, {
+          let pin = L.marker(latLng, {
             icon: finish_marker_icon
           });
 
-          Store.dispatch(Actions.setFinishRoutePoint(event.latlng));
+          Store.dispatch(Actions.setFinishRoutePoint(latLng));
           Store.dispatch(Actions.setFinishRoutePin(pin));
           this.state.mapState.finishPin.addTo(this.state.mapState.mapObject);
 
@@ -225,6 +226,11 @@ export default class App extends Component {
               r.addTo(this.state.mapState.mapObject);
 
               Store.dispatch(Actions.setObstacleGuess(way, r));
+            }, () => {
+              if (this.state.obstaclesState.guessedPolyline) {
+                this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.guessedPolyline);
+                Store.dispatch(Actions.setObstacleGuess([], null));
+              }
             });
       });
 
@@ -232,7 +238,8 @@ export default class App extends Component {
       fetchObstacleWayGuess.bind(this)(marker.getLatLng())
         .then((way) => {
           let r = L.polyline(way, {
-            color: '#c0392b'
+            color: '#c0392b',
+            opacity: 0.8
           });
 
           if (this.state.obstaclesState.guessedPolyline) {
@@ -242,6 +249,10 @@ export default class App extends Component {
           r.addTo(this.state.mapState.mapObject);
 
           Store.dispatch(Actions.setObstacleGuess(way, r));
+        }, () => {
+          if (this.state.obstaclesState.guessedPolyline) {
+            this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.guessedPolyline);
+          }
         });
     } else {
       Store.dispatch(Actions.setUiMode('MODE_CHOOSE'));
@@ -312,13 +323,15 @@ export default class App extends Component {
  */
 function parseRouteResponse(response) {
   console.log(response);
+
+  let points = [];
+
   let raw_points = response.split('\n');
   let dist = response[response.length - 1].split(' ');
   dist.shift(); // Remove "Dist:"
   raw_points.pop(); // Remove dist line
   raw_points.pop(); // Remove dist line
 
-  let points = [];
   let raw_point;
   //console.log("raw_points", raw_points);
   for (var i = 0; i < raw_points.length; i++) {
@@ -391,7 +404,10 @@ function fetchObstacleWayGuess(coords) {
           return response.text();
         })
         .then((response) => {
-          resolve(parseRouteResponse(response));
+          if (response === '')
+            reject();
+          else
+            resolve(parseRouteResponse(response));
         });
   });
 }
