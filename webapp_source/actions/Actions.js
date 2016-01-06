@@ -64,6 +64,26 @@ export function removeRouteFromMap() {
 }
 
 /**
+ * Action creator for removing route from map
+ * @returns {{type}}
+ */
+export function removePolylinesFromMap() {
+  return {
+    type: types.CLEAR_MAP_POLYLINES
+  }
+}
+
+/**
+ * Action creator for setting route polylines
+ */
+export function setRoutePolylines(polylines) {
+  return {
+    type: types.SET_MAP_POLYLINES,
+    polylines
+  }
+}
+
+/**
  * Action creator for setting route nodes
  * @param pins Array of leaflet markers
  * @returns {{type, routeNodes: *}}

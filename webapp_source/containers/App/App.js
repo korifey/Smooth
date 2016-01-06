@@ -72,11 +72,52 @@ export default class App extends Component {
   }
 
   redrawMap() {
-    if (this.state.routeState.route.length && this.state.mapState.route == null) {
+    if (this.state.routeState.route.length && this.state.mapState.polylines.length === 0) {
       console.log("redrawMap", this.state.routeState.route);
-      let r = L.polyline(this.state.routeState.route);
-      console.log(r);
-      r.addTo(this.state.mapState.mapObject);
+      let polylines = [];
+
+      for (let i = 0; i < this.state.routeState.route.length; i++) {
+        let polyline = this.state.routeState.route[i].polyline;
+        let type = this.state.routeState.route[i].type;
+        let color;
+
+        switch (type) {
+          case '1':
+            color = '#64DD17';
+            break;
+          case '2':
+            color = '#FF5252';
+            break;
+          case '3':
+            color = '#3F51B5';
+            break;
+        }
+
+        let outline = L.polyline(polyline, {
+          stroke: true,
+          color: '#fff',
+          weight: 7,
+          opacity: 1
+        });
+        let shadow = L.polyline(polyline, {
+          stroke: true,
+          color: '#333',
+          weight: 8,
+          opacity: 0.5
+        });
+        let line = L.polyline(polyline, {
+          stroke: true,
+          color: color,
+          weight: 5,
+          opacity: 1
+        });
+        this.state.mapState.mapObject.addLayer(shadow);
+        this.state.mapState.mapObject.addLayer(outline);
+        this.state.mapState.mapObject.addLayer(line);
+        polylines.push(shadow);
+        polylines.push(outline);
+        polylines.push(line);
+      }
 
       let markers = [];
 
@@ -92,13 +133,14 @@ export default class App extends Component {
       //}
       //console.log("Done with markers");
 
-      Store.dispatch(Actions.setRouteOnMap(r, markers));
+      //Store.dispatch(Actions.setRouteOnMap(r, markers));
+      Store.dispatch(Actions.setRoutePolylines(polylines));
       Store.dispatch(Actions.setIsFetchingRoute(false));
     }
 
-    console.log("redrawMap", this.state.routeState.route.length, this.state.mapState.route);
+    //console.log("redrawMap", this.state.routeState.route.length, this.state.mapState.route);
 
-    if (!this.state.routeState.route.length && this.state.mapState.route) {
+    if (!this.state.routeState.route.length && this.state.mapState.polylines.length) {
       clearMap.bind(this)();
     }
   }
@@ -132,9 +174,9 @@ export default class App extends Component {
       case 'ROUTING':
         if (this.state.routeState.start.length && this.state.routeState.finish.length) {
           // Clear route if there is one
-          if (this.state.routeState.route.length) {
-            Store.dispatch(Actions.clearRoute());
-          }
+          //if (this.state.routeState.route.length) {
+            clearMap.bind(this)();
+          //}
         } else if (!this.state.routeState.start.length) {
           let pin = L.marker(event.latlng, {
             icon: start_marker_icon
@@ -325,29 +367,51 @@ function parseRouteResponse(response) {
   console.log(response);
 
   let points = [];
+  let route_parts = []; // [{ polyline: [[lat, lng], ...], type: int }, ...]
 
   let raw_points = response.split('\n');
   let dist = response[response.length - 1].split(' ');
   dist.shift(); // Remove "Dist:"
-  raw_points.pop(); // Remove dist line
+  raw_points.pop(); // Remove empty line
   raw_points.pop(); // Remove dist line
 
-  let raw_point;
   //console.log("raw_points", raw_points);
-  for (var i = 0; i < raw_points.length; i++) {
-    raw_point = raw_points[i].split(' ');
-    points.push(L.latLng([parseFloat(raw_point[1]), parseFloat(raw_point[0])]));
+  for (let i = 0, j = 0; i < raw_points.length; i++) {
+    let raw_point = raw_points[i].split(' ');
+
+    if (typeof route_parts[j] === 'undefined') {
+      route_parts[j] = {
+        polyline: [[parseFloat(raw_point[1]), parseFloat(raw_point[0])]],
+        type: raw_point[2]
+      }
+    } else if (route_parts[j].type === raw_point[2]) {
+      route_parts[j].polyline.push([parseFloat(raw_point[1]), parseFloat(raw_point[0])]);
+    } else {
+      route_parts[j].polyline.push([parseFloat(raw_point[1]), parseFloat(raw_point[0])]);
+      j++;
+
+      if (i !== raw_points.length - 1)
+        i--; // end point of one part is start point of next one
+    }
+
+    //points.push(L.latLng([parseFloat(raw_point[1]), parseFloat(raw_point[0])]));
     //console.log("raw_point", [raw_point[1], raw_point[0]]);
   }
 
   //console.log(points);
-  return points;
+  return route_parts;
 }
 
 function clearMap() {
 
-  if (this.state.mapState.route)
-    this.state.mapState.mapObject.removeLayer(this.state.mapState.route);
+  if (this.state.mapState.polylines.length) {
+    //this.state.mapState.mapObject.removeLayer(this.state.mapState.route);
+
+    for (var i = 0; i < this.state.mapState.polylines.length; i++) {
+      var polyline = this.state.mapState.polylines[i];
+      this.state.mapState.mapObject.removeLayer(polyline);
+    }
+  }
 
   if (this.state.mapState.routeNodes) {
     for (let i = 0; i < this.state.mapState.routeNodes.length; i++) {
@@ -366,6 +430,7 @@ function clearMap() {
     this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.guessedPolyline);
 
   Store.dispatch(Actions.removeRouteFromMap());
+  //Store.dispatch(Actions.removePolylinesFromMap());
   Store.dispatch(Actions.clearRoute());
 }
 

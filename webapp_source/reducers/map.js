@@ -11,7 +11,8 @@ const initialMapState = {
   startPin: null,
   finishPin: null,
   route: null,
-  routeNodes: []
+  routeNodes: [],
+  polylines: []
 };
 
 export default function mapReducer(state = initialMapState, action) {
@@ -39,20 +40,35 @@ export default function mapReducer(state = initialMapState, action) {
       console.log("mapReducer", action.type, state, newState);
       return newState;
 
-    case ActionTypes.SET_MAP_ROUTE:
-      newState = Object.assign({}, state, {
-        route: action.route,
-        routeNodes: action.routeNodes
-      });
-      console.log("mapReducer", action.type, state, newState);
-      return newState;
+    //case ActionTypes.SET_MAP_ROUTE:
+    //  newState = Object.assign({}, state, {
+    //    route: action.route,
+    //    routeNodes: action.routeNodes
+    //  });
+    //  console.log("mapReducer", action.type, state, newState);
+    //  return newState;
 
     case ActionTypes.CLEAR_MAP_ROUTE:
       newState = Object.assign({}, state, {
         route: null,
         routeNodes: [],
+        polylines: [],
         startPin: null,
         finishPin: null
+      });
+      console.log("mapReducer", action.type, state, newState);
+      return newState;
+
+    case ActionTypes.SET_MAP_POLYLINES:
+      newState = Object.assign({}, state, {
+        polylines: action.polylines
+      });
+      console.log("mapReducer", action.type, state, newState);
+      return newState;
+
+    case ActionTypes.CLEAR_MAP_POLYLINES:
+      newState = Object.assign({}, state, {
+        polylines: []
       });
       console.log("mapReducer", action.type, state, newState);
       return newState;
