@@ -304,7 +304,19 @@ export default class App extends Component {
     }
   }
 
-  onObstacleConfirm() {
+  onObstaclePhotoInputChange(event) {
+    let input = event.target;
+    let label = input.nextElementSibling;
+    let file = input.files[0];
+
+    if (file) {
+      Store.dispatch(Actions.setObstaclePhotoState('SELECTED'));
+    }
+  }
+
+  onObstacleConfirm(event) {
+    event.preventDefault();
+    // To Java Application
     let queryString = this.state.obstaclesState.obstacleCoords.lng + '&' + this.state.obstaclesState.obstacleCoords.lat;
 
     let request = new Request('/obstacle/add?' + queryString, {
@@ -313,7 +325,7 @@ export default class App extends Component {
       })
     });
 
-    fetch(request)
+    window.fetch(request)
       .then((response) => {
         return response.text();
       })
@@ -329,6 +341,25 @@ export default class App extends Component {
           Store.dispatch(Actions.setObstacleFormState('BASIC'));
         }, 3500);
       });
+
+    // To obstacle storage
+    if (this.state.uiState.obstaclePhotoState === 'SELECTED') {
+      let xmlhttp = new XMLHttpRequest();
+
+      xmlhttp.onreadystatechange = () => {
+        if (this.readyState === 4) {
+          if (this.state === 200) {
+            Store.dispatch(Actions.setObstaclePhotoState('LOADED'));
+          }
+        }
+      };
+
+      let form = new FormData(document.querySelector('.ObstacleForm'));
+      form.append('path', 'http://localhost:3030/');
+      xmlhttp.open('POST', 'http://localhost:3030/obstacle', true);
+      console.log(form);
+      xmlhttp.send(form);
+    }
   }
 
   render() {
@@ -349,7 +380,9 @@ export default class App extends Component {
         <ObstacleForm
             visibility={this.state.uiState.obstacleFormVisibility}
             onObstacleConfirm={this.onObstacleConfirm.bind(this)}
-            state={this.state.uiState.obstacleFormState}
+            formState={this.state.uiState.obstacleFormState}
+            photoState={this.state.uiState.obstaclePhotoState}
+            onPhotoInputChange={this.onObstaclePhotoInputChange}
         />
       </div>
     );

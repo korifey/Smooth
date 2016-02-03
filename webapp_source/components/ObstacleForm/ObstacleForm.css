@@ -18,3 +18,21 @@
 .ObstacleForm__text {
   margin-bottom: 2em;
 }
+
+.ObstacleForm__button {
+  margin-top: 0.25rem;
+}
+
+.ObstacleForm div.basic, .ObstacleForm div.photo, .ObstacleForm div.success {
+  display: none;
+}
+.ObstacleForm .basic.active, .ObstacleForm .photo.active, .ObstacleForm .success.active {
+  display: block;
+}
+
+.ObstacleForm .has-photo, .ObstacleForm .no-photo {
+  display: none;
+}
+.ObstacleForm .has-photo.visible, .ObstacleForm .no-photo.visible {
+  display: block;
+}

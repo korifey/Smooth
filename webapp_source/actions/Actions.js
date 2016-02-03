@@ -132,6 +132,13 @@ export function setObstacleFormState(state) {
   }
 }
 
+export function setObstaclePhotoState(state) {
+  return {
+    type: types.SET_OBSTACLE_PHOTO_STATE,
+    state
+  }
+}
+
 export function enableRouteForm() {
   return {
     type: types.ENABLE_ROUTE_FORM

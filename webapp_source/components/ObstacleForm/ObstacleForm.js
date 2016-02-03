@@ -9,15 +9,32 @@ require('./ObstacleForm.css');
 export default class ObstacleForm extends Component {
   render() {
     let confirm = this.props.onObstacleConfirm;
-    return <div className={"card ObstacleForm " + (this.props.visibility ? "active " : " ") + (this.props.state ? this.props.state : "") + " " + this.props.state}>
-      <div className="basic">
+    let onPhotoInputChange = this.props.onPhotoInputChange;
+    return <form className={"card ObstacleForm" + (this.props.visibility ? " active" : "")} action="http://localhost:3030/obstacle" method="post" enctype="multipart/form-data">
+      <div className={"basic" + (this.props.formState === 'BASIC' ? " active" : "")}>
         <p className="card__text ObstacleForm__text">Подтвердите пренадлежность препятствия выделенному участку
           или передвинте препятствие</p>
-        <button className="ObstacleForm__button card__button" onClick={confirm} >Подтвердить</button>
+
+        <input
+            type="file"
+            name="obstaclePhoto"
+            className="input-file"
+            id="obstacle-photo"
+            onChange={onPhotoInputChange}/>
+        <label
+            htmlFor="obstacle-photo"
+            className={"ObstacleForm__button card__button" + ((this.props.photoState === 'SELECTED' || this.props.photoState === 'LOADED') ? " success" : "")}>
+          {(this.props.photoState === 'SELECTED' || this.props.photoState === 'LOADED') ? "Спасибо" : "Загрузите фото"}
+        </label>
+        <button
+            className="ObstacleForm__button card__button"
+            onClick={confirm}>
+          {this.props.photoState === 'SELECTED' ? "Отправить" : "Отправить без фото"}
+        </button>
       </div>
-      <div className="success">
+      <div className={"success" + (this.props.formState === 'SUCCESS' ? " active" : "")}>
         <p className="card__text">Спасибо! Препятствие успешно отправлено.</p>
       </div>
-    </div>
+    </form>
   }
 }
