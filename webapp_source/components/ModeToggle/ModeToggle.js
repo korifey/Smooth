@@ -10,22 +10,11 @@ require('./ModeToggle.css');
 export default class ModeToggle extends Component {
   constructor() {
     super();
-    this.state = Store.getState().uiState
   }
 
   render() {
     return <div className="ModeToggle">
       <RoundButton text="Найти меня"/>
-      <RoundButton
-          text="Построить маршрут"
-          className={"success " + (this.props.routeButtonActive ? 'active' : '')}
-          onClick={this.props.onRouteClick}
-      />
-      <RoundButton
-          text="Сообщить о барьере"
-          className={"warning " + (this.props.obstacleButtonActive ? 'active' : '')}
-          onClick={this.props.onObstacleClick}
-      />
     </div>
   }
 }

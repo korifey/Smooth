@@ -1,0 +1,74 @@
+.ChoiceTooltip {
+  position: absolute;
+  display: none;
+  z-index: 100;
+  font-size: 10pt;
+  text-transform: uppercase;
+  border-radius: 1em;
+  /*border: 1px solid rgba(0,0,0,.15);*/
+  box-shadow: 0 8px 20px rgba(0,0,0,.15);
+  -webkit-transform: translate(-50%, -120%);
+  -moz-transform: translate(-50%, -120%);
+  -ms-transform: translate(-50%, -120%);
+  -o-transform: translate(-50%, -120%);
+  transform: translate(-50%, -120%);
+}
+.ChoiceTooltip.visible {
+  display: block;
+}
+.ChoiceTooltip:before {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  z-index: 50;
+  margin-left: -10px;
+  margin-top: -10px;
+  width: 20px;
+  height: 20px;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 1px 1px rgba(0,0,0,.1);
+}
+
+.ChoiceTooltip__choice {
+  position: relative;
+  display: inline-block;
+  padding: 4pt 10pt;
+  min-width:150px;
+  text-align: center;
+  cursor: pointer;
+}
+.ChoiceTooltip__choice:first-child {
+  padding-left: 1em;
+  border-radius: 1em 0 0 1em;
+}
+.ChoiceTooltip__choice:last-child {
+  padding-right: 1em;
+  border-radius: 0 1em 1em 0;
+}
+
+.choice_ROUTING {
+  background-color: #8BC34A;
+}
+.choice_OBSTACLE {
+  padding-right: 1em;
+  background-color: #FFEB3B;
+}
+.choice_MODE_CHOOSE {
+  padding-right: 1em;
+  background-color: #FFEB3B;
+}
+
+.ChoiceTooltip__choice-delimeter {
+  position: absolute;
+  display: block;
+  top: 50%;
+  right: -5px;
+  margin-top: -10px;
+  width: 10px;
+  height: 10px;
+  background-color: #fff;
+  border-radius: 10px;
+}

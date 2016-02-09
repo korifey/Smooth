@@ -3,6 +3,7 @@ import Map from '../../components/Map/Map';
 import ModeToggle from '../../components/ModeToggle/ModeToggle';
 import RouteForm from '../../components/RouteForm/RouteForm';
 import ObstacleForm from '../../components/ObstacleForm/ObstacleForm';
+import ChoicesTooltip from '../../components/ChoiceTooltip/ChoiceTooltip';
 import Store from '../../store/store';
 import * as Actions from '../../actions/Actions';
 //import SomeApp from './SomeApp';
@@ -166,38 +167,113 @@ export default class App extends Component {
   onMapClick(event) {
     console.log("Event latlng:", event.latlng);
     let latLng = Object.assign({}, event.latlng);
+    let xoffset = event.containerPoint.x;
+    let yoffset = event.containerPoint.y;
+    let latlng = event.latlng;
 
     switch(this.state.uiState.uiMode) {
       case 'MODE_CHOOSE':
-        break;
-
+        Store.dispatch(Actions.clearRoute());
+        clearMap.bind(this)();
       case 'ROUTING':
-        if (this.state.routeState.start.length && this.state.routeState.finish.length) {
-          // Clear route if there is one
-          //if (this.state.routeState.route.length) {
-            clearMap.bind(this)();
-          //}
-        } else if (!this.state.routeState.start.length) {
-          let pin = L.marker(event.latlng, {
-            icon: start_marker_icon
-          });
-
-          Store.dispatch(Actions.setStartRoutePoint(latLng));
-          Store.dispatch(Actions.setStartRoutePin(pin));
-          this.state.mapState.startPin.addTo(this.state.mapState.mapObject);
-
-        } else {
-          let pin = L.marker(latLng, {
-            icon: finish_marker_icon
-          });
-
-          Store.dispatch(Actions.setFinishRoutePoint(latLng));
-          Store.dispatch(Actions.setFinishRoutePin(pin));
-          this.state.mapState.finishPin.addTo(this.state.mapState.mapObject);
-
-        }
+        Store.dispatch(Actions.setTooltipPosition(xoffset, yoffset));
+        Store.dispatch(Actions.setTooltipCoords(latlng.lat, latLng.lng));
+        Store.dispatch(Actions.showTooltip());
         break;
+      case 'OBSTACLE':
+        if (this.state.obstaclesState.obstaclePin) {
+          this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.obstaclePin);
+        }
+
+        Store.dispatch(Actions.setObstaclePhotoState('NO'));
+        Store.dispatch(Actions.setObstacleFormState('BASIC'));
+        Store.dispatch(Actions.disableObstacleForm());
+
+        Store.dispatch(Actions.setTooltipPosition(xoffset, yoffset));
+        Store.dispatch(Actions.setTooltipCoords(latlng.lat, latLng.lng));
+        Store.dispatch(Actions.showTooltip());
+
+        break;
+
+      //case 'ROUTING':
+      //  if (this.state.routeState.start.length && this.state.routeState.finish.length) {
+      //    // Clear route if there is one
+      //    //if (this.state.routeState.route.length) {
+      //      clearMap.bind(this)();
+      //    //}
+      //  } else if (!this.state.routeState.start.length) {
+      //    let pin = L.marker(event.latlng, {
+      //      icon: start_marker_icon
+      //    });
+      //
+      //    Store.dispatch(Actions.setStartRoutePoint(latLng));
+      //    Store.dispatch(Actions.setStartRoutePin(pin));
+      //    this.state.mapState.startPin.addTo(this.state.mapState.mapObject);
+      //
+      //  } else {
+      //    let pin = L.marker(latLng, {
+      //      icon: finish_marker_icon
+      //    });
+      //
+      //    Store.dispatch(Actions.setFinishRoutePoint(latLng));
+      //    Store.dispatch(Actions.setFinishRoutePin(pin));
+      //    this.state.mapState.finishPin.addTo(this.state.mapState.mapObject);
+      //
+      //  }
+      //  break;
     }
+  }
+
+  onStartPointClick() {
+    Store.dispatch(Actions.setUiMode('ROUTING'));
+
+    let latLng = Object.assign({}, {
+      lat: this.state.uiState.tooltipLat,
+      lng: this.state.uiState.tooltipLng
+    });
+
+    let pin = L.marker(latLng, {
+      icon: start_marker_icon
+    });
+
+    Store.dispatch(Actions.setStartRoutePoint(latLng));
+    Store.dispatch(Actions.setStartRoutePin(pin));
+    Store.dispatch(Actions.hideTooltip());
+    pin.addTo(this.state.mapState.mapObject);
+  }
+
+  onFinishPointClick() {
+    Store.dispatch(Actions.setUiMode('MODE_CHOOSE'));
+
+    let latLng = Object.assign({}, {
+      lat: this.state.uiState.tooltipLat,
+      lng: this.state.uiState.tooltipLng
+    });
+
+    let pin = L.marker(latLng, {
+      icon: finish_marker_icon
+    });
+
+    Store.dispatch(Actions.setFinishRoutePoint(latLng));
+    Store.dispatch(Actions.setFinishRoutePin(pin));
+    Store.dispatch(Actions.hideTooltip());
+    setTimeout(this.onRouteSubmit.bind(this), 100);
+    pin.addTo(this.state.mapState.mapObject);
+  }
+
+  onCancelRouteClick() {
+    Store.dispatch(Actions.setUiMode('MODE_CHOOSE'));
+
+    if (this.state.mapState.startPin) {
+      this.state.mapState.mapObject.removeLayer(this.state.mapState.startPin);
+    }
+
+    //Store.dispatch(Actions.setStartRoutePin(null));
+    Store.dispatch(Actions.setStartRoutePoint({
+      lat: null,
+      lng: null
+    }));
+    Store.dispatch(Actions.hideTooltip());
   }
 
   onRouteClick() {
@@ -235,9 +311,13 @@ export default class App extends Component {
       Store.dispatch(Actions.setUiMode('OBSTACLE'));
       Store.dispatch(Actions.enableObstacleForm());
       Store.dispatch(Actions.disableRouteForm());
+      Store.dispatch(Actions.hideTooltip());
       clearMap.bind(this)();
 
-      const coords = this.state.mapState.mapObject.getCenter();
+      const coords = {
+        lat: this.state.uiState.tooltipLat,
+        lng: this.state.uiState.tooltipLng
+      };
 
       //this.state.mapState.mapObject.setView([lat, lng]);
 
@@ -368,6 +448,34 @@ export default class App extends Component {
   }
 
   render() {
+    let choices;
+
+    if (this.state.uiState.uiMode == 'MODE_CHOOSE' || this.state.uiState.uiMode == 'OBSTACLE') {
+      choices = [
+        {
+          title: "Точка старта",
+          state: "ROUTING",
+          action: this.onStartPointClick.bind(this)
+        }, {
+          title: "Препятствие",
+          state: "OBSTACLE",
+          action: this.onObstacleClick.bind(this)
+        }
+      ];
+    } else if (this.state.uiState.uiMode == 'ROUTING') {
+      choices = [
+        {
+          title: "Точка финиша",
+          state: "ROUTING",
+          action: this.onFinishPointClick.bind(this)
+        }, {
+          title: "Отмена",
+          state: "MODE_CHOOSE",
+          action: this.onCancelRouteClick.bind(this)
+        }
+      ];
+    }
+
     return (
       <div className="app">
         <Map state={{mapState: this.state.mapState, routeState: this.state.routeState}}
@@ -381,7 +489,12 @@ export default class App extends Component {
             routeButtonActive={this.state.uiState.routeFormVisibility}
             obstacleButtonActive={this.state.uiState.obstacleFormVisibility}
          />
-        <RouteForm visibility={this.state.uiState.routeFormVisibility} onSubmit={this.onRouteSubmit.bind(this)} />
+        <ChoicesTooltip
+          show={this.state.uiState.showTooltip}
+          xoffset={this.state.uiState.tooltipX}
+          yoffset={this.state.uiState.tooltipY}
+          choices={choices}
+        />
         <ObstacleForm
             visibility={this.state.uiState.obstacleFormVisibility}
             onObstacleConfirm={this.onObstacleConfirm.bind(this)}
@@ -477,6 +590,7 @@ function fetchRoute() {
 
   let queryString = this.state.routeState.start[1] + '&' + this.state.routeState.start[0] +
       '&' + this.state.routeState.finish[1] + '&' + this.state.routeState.finish[0];
+  console.log("query string", queryString);
   let request = new Request('/path?' + queryString, {
     headers: new Headers({
       'Content-Type': 'text/plain'

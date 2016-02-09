@@ -150,6 +150,32 @@ export function disableRouteForm() {
   }
 }
 
+export function showTooltip() {
+  return {
+    type: types.SHOW_TOOLTIP
+  }
+}
+
+export function hideTooltip() {
+  return {
+    type: types.HIDE_TOOLTIP
+  }
+}
+
+export function setTooltipPosition(x, y) {
+  return {
+    type: types.SET_TOOLTIP_POSITION,
+    coords: {x, y}
+  }
+}
+
+export function setTooltipCoords(lat, lng) {
+  return {
+    type: types.SET_TOOLTIP_COORDS,
+    coords: {lat, lng}
+  }
+}
+
 // TODO: Route actions
 /**
  * Action creator for setting start route point

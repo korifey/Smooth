@@ -10,7 +10,12 @@ const initialUiState = {
   obstacleFormVisibility: false,
   obstacleFormState: 'BASIC',  // ['BASIC', 'PHOTO', 'SUCCESS', 'ERROR']
   obstaclePhotoState: 'NO', // ['NO', 'SELECTED', 'LOADED']
-  uiMode: 'ROUTING' // ['MODE_CHOOSE', 'ROUTING', 'OBSTACLE']
+  uiMode: 'MODE_CHOOSE', // ['MODE_CHOOSE', 'ROUTING', 'OBSTACLE']
+  showTooltip: false,
+  tooltipX: 0,
+  tooltipY: 0,
+  tooltipLat: 0,
+  tooltipLng: 0
 };
 
 export default function uiReducer(state = initialUiState, action) {
@@ -61,6 +66,36 @@ export default function uiReducer(state = initialUiState, action) {
     case ActionTypes.SET_OBSTACLE_PHOTO_STATE:
       newState = Object.assign({}, state, {
         obstaclePhotoState: action.state
+      });
+      console.log("uiReducer", action.type, state, newState);
+      return newState;
+
+    case ActionTypes.SHOW_TOOLTIP:
+      newState = Object.assign({}, state, {
+        showTooltip: true
+      });
+      console.log("uiReducer", action.type, state, newState);
+      return newState;
+
+    case ActionTypes.HIDE_TOOLTIP:
+      newState = Object.assign({}, state, {
+        showTooltip: false
+      });
+      console.log("uiReducer", action.type, state, newState);
+      return newState;
+
+    case ActionTypes.SET_TOOLTIP_POSITION:
+      newState = Object.assign({}, state, {
+        tooltipX: action.coords.x,
+        tooltipY: action.coords.y
+      });
+      console.log("uiReducer", action.type, state, newState);
+      return newState;
+
+    case ActionTypes.SET_TOOLTIP_COORDS:
+      newState = Object.assign({}, state, {
+        tooltipLat: action.coords.lat,
+        tooltipLng: action.coords.lng
       });
       console.log("uiReducer", action.type, state, newState);
       return newState;
