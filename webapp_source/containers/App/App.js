@@ -342,10 +342,9 @@ export default class App extends Component {
         }, 3500);
       });
 
+    let xmlhttp = new XMLHttpRequest();
     // To obstacle storage
     if (this.state.uiState.obstaclePhotoState === 'SELECTED') {
-      let xmlhttp = new XMLHttpRequest();
-
       xmlhttp.onreadystatechange = () => {
         if (this.readyState === 4) {
           if (this.state === 200) {
@@ -353,13 +352,19 @@ export default class App extends Component {
           }
         }
       };
-
-      let form = new FormData(document.querySelector('.ObstacleForm'));
-      form.append('path', 'http://localhost:3030/');
-      xmlhttp.open('POST', 'http://localhost:3030/obstacle', true);
-      console.log(form);
-      xmlhttp.send(form);
     }
+
+    let latInput = document.querySelector('[name=obstacleLat');
+    let lngInput = document.querySelector('[name=obstacleLng');
+
+    latInput.value = this.state.obstaclesState.obstacleCoords.lat;
+    lngInput.value = this.state.obstaclesState.obstacleCoords.lng;
+
+    let form = new FormData(document.querySelector('.ObstacleForm'));
+    form.append('path', 'http://localhost:3030/');
+    xmlhttp.open('POST', 'http://localhost:3030/obstacle', true);
+    console.log(form);
+    xmlhttp.send(form);
   }
 
   render() {

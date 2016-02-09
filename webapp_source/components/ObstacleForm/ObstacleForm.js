@@ -26,6 +26,8 @@ export default class ObstacleForm extends Component {
             className={"ObstacleForm__button card__button" + ((this.props.photoState === 'SELECTED' || this.props.photoState === 'LOADED') ? " success" : "")}>
           {(this.props.photoState === 'SELECTED' || this.props.photoState === 'LOADED') ? "Спасибо" : "Загрузите фото"}
         </label>
+        <input type="hidden" name="obstacleLat"/>
+        <input type="hidden" name="obstacleLng"/>
         <button
             className="ObstacleForm__button card__button"
             onClick={confirm}>
