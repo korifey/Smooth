@@ -22,6 +22,9 @@
 .ObstacleForm__button {
   margin-top: 0.25rem;
 }
+.ObstacleForm__button:disabled {
+  opacity: .75;
+}
 
 .ObstacleForm div.basic, .ObstacleForm div.photo, .ObstacleForm div.success {
   display: none;

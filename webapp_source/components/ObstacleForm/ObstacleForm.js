@@ -30,8 +30,10 @@ export default class ObstacleForm extends Component {
         <input type="hidden" name="obstacleLng"/>
         <button
             className="ObstacleForm__button card__button"
-            onClick={confirm}>
-          {this.props.photoState === 'SELECTED' ? "Отправить" : "Отправить без фото"}
+            onClick={confirm}
+            disabled={this.props.photoState !== 'SELECTED'}
+        >
+          Отправить
         </button>
       </div>
       <div className={"success" + (this.props.formState === 'SUCCESS' ? " active" : "")}>
