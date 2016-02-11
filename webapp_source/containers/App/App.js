@@ -276,29 +276,6 @@ export default class App extends Component {
     Store.dispatch(Actions.hideTooltip());
   }
 
-  onRouteClick() {
-    switch (this.state.uiState.uiMode) {
-      case 'ROUTING':
-        Store.dispatch(Actions.setUiMode('MODE_CHOOSE'));
-        Store.dispatch(Actions.disableRouteForm());
-        Store.dispatch(Actions.clearRoute());
-        clearMap.bind(this)();
-        break;
-
-      case 'OBSTACLE':
-        Store.dispatch(Actions.setUiMode('ROUTING'));
-        Store.dispatch(Actions.enableRouteForm());
-        Store.dispatch(Actions.disableObstacleForm());
-        Store.dispatch(Actions.resetObstacle());
-        clearMap.bind(this)();
-        break;
-
-      default:
-        Store.dispatch(Actions.setUiMode('ROUTING'));
-        Store.dispatch(Actions.enableRouteForm());
-    }
-  }
-
   onRouteSubmit() {
     fetchRoute.bind(this)();
   }
@@ -334,9 +311,10 @@ export default class App extends Component {
 
       marker.on('dragend', (event) => {
         Store.dispatch(Actions.setObstacle(marker.getLatLng(), marker));
-        fetchObstacleWayGuess.bind(this)(marker.getLatLng())
+        fetchObstacleWayGuess(marker.getLatLng())
             .then((way) => {
-              let r = L.polyline(way, {
+              console.log("Draw way", way[0]);
+              let r = L.polyline(way[0].polyline, {
                 color: '#c0392b',
                 opacity: 0.8
               });
@@ -347,7 +325,7 @@ export default class App extends Component {
 
               r.addTo(this.state.mapState.mapObject);
 
-              Store.dispatch(Actions.setObstacleGuess(way, r));
+              Store.dispatch(Actions.setObstacleGuess(way[0].polyline, r));
             }, () => {
               if (this.state.obstaclesState.guessedPolyline) {
                 this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.guessedPolyline);
@@ -359,7 +337,8 @@ export default class App extends Component {
       Store.dispatch(Actions.setObstacle(marker.getLatLng(), marker));
       fetchObstacleWayGuess.bind(this)(marker.getLatLng())
         .then((way) => {
-          let r = L.polyline(way, {
+          console.log("way", way[0]);
+          let r = L.polyline(way[0].polyline, {
             color: '#c0392b',
             opacity: 0.8
           });
@@ -370,8 +349,9 @@ export default class App extends Component {
 
           r.addTo(this.state.mapState.mapObject);
 
-          Store.dispatch(Actions.setObstacleGuess(way, r));
+          Store.dispatch(Actions.setObstacleGuess(way[0], r));
         }, () => {
+          console.log("Handle reject");
           if (this.state.obstaclesState.guessedPolyline) {
             this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.guessedPolyline);
           }
@@ -484,7 +464,7 @@ export default class App extends Component {
              onMapDidMount={this.mapDidMount.bind(this)}
         />
         <ModeToggle
-            onRouteClick={this.onRouteClick.bind(this)}
+            //onRouteClick={this.onRouteClick.bind(this)}
             onObstacleClick={this.onObstacleClick.bind(this)}
             routeButtonActive={this.state.uiState.routeFormVisibility}
             obstacleButtonActive={this.state.uiState.obstacleFormVisibility}
@@ -549,7 +529,7 @@ function parseRouteResponse(response) {
     //console.log("raw_point", [raw_point[1], raw_point[0]]);
   }
 
-  //console.log(points);
+  console.log(route_parts);
   return route_parts;
 }
 
@@ -597,7 +577,7 @@ function fetchRoute() {
     })
   });
 
-  fetch(request)
+  window.fetch(request)
       .then((response) => {
         return response.text();
       })
@@ -610,20 +590,21 @@ function fetchObstacleWayGuess(coords) {
   return new Promise((resolve, reject) => {
     let queryString = coords.lng + '&' + coords.lat;
 
-    let request = new Request('/obstacle/try?' + queryString, {
+    let request = new Request('http://smooth.lc/obstacle/try?' + queryString, {
       headers: new Headers({
         'Content-Type': 'text/plain'
       })
     });
 
-    fetch(request)
+    window.fetch(request)
         .then((response) => {
           return response.text();
         })
         .then((response) => {
-          if (response === '')
+          if (response === '') {
+            console.log("empty response");
             reject();
-          else
+          } else
             resolve(parseRouteResponse(response));
         });
   });
