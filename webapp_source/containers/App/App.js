@@ -175,6 +175,10 @@ export default class App extends Component {
       case 'MODE_CHOOSE':
         Store.dispatch(Actions.clearRoute());
         clearMap.bind(this)();
+        Store.dispatch(Actions.setTooltipPosition(xoffset, yoffset));
+        Store.dispatch(Actions.setTooltipCoords(latlng.lat, latLng.lng));
+        Store.dispatch(Actions.showTooltip());
+        break;
       case 'ROUTING':
         Store.dispatch(Actions.setTooltipPosition(xoffset, yoffset));
         Store.dispatch(Actions.setTooltipCoords(latlng.lat, latLng.lng));
@@ -184,6 +188,9 @@ export default class App extends Component {
         if (this.state.obstaclesState.obstaclePin) {
           this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.obstaclePin);
         }
+
+        Store.dispatch(Actions.clearRoute());
+        clearMap.bind(this)();
 
         Store.dispatch(Actions.setObstaclePhotoState('NO'));
         Store.dispatch(Actions.setObstacleFormState('BASIC'));
@@ -349,7 +356,7 @@ export default class App extends Component {
 
           r.addTo(this.state.mapState.mapObject);
 
-          Store.dispatch(Actions.setObstacleGuess(way[0], r));
+          Store.dispatch(Actions.setObstacleGuess(way[0].polyline, r));
         }, () => {
           console.log("Handle reject");
           if (this.state.obstaclesState.guessedPolyline) {
@@ -571,7 +578,7 @@ function fetchRoute() {
   let queryString = this.state.routeState.start[1] + '&' + this.state.routeState.start[0] +
       '&' + this.state.routeState.finish[1] + '&' + this.state.routeState.finish[0];
   console.log("query string", queryString);
-  let request = new Request('/path?' + queryString, {
+  let request = new Request('http://smooth.lc/path?' + queryString, {
     headers: new Headers({
       'Content-Type': 'text/plain'
     })
