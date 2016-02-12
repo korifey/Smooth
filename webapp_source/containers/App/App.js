@@ -399,7 +399,7 @@ export default class App extends Component {
     // To Java Application
     let queryString = this.state.obstaclesState.obstacleCoords.lng + '&' + this.state.obstaclesState.obstacleCoords.lat;
 
-    let request = new Request('http://smooth.lc/obstacle/add?' + queryString, {
+    let request = new Request('/obstacle/add?' + queryString, {
       headers: new Headers({
         'Content-Type': 'text/plain'
       })
@@ -442,10 +442,20 @@ export default class App extends Component {
     lngInput.value = this.state.obstaclesState.obstacleCoords.lng;
 
     let form = new FormData(document.querySelector('.ObstacleForm'));
-    form.append('path', 'http://smooth.lc/');
-    xmlhttp.open('POST', 'http://smooth.lc/obstacles/add', true);
+    form.append('path', '/');
+    xmlhttp.open('POST', '/obstacles/add', true);
     console.log(form);
     xmlhttp.send(form);
+  }
+
+  onLocationClick() {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        this.state.mapState.mapObject.panTo([position.coords.latitude, position.coords.longitude]);
+      });
+    } else {
+      alert("Your device does not support geolocation or this feature is turned off");
+    }
   }
 
   render() {
@@ -489,6 +499,7 @@ export default class App extends Component {
             onObstacleClick={this.onObstacleClick.bind(this)}
             routeButtonActive={this.state.uiState.routeFormVisibility}
             obstacleButtonActive={this.state.uiState.obstacleFormVisibility}
+            onLocationClick={this.onLocationClick.bind(this)}
          />
         <ChoicesTooltip
           show={this.state.uiState.showTooltip}
@@ -607,7 +618,7 @@ function fetchRoute() {
   let queryString = this.state.routeState.start[1] + '&' + this.state.routeState.start[0] +
       '&' + this.state.routeState.finish[1] + '&' + this.state.routeState.finish[0];
   console.log("query string", queryString);
-  let request = new Request('http://smooth.lc/path?' + queryString, {
+  let request = new Request('/path?' + queryString, {
     headers: new Headers({
       'Content-Type': 'text/plain'
     })
@@ -629,7 +640,7 @@ function fetchObstacleWayGuess(coords) {
   return new Promise((resolve, reject) => {
     let queryString = coords.lng + '&' + coords.lat;
 
-    let request = new Request('http://smooth.lc/obstacle/try?' + queryString, {
+    let request = new Request('/obstacle/try?' + queryString, {
       headers: new Headers({
         'Content-Type': 'text/plain'
       })
@@ -671,7 +682,7 @@ function showObstacles() {
         let imgWidth = obstacle.width < 300 ? obstacle.width : 300;
 
         pin.addTo(this.state.mapState.mapObject)
-          .bindPopup("<img src='http://smooth.lc/obstacles/images/" + obstacle.img + "\' style='width:" + imgWidth + "px'/>");
+          .bindPopup("<img src='/obstacles/images/" + obstacle.img + "\' style='width:" + imgWidth + "px'/>");
 
         obstaclePins.push(pin);
       });
@@ -683,7 +694,7 @@ function showObstacles() {
 
 function fetchObstacles() {
   return new Promise((resolve, reject) => {
-    let request = new Request('http://smooth.lc/obstacles');
+    let request = new Request('/obstacles');
 
     window.fetch(request)
       .then((response) => {
