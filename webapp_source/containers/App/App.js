@@ -98,13 +98,13 @@ export default class App extends Component {
         let outline = L.polyline(polyline, {
           stroke: true,
           color: '#fff',
-          weight: 7,
+          weight: 10,
           opacity: 1
         });
         let shadow = L.polyline(polyline, {
           stroke: true,
           color: '#333',
-          weight: 8,
+          weight: 11,
           opacity: 0.5
         });
         let line = L.polyline(polyline, {
