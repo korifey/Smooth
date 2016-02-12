@@ -15,7 +15,8 @@ const initialUiState = {
   tooltipX: 0,
   tooltipY: 0,
   tooltipLat: 0,
-  tooltipLng: 0
+  tooltipLng: 0,
+  obstaclePopup: null
 };
 
 export default function uiReducer(state = initialUiState, action) {

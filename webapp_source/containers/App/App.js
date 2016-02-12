@@ -654,6 +654,12 @@ function showObstacles() {
     .then((obstacles) => {
       let obstaclePins = [];
 
+      //if (this.state.uiState.obstaclePopup === null) {
+      //  let popup = L.popup({
+      //
+      //  })
+      //}
+
       obstacles.forEach((obstacle, array, index) => {
         let pin = L.marker({
           lat: parseFloat(obstacle.lat),
@@ -662,11 +668,12 @@ function showObstacles() {
           icon: obstacle_marker_icon
         });
 
-        obstaclePins.push(pin);
-      });
+        let imgWidth = obstacle.width < 300 ? obstacle.width : 300;
 
-      obstaclePins.forEach((pin) => {
-        pin.addTo(this.state.mapState.mapObject);
+        pin.addTo(this.state.mapState.mapObject)
+          .bindPopup("<img src='http://smooth.lc/obstacles/images/" + obstacle.img + "\' style='width:" + imgWidth + "px'/>");
+
+        obstaclePins.push(pin);
       });
 
       Store.dispatch(Actions.setObstacles(obstaclePins));
