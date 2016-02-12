@@ -4,6 +4,7 @@ import ModeToggle from '../../components/ModeToggle/ModeToggle';
 import RouteForm from '../../components/RouteForm/RouteForm';
 import ObstacleForm from '../../components/ObstacleForm/ObstacleForm';
 import ChoicesTooltip from '../../components/ChoiceTooltip/ChoiceTooltip';
+import Legend from '../../components/Legend/Legend';
 import Store from '../../store/store';
 import * as Actions from '../../actions/Actions';
 //import SomeApp from './SomeApp';
@@ -502,6 +503,11 @@ export default class App extends Component {
             photoState={this.state.uiState.obstaclePhotoState}
             onPhotoInputChange={this.onObstaclePhotoInputChange}
         />
+        <Legend
+          walkDistance={this.state.routeState.walkDistance}
+          badDistance={this.state.routeState.badDistance}
+          transportDistance={this.state.routeState.transportDistance}
+        />
       </div>
     );
   }
@@ -521,10 +527,12 @@ function parseRouteResponse(response) {
   let route_parts = []; // [{ polyline: [[lat, lng], ...], type: int }, ...]
 
   let raw_points = response.split('\n');
-  let dist = response[response.length - 1].split(' ');
-  dist.shift(); // Remove "Dist:"
   raw_points.pop(); // Remove empty line
-  raw_points.pop(); // Remove dist line
+  let dist = raw_points.pop().split(' '); // Save and remove dist line
+  dist.shift(); // Remove "Dist:"
+  dist = dist.map((el) => {
+    return parseInt(el);
+  });
 
   //console.log("raw_points", raw_points);
   for (let i = 0, j = 0; i < raw_points.length; i++) {
@@ -550,7 +558,10 @@ function parseRouteResponse(response) {
   }
 
   console.log(route_parts);
-  return route_parts;
+  return {
+    route: route_parts,
+    distances: dist
+  };
 }
 
 function clearMap() {
@@ -607,7 +618,10 @@ function fetchRoute() {
         return response.text();
       })
       .then((response) => {
-        Store.dispatch(Actions.setRoute(parseRouteResponse(response)));
+        var routeData = parseRouteResponse(response);
+
+        Store.dispatch(Actions.setRoute(routeData.route));
+        Store.dispatch(Actions.setRouteDistances(routeData.distances[0], routeData.distances[1], routeData.distances[2]))
       });
 }
 
@@ -630,7 +644,7 @@ function fetchObstacleWayGuess(coords) {
             console.log("empty response");
             reject();
           } else
-            resolve(parseRouteResponse(response));
+            resolve(parseRouteResponse(response).route);
         });
   });
 }

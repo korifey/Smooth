@@ -7,6 +7,9 @@ const initialRouteState = {
   start: [],
   finish: [],
   route: [],
+  walkDistance: 0,
+  transportDistance: 0,
+  badDistance: 0,
   isFetching: false
 };
 
@@ -45,7 +48,19 @@ export default function routeReducer(state = initialRouteState, action) {
       newState = Object.assign({}, state, {
         route: action.route,
         start: [],
-        finish: []
+        finish: [],
+        walkDistance: 0,
+        transportDistance: 0,
+        badDistance: 0
+      });
+      console.log("routeReducer", action.type, state, newState);
+      return newState;
+
+    case ActionTypes.SET_ROUTE_DISTANCES:
+      newState = Object.assign({}, state, {
+        walkDistance: action.walk,
+        badDistance: action.bad,
+        transportDistance: action.transport
       });
       console.log("routeReducer", action.type, state, newState);
       return newState;

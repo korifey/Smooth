@@ -266,3 +266,19 @@ export function clearRoute() {
     route: []
   }
 }
+
+/**
+ * Action creator for setting distances for current route
+ * @param walk Number
+ * @param bad Number
+ * @param transport Number
+ * @returns Object
+ */
+export function setRouteDistances(walk, bad, transport) {
+  return {
+    type: types.SET_ROUTE_DISTANCES,
+    walk,
+    bad,
+    transport
+  }
+}

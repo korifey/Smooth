@@ -24,6 +24,7 @@ export const SET_ROUTE = 'SET_ROUTE';
 export const CLEAR_ROUTE = 'CLEAR_ROUTE';
 export const SET_ROUTE_NODES = 'SET_ROUTE_NODES';
 export const CLEAR_ROUTE_NODES = 'CLEAR_ROUTE_NODES';
+export const SET_ROUTE_DISTANCES = 'SET_ROUTE_DISTANCES';
 
 // Map
 export const SET_MAP = 'SET_MAP';

@@ -1,0 +1,50 @@
+.Legend {
+  display: table;
+  position: absolute;
+  left: 1em;
+  bottom: 1em;
+  z-index: 100;
+  background-color: #fff;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  font-size: 12pt;
+  line-height: 22pt;
+}
+
+.Legend__header {
+  display: table-row;
+  background-color: rgba(0,0,0,.1);
+}
+.Legend__title {
+  display: table-cell;
+  column-span: 3;
+  margin-bottom: 5pt;
+  padding: 0 10pt;
+  line-height: 24pt;
+}
+
+.Legend-item {
+  display: table-row;
+  padding: 0 10pt;
+}
+.Legend-item__name {
+  display: table-cell;
+  padding: 0 5pt 0 10pt;
+}
+.Legend-item__example {
+  display: table-cell;
+  position: relative;
+  padding: 0 10pt;
+  width: 50pt;
+  vertical-align: middle;
+}
+.Legend-item__line {
+  display: inline-block;
+  width: 100%;
+  height: 2pt;
+}
+
+.Legend-item__distance {
+  display: table-cell;
+  padding: 0 10pt;
+  background-color: #faf5f0;
+}
