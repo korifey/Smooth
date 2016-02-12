@@ -19,6 +19,11 @@ export default function obstaclesReducer(state = initialObstaclesState, action) 
         obstaclePin: action.pin
       });
 
+    case ActionTypes.SET_OBSTACLES:
+      return Object.assign({}, state, {
+        obstacles: action.obstacles
+      });
+
     case ActionTypes.SET_OBSTACLES_VISIBILITY:
       return Object.assign({}, state, {
         obstaclesVisibility: action.obstaclesVisibility

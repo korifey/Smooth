@@ -137,6 +137,13 @@ export default class App extends Component {
       //Store.dispatch(Actions.setRouteOnMap(r, markers));
       Store.dispatch(Actions.setRoutePolylines(polylines));
       Store.dispatch(Actions.setIsFetchingRoute(false));
+
+      // Obstacles
+      if (this.state.obstaclesState.obstacles.length) {
+        this.state.obstaclesState.obstacles.forEach((pin) => {
+          pin.addTo(this.state.mapState.mapObject);
+        });
+      }
     }
 
     //console.log("redrawMap", this.state.routeState.route.length, this.state.mapState.route);
@@ -195,6 +202,8 @@ export default class App extends Component {
         Store.dispatch(Actions.setObstaclePhotoState('NO'));
         Store.dispatch(Actions.setObstacleFormState('BASIC'));
         Store.dispatch(Actions.disableObstacleForm());
+
+        Store.dispatch(Actions.setUiMode('MODE_CHOOSE'));
 
         Store.dispatch(Actions.setTooltipPosition(xoffset, yoffset));
         Store.dispatch(Actions.setTooltipCoords(latlng.lat, latLng.lng));
@@ -265,6 +274,7 @@ export default class App extends Component {
     Store.dispatch(Actions.setFinishRoutePin(pin));
     Store.dispatch(Actions.hideTooltip());
     setTimeout(this.onRouteSubmit.bind(this), 100);
+    showObstacles.bind(this)();
     pin.addTo(this.state.mapState.mapObject);
   }
 
@@ -291,6 +301,8 @@ export default class App extends Component {
     console.log("onObstacleClick");
 
     if (!this.state.uiState.obstacleFormVisibility) {
+
+      showObstacles.bind(this)();
 
       Store.dispatch(Actions.setUiMode('OBSTACLE'));
       Store.dispatch(Actions.enableObstacleForm());
@@ -386,7 +398,7 @@ export default class App extends Component {
     // To Java Application
     let queryString = this.state.obstaclesState.obstacleCoords.lng + '&' + this.state.obstaclesState.obstacleCoords.lat;
 
-    let request = new Request('/obstacle/add?' + queryString, {
+    let request = new Request('http://smooth.lc/obstacle/add?' + queryString, {
       headers: new Headers({
         'Content-Type': 'text/plain'
       })
@@ -406,6 +418,7 @@ export default class App extends Component {
         }, 3000);
         setTimeout(() => {
           Store.dispatch(Actions.setObstacleFormState('BASIC'));
+          Store.dispatch(Actions.setObstaclePhotoState('NO'));
         }, 3500);
       });
 
@@ -428,8 +441,8 @@ export default class App extends Component {
     lngInput.value = this.state.obstaclesState.obstacleCoords.lng;
 
     let form = new FormData(document.querySelector('.ObstacleForm'));
-    form.append('path', 'http://localhost:3030/');
-    xmlhttp.open('POST', 'http://localhost:3030/obstacle', true);
+    form.append('path', 'http://smooth.lc/');
+    xmlhttp.open('POST', 'http://smooth.lc/obstacles/add', true);
     console.log(form);
     xmlhttp.send(form);
   }
@@ -566,6 +579,11 @@ function clearMap() {
     this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.obstaclePin);
   if (this.state.obstaclesState.guessedWay.length)
     this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.guessedPolyline);
+  if (this.state.obstaclesState.obstacles.length) {
+    this.state.obstaclesState.obstacles.forEach((pin) => {
+      this.state.mapState.mapObject.removeLayer(pin);
+    });
+  }
 
   Store.dispatch(Actions.removeRouteFromMap());
   //Store.dispatch(Actions.removePolylinesFromMap());
@@ -614,5 +632,44 @@ function fetchObstacleWayGuess(coords) {
           } else
             resolve(parseRouteResponse(response));
         });
+  });
+}
+
+function showObstacles() {
+  fetchObstacles()
+    .then((obstacles) => {
+      let obstaclePins = [];
+
+      obstacles.forEach((obstacle, array, index) => {
+        let pin = L.marker({
+          lat: parseFloat(obstacle.lat),
+          lng: parseFloat(obstacle.lng)
+        }, {
+          icon: obstacle_marker_icon
+        });
+
+        obstaclePins.push(pin);
+      });
+
+      obstaclePins.forEach((pin) => {
+        pin.addTo(this.state.mapState.mapObject);
+      });
+
+      Store.dispatch(Actions.setObstacles(obstaclePins));
+
+    });
+}
+
+function fetchObstacles() {
+  return new Promise((resolve, reject) => {
+    let request = new Request('http://smooth.lc/obstacles');
+
+    window.fetch(request)
+      .then((response) => {
+        return response.text();
+      })
+      .then((obstacles) => {
+        resolve(JSON.parse(obstacles));
+      });
   });
 }

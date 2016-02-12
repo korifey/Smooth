@@ -15,6 +15,13 @@ export function setObstacle(coords, pin) {
   }
 }
 
+export function setObstacles(obstacles) {
+  return {
+    type: types.SET_OBSTACLES,
+    obstacles
+  }
+}
+
 export function setObstacleGuess(way, polyline) {
   return {
     type: types.SET_GUESS,
