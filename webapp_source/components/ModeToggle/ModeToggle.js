@@ -15,6 +15,11 @@ export default class ModeToggle extends Component {
   render() {
     return <div className="ModeToggle">
       <RoundButton text="Найти меня" onClick={this.props.onLocationClick}/>
+      <RoundButton
+        text="Транспорт"
+        onClick={this.props.onTransportClick}
+        className={this.props.transportState ? 'success' : ''}
+      />
     </div>
   }
 }

@@ -5,7 +5,9 @@ import RouteForm from '../../components/RouteForm/RouteForm';
 import ObstacleForm from '../../components/ObstacleForm/ObstacleForm';
 import ChoicesTooltip from '../../components/ChoiceTooltip/ChoiceTooltip';
 import Legend from '../../components/Legend/Legend';
+import Transport from '../../components/Transport/Transport';
 import Store from '../../store/store';
+import TransportStore from '../../store/transportStore';
 import * as Actions from '../../actions/Actions';
 //import SomeApp from './SomeApp';
 // import { createStore, combineReducers } from 'redux';
@@ -13,6 +15,7 @@ import * as Actions from '../../actions/Actions';
 // import * as reducers from '../reducers';
 
 let Promise = require('es6-promise').Promise;
+import webSocket from '../../containers/App/ws/ws';
 
 // const reducer = combineReducers(reducers);
 // const store = createStore(reducer);
@@ -40,6 +43,36 @@ const obstacle_marker_icon = L.divIcon({
   html: '<div>!</div>'
 });
 
+const vehicle_marker_icon = L.divIcon({
+  iconSize: [12, 12],
+  iconAnchor: [7, 7],
+  className: 'ArrowPin VehicleIcon AnimatedMarker',
+  html: '<div></div>'
+});
+
+// MIT-licensed code by Benjamin Becquet
+// https://github.com/bbecquet/Leaflet.PolylineDecorator
+L.RotatedMarker = L.Marker.extend({
+  options: { angle: 0 },
+  _setPos: function(pos) {
+    L.Marker.prototype._setPos.call(this, pos);
+    if (L.DomUtil.TRANSFORM) {
+      // use the CSS transform rule if available
+      this._icon.style[L.DomUtil.TRANSFORM] += ' rotate(' + this.options.angle + 'deg)';
+    } else if (L.Browser.ie) {
+      // fallback for IE6, IE7, IE8
+      var rad = this.options.angle * L.LatLng.DEG_TO_RAD,
+        costheta = Math.cos(rad),
+        sintheta = Math.sin(rad);
+      this._icon.style.filter += ' progid:DXImageTransform.Microsoft.Matrix(sizingMethod=\'auto expand\', M11=' +
+        costheta + ', M12=' + (-sintheta) + ', M21=' + sintheta + ', M22=' + costheta + ')';
+    }
+  }
+});
+L.rotatedMarker = function(pos, options) {
+  return new L.RotatedMarker(pos, options);
+};
+
 let homer_marker_icon_img = require('../../components/Map/images/homers.png');
 
 let markerIcon = L.icon({
@@ -61,6 +94,11 @@ export default class App extends Component {
 
   componentDidMount() {
     this.unsubscribe = Store.subscribe(this.updateApp.bind(this));
+
+    webSocket.onmessage = (event) => {
+      Store.dispatch(Actions.setVehiclesData(JSON.parse(event.data)));
+      this.drawTransport();
+    };
   }
 
   updateApp() {
@@ -145,6 +183,14 @@ export default class App extends Component {
           pin.addTo(this.state.mapState.mapObject);
         });
       }
+
+      // Vehicles
+      //if (this.state.mapState.vehicles.length) {
+      //  for (var i = 0; i < this.state.mapState.vehicles.length; i++) {
+      //    var v = this.state.mapState.vehicles[i];
+      //    this.state.mapState.mapObject.removeLayer(v);
+      //  }
+      //}
     }
 
     //console.log("redrawMap", this.state.routeState.route.length, this.state.mapState.route);
@@ -458,6 +504,65 @@ export default class App extends Component {
     }
   }
 
+  onTransportClick() {
+    //if (this.state.mapState.vehicles.length) {
+    //  Store.dispatch(Actions.setTransport([]));
+    //} else {
+    //  fetchTransport()
+    //    .then((vehicles) => {
+    //      var vehiclePins = vehicles.map((el) => {
+    //        var pin = L.rotatedMarker([parseFloat(el.lat), parseFloat(el.lng)], {
+    //          icon: vehicle_marker_icon
+    //        });
+    //
+    //        pin.options.angle = el.bearing;
+    //
+    //        pin.addTo(this.state.mapState.mapObject);
+    //        return pin;
+    //      });
+    //
+    //      Store.dispatch(Actions.setTransport(vehiclePins));
+    //    });
+    //}
+
+    if (this.state.transportState.vehiclesVisibility) {
+      this.removeTransportPins();
+    } else {
+      this.drawTransport();
+    }
+
+    Store.dispatch(Actions.setVehiclesVisibility(!this.state.transportState.vehiclesVisibility));
+  }
+
+  drawTransport() {
+    this.removeTransportPins();
+
+    if (this.state.transportState.vehiclesVisibility) {
+      let vehiclesPins = this.state.transportState.vehiclesData.map((el) => {
+        let pin = L.rotatedMarker([el.lat, el.lng], {
+          icon: vehicle_marker_icon,
+          title: el.id + "coords: " + el.lat + "|" + el.lng
+        });
+
+        pin.options.angle = el.bearing;
+
+        pin.addTo(this.state.mapState.mapObject);
+
+        return pin;
+      });
+      Store.dispatch(Actions.setTransport(vehiclesPins));
+    }
+  }
+
+  removeTransportPins() {
+    if (this.state.transportState.vehicles.length) {
+      for (var i = 0; i < this.state.transportState.vehicles.length; i++) {
+        var v = this.state.transportState.vehicles[i];
+        this.state.mapState.mapObject.removeLayer(v);
+      }
+    }
+  }
+
   render() {
     let choices;
 
@@ -500,6 +605,8 @@ export default class App extends Component {
             routeButtonActive={this.state.uiState.routeFormVisibility}
             obstacleButtonActive={this.state.uiState.obstacleFormVisibility}
             onLocationClick={this.onLocationClick.bind(this)}
+            onTransportClick={this.onTransportClick.bind(this)}
+            transportState={this.state.transportState.vehiclesVisibility}
          />
         <ChoicesTooltip
           show={this.state.uiState.showTooltip}
@@ -596,6 +703,11 @@ function clearMap() {
     this.state.mapState.mapObject.removeLayer(this.state.mapState.startPin);
   if (this.state.mapState.finishPin)
     this.state.mapState.mapObject.removeLayer(this.state.mapState.finishPin);
+  if (this.state.mapState.vehicles.length) {
+    this.state.mapState.vehicles.forEach((el) => {
+      this.state.mapState.mapObject.removeLayer(el);
+    });
+  }
 
   if (this.state.obstaclesState.obstaclePin)
     this.state.mapState.mapObject.removeLayer(this.state.obstaclesState.obstaclePin);
@@ -618,7 +730,7 @@ function fetchRoute() {
   let queryString = this.state.routeState.start[1] + '&' + this.state.routeState.start[0] +
       '&' + this.state.routeState.finish[1] + '&' + this.state.routeState.finish[0];
   console.log("query string", queryString);
-  let request = new Request('/path?' + queryString, {
+  let request = new Request('http://smooth.lc/path?' + queryString, {
     headers: new Headers({
       'Content-Type': 'text/plain'
     })
@@ -704,4 +816,29 @@ function fetchObstacles() {
         resolve(JSON.parse(obstacles));
       });
   });
+}
+
+function fetchTransport() {
+  return new Promise((resolve, reject) => {
+    let request = new Request('http://smooth.lc/transport');
+
+    window.fetch(request)
+      .then((response) => {
+        return response.text();
+      })
+      .then((vehicles) => {
+        resolve(JSON.parse(vehicles));
+      });
+  })
+}
+
+function addMarkers(coords, map) {
+  for (var i = 0; i < coords.length; i++) {
+    var point = coords[i];
+    var marker = L.marker(point, {
+      icon: start_marker_icon
+    });
+
+    marker.addTo(map);
+  }
 }

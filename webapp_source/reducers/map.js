@@ -12,7 +12,10 @@ const initialMapState = {
   finishPin: null,
   route: null,
   routeNodes: [],
-  polylines: []
+  polylines: [],
+  vehicles: [],
+  vehiclesData: [],
+  vehiclesVisibility: false
 };
 
 export default function mapReducer(state = initialMapState, action) {

@@ -113,6 +113,31 @@ export function setRoutePolylines(polylines) {
 //    }
 //}
 
+export function setTransport(vehicles) {
+  return {
+    type: types.SET_TRANSPORT,
+    vehicles
+  }
+}
+
+export function setVehiclesData(vehicles) {
+  return {
+    type: types.SET_VEHICLES_DATA,
+    vehicles
+  }
+}
+
+/**
+ *
+ * @param {boolean} visibility
+ */
+export function setVehiclesVisibility(visibility) {
+  return {
+    type: types.SET_VEHICLES_VISIBILITY,
+    visibility
+  }
+}
+
 // TODO: UI actions
 export function setUiMode(mode) {
   return {

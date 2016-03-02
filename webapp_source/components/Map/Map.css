@@ -24,3 +24,38 @@
     color: #fff;
     font-size: 12pt;
 }
+
+.VehicleIcon {
+    color: #fff;
+    font-size: 12pt;
+}
+
+.ArrowPin {
+    width: 12px;
+    height: 30px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #3F51B5;
+    background-color: #fff;
+    border-radius: 10px;
+}
+.ArrowPin:before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: -5px;
+    left: -1px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-color: transparent transparent #3F51B5 transparent;
+    border-width: 0 6px 8px 6px;
+}
+
+.AnimatedMarker {
+    -webkit-transition: all 5s;
+    -moz-transition: all 5s;
+    -ms-transition: all 5s;
+    -o-transition: all 5s;
+    transition: all 5s;
+}
