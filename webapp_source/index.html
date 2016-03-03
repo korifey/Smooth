@@ -3,6 +3,8 @@
   <meta charset="UTF-8">
   <title>SMOOTH — Accessible City Navigator</title>
 
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
   <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png?v=qAARpvaOqj">
   <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png?v=qAARpvaOqj">
   <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png?v=qAARpvaOqj">
@@ -27,5 +29,34 @@
 <div id="root"></div>
 </body>
 
+<script>
+  var logger = function()
+  {
+    var oldConsoleLog = null;
+    var pub = {};
+
+    pub.enableLogger =  function enableLogger()
+    {
+      if(oldConsoleLog == null)
+        return;
+
+      window['console']['log'] = oldConsoleLog;
+    };
+
+    pub.disableLogger = function disableLogger()
+    {
+      oldConsoleLog = console.log;
+      window['console']['log'] = function() {};
+    };
+
+    return pub;
+  }();
+
+  document.addEventListener('DOMContentLoaded', function () {
+    if (localStorage.getItem('logger') !== 1) {
+      logger.disableLogger();
+    }
+  })
+</script>
 <script src="static/bundle.js"></script>
 </html>
