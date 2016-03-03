@@ -53,7 +53,7 @@ const vehicle_marker_icon = L.divIcon({
 // MIT-licensed code by Benjamin Becquet
 // https://github.com/bbecquet/Leaflet.PolylineDecorator
 L.RotatedMarker = L.Marker.extend({
-  options: { angle: 0 },
+  options: { angle: 0, vehicle_id: 0 },
   _setPos: function(pos) {
     L.Marker.prototype._setPos.call(this, pos);
     if (L.DomUtil.TRANSFORM) {
@@ -201,13 +201,14 @@ export default class App extends Component {
   }
 
   mapDidMount() {
-    let map = L.map('map').setView([this.state.mapState.lat, this.state.mapState.lng], 16);
+    let map = L.map('map').setView([this.state.mapState.lat, this.state.mapState.lng], 15);
     L.tileLayer('https://api.tiles.mapbox.com/v4/kascode.k35co93d/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoia2FzY29kZSIsImEiOiJoeXp2cENzIn0.HYtI1Pj7v372xyxg5kz3Kg#11', {
       attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
       maxZoom: 19
     }).addTo(map);
 
     map.on('click', this.onMapClick.bind(this));
+    map.on('zoomend', this.onMapZoom.bind(this))
 
     Store.dispatch(Actions.setMap(map));
     this.forceUpdate();
@@ -284,6 +285,19 @@ export default class App extends Component {
       //
       //  }
       //  break;
+    }
+  }
+
+  onMapZoom() {
+    let zoomLevel = this.state.mapState.mapObject.getZoom();
+
+    if (zoomLevel <= 16) {
+      //Store.dispatch(Actions.setVehiclesVisibility(false));
+      this.removeTransportPins();
+      Store.dispatch(Actions.setTransport([]));
+      Store.dispatch(Actions.setVehiclesAllowed(false));
+    } else {
+      Store.dispatch(Actions.setVehiclesAllowed(true));
     }
   }
 
@@ -535,22 +549,75 @@ export default class App extends Component {
   }
 
   drawTransport() {
-    this.removeTransportPins();
+    //this.removeTransportPins();
 
-    if (this.state.transportState.vehiclesVisibility) {
-      let vehiclesPins = this.state.transportState.vehiclesData.map((el) => {
-        let pin = L.rotatedMarker([el.lat, el.lng], {
-          icon: vehicle_marker_icon,
-          title: el.id + "coords: " + el.lat + "|" + el.lng
+    if (this.state.transportState.vehiclesVisibility && this.state.uiState.vehiclePinsAllowed) {
+      if (this.state.transportState.vehicles.length) {
+        let bounds = this.state.mapState.mapObject.getBounds();
+
+        // clear vehicles out of view
+        let visibleVehicles = [];
+        for (let i =0; i < this.state.transportState.vehicles.length; i++) {
+          let v = this.state.transportState.vehicles[i];
+          if (bounds.contains(v.getLatLng()))
+            visibleVehicles.push(v);
+          else {
+            this.state.mapState.mapObject.removeLayer(v);
+          }
+        }
+        Store.dispatch(Actions.setTransport(visibleVehicles));
+
+        // move visible vehicles
+        this.state.transportState.vehiclesData.map((el) => {
+          let e = findElById(this.state.transportState.vehicles, el.id);
+          let newPins = [];
+
+          if (e !== false) {
+            e.options.angle = el.bearing;
+            e.setLatLng([el.lat, el.lng]);
+          }
+          else {
+            if (bounds.contains([el.lat, el.lng])) {
+              let pin = L.rotatedMarker([el.lat, el.lng], {
+                icon: vehicle_marker_icon,
+                title: el.id + "coords: " + el.lat + "|" + el.lng
+              });
+
+              pin.options.angle = el.bearing;
+              pin.options.vehicle_id = el.id;
+
+              pin.addTo(this.state.mapState.mapObject);
+
+              newPins.push(pin);
+            }
+          }
+
+          if (newPins.length > 0) {
+            Store.dispatch(Actions.setTransport(Array.prototype.concat(this.state.transportState.vehicles, newPins)));
+          }
         });
+      } else {
+        let vehiclesPins = [];
+        for (let i = 0; i < this.state.transportState.vehiclesData.length; i++) {
+          let el = this.state.transportState.vehiclesData[i];
+          let bounds = this.state.mapState.mapObject.getBounds();
 
-        pin.options.angle = el.bearing;
+          if (bounds.contains([el.lat, el.lng])) {
+            let pin = L.rotatedMarker([el.lat, el.lng], {
+              icon: vehicle_marker_icon,
+              title: el.id + "coords: " + el.lat + "|" + el.lng
+            });
 
-        pin.addTo(this.state.mapState.mapObject);
+            pin.options.angle = el.bearing;
+            pin.options.vehicle_id = el.id;
 
-        return pin;
-      });
-      Store.dispatch(Actions.setTransport(vehiclesPins));
+            pin.addTo(this.state.mapState.mapObject);
+
+            vehiclesPins.push(pin);
+          }
+        }
+        Store.dispatch(Actions.setTransport(vehiclesPins));
+      }
     }
   }
 
@@ -607,6 +674,7 @@ export default class App extends Component {
             onLocationClick={this.onLocationClick.bind(this)}
             onTransportClick={this.onTransportClick.bind(this)}
             transportState={this.state.transportState.vehiclesVisibility}
+            vehiclePinsAllowed={this.state.uiState.vehiclePinsAllowed}
          />
         <ChoicesTooltip
           show={this.state.uiState.showTooltip}
@@ -841,4 +909,12 @@ function addMarkers(coords, map) {
 
     marker.addTo(map);
   }
+}
+
+function findElById(array, id) {
+  for (var i = 0; i < array.length; i++) {
+    var obj = array[i];
+    if (obj.options.vehicle_id === id) return obj;
+  }
+  return false;
 }

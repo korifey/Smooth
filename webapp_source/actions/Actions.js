@@ -138,7 +138,7 @@ export function setVehiclesVisibility(visibility) {
   }
 }
 
-// TODO: UI actions
+// UI actions
 export function setUiMode(mode) {
   return {
     type: types.SET_UI_MODE,
@@ -205,6 +205,13 @@ export function setTooltipCoords(lat, lng) {
   return {
     type: types.SET_TOOLTIP_COORDS,
     coords: {lat, lng}
+  }
+}
+
+export function setVehiclesAllowed(allowed) {
+  return {
+    type: types.SET_VEHICLES_ALLOWED,
+    allowed
   }
 }
 

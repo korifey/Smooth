@@ -16,7 +16,8 @@ const initialUiState = {
   tooltipY: 0,
   tooltipLat: 0,
   tooltipLng: 0,
-  obstaclePopup: null
+  obstaclePopup: null,
+  vehiclePinsAllowed: false
 };
 
 export default function uiReducer(state = initialUiState, action) {
@@ -97,6 +98,13 @@ export default function uiReducer(state = initialUiState, action) {
       newState = Object.assign({}, state, {
         tooltipLat: action.coords.lat,
         tooltipLng: action.coords.lng
+      });
+      console.log("uiReducer", action.type, state, newState);
+      return newState;
+
+    case ActionTypes.SET_VEHICLES_ALLOWED:
+      newState = Object.assign({}, state, {
+        vehiclePinsAllowed: action.allowed
       });
       console.log("uiReducer", action.type, state, newState);
       return newState;

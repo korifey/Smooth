@@ -10,12 +10,14 @@ export default class RoundButton extends Component {
 
     render() {
         let clickFunc = this.props.onClick;
-        return <div
+        return <button
             className={'RoundButton' + ' ' + this.props.className}
             href={this.props.href}
-            onClick={clickFunc}>
+            onClick={clickFunc}
+            disabled={this.props.buttonDisabled}
+        >
             {this.props.text}
-        </div>
+        </button>
     }
 }
 

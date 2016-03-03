@@ -1,5 +1,5 @@
 .RoundButton {
-  display: block;
+  display: inline-block;
   margin-bottom: 1em;
   padding: 0 2em;
   background-color: #fff;
