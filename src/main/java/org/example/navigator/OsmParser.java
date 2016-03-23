@@ -54,6 +54,7 @@ public class OsmParser {
         Graph res;
         Way enclosingWay = null;
         boolean enclosingWayIsHighway;
+        boolean enclosingWayByFoot;
         private int badNodes;
 
         @Override
@@ -93,10 +94,11 @@ public class OsmParser {
 
                 case "way":
                     if (enclosingWay != null) throw new IllegalStateException("<way>: enclosing way != null");
-                    if (attributes.getValue("foot").equals("no")) break;
+
                     _id = Long.parseLong(attributes.getValue("id"));
                     enclosingWay = new Way(_id);
                     enclosingWayIsHighway = false;
+                    enclosingWayByFoot = true;
                     break;
 
                 case "nd":
@@ -111,6 +113,9 @@ public class OsmParser {
 
                 case "tag":
                     if (enclosingWay == null) return;
+                    if (attributes.getValue("k").equals("foot") && attributes.getValue("v").equals("no")) {
+                        enclosingWayByFoot = false;
+                    }
                     if (attributes.getValue("k").equals("highway")) {
                         enclosingWayIsHighway = true;
 
@@ -131,7 +136,7 @@ public class OsmParser {
 
                 case "way":
                     if (enclosingWay == null) throw new IllegalStateException("</way>: enclosing way == null");
-                    if (!enclosingWayIsHighway) {
+                    if (!enclosingWayByFoot|| !enclosingWayIsHighway) {
                         enclosingWay = null;
                         break;
                     }

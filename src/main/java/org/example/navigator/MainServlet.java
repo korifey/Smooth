@@ -21,7 +21,7 @@ public class MainServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         ServletOutputStream out = resp.getOutputStream();
-        logger.info(req.getRequestURI()+"?"+req.getQueryString());
+        logger.info(req.getRequestURI() + "?" + req.getQueryString());
 
         List<Double> lst = new ArrayList<>();
         for (Enumeration<String> en = req.getParameterNames(); en.hasMoreElements(); ) {
@@ -48,31 +48,37 @@ public class MainServlet extends HttpServlet {
 
 
         //OsmParser.INSTANCE.graph = OsmParser.Parse("spb-full.zip");
-
-        Node src = OsmParser.INSTANCE.graph.find(__src, maxdist);
-        Node dst = OsmParser.INSTANCE.graph.find(__dst, maxdist);
-
-        if (src == null) {
-            out.println("error: can't find start point");
-            return;
-        }
-
-        if (dst == null) {
-            out.println("error: can't find destination point");
-            return;
-        }
-
-        if (src == dst) {
-            out.println("error: source == destination");
-            return;
-        }
-
         Graph graph = OsmParser.INSTANCE.graph;
+
+        Node src = null;
+        Node dst = null;
+
         try {
+            src = graph.findNodeOrEdge(__src, maxdist);
+            dst = graph.findNodeOrEdge(__dst, maxdist);
+
+            if (src == null) {
+                out.println("error: can't find start point");
+                return;
+            }
+
+            if (dst == null) {
+                out.println("error: can't find destination point");
+                return;
+            }
+
+            if (src == dst) {
+                out.println("error: source == destination");
+                return;
+            }
+
             Path path = graph.aStar(src, dst);
             path.print(new PrintStream(out));
-        } catch (Exception e) {
+
+        } finally {
             graph.clear();
+            if (src instanceof EdgeNode) ((EdgeNode) src).close();
+            if (dst instanceof EdgeNode) ((EdgeNode) dst).close();
         }
 
     }

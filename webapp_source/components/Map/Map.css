@@ -1,0 +1,61 @@
+.map {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+}
+
+.RoundPin {
+    text-align: center;
+    border-radius: 50%;
+    font-weight: bold;
+    box-shadow: 0 1px 2px rgba(0,0,0,.3), 0 0 4px rgba(0,0,0,.2), inset 0 -1px 2px rgba(0,0,0,.1);
+}
+
+.RouteIcon {
+    background-color: #fff;
+    line-height: 22px;
+}
+
+.ObstacleIcon {
+    background-color: #c0392b;
+    color: #fff;
+    font-size: 12pt;
+}
+
+.VehicleIcon {
+    color: #fff;
+    font-size: 12pt;
+}
+
+.ArrowPin {
+    width: 12px;
+    height: 30px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #3F51B5;
+    background-color: #fff;
+    border-radius: 10px;
+}
+.ArrowPin:before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: -5px;
+    left: -1px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-color: transparent transparent #3F51B5 transparent;
+    border-width: 0 6px 8px 6px;
+}
+
+.AnimatedMarker {
+    -webkit-transition: all 5s;
+    -moz-transition: all 5s;
+    -ms-transition: all 5s;
+    -o-transition: all 5s;
+    transition: all 5s;
+}

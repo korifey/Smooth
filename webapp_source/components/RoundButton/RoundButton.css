@@ -1,0 +1,42 @@
+.RoundButton {
+  display: inline-block;
+  margin-bottom: 1em;
+  padding: 0 2em;
+  background-color: #fff;
+  font-size: 10pt;
+  line-height: 4em;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  border-radius: 15px 0 0 15px;
+  border: 2px solid;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  transition: box-shadow .25s;
+  cursor: pointer;
+}
+@media (min-resolution: 2dppx) and (max-width: 400px) {
+  .RoundButton {
+    padding: 0 1em;
+    line-height: 3em;
+  }
+}
+
+.RoundButton:hover {
+  box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+}
+
+.RoundButton.success {
+  border-color: #618734;
+  background-color: #8BC34A;
+}
+.RoundButton.success.active {
+  background-color: #8BC34A;
+}
+
+.RoundButton.warning {
+  border-color: #FFEB3B;
+}
+
+.RoundButton.warning.active {
+  background-color: #FFEB3B;
+}

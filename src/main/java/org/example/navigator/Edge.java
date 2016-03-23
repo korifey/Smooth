@@ -3,9 +3,6 @@ package org.example.navigator;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Dmitry.Ivanov on 10/26/2014.
- */
 public class Edge {
     public Way way;
     public Node start;
@@ -38,5 +35,9 @@ public class Edge {
     //in meters
     public double distTo(Node n) {
         return n.vector().distToSegment2(start.vector(), end.vector());
+    }
+
+    public boolean contains(Node n) {
+        return start.equals(n) || end.equals(n);
     }
 }
