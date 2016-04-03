@@ -871,20 +871,20 @@ function fetchRouteById(id) {
     })
   });
 
-  //window.fetch(request)
-  //  .then((response) => {
-  //    return response.text();
-  //  })
-  //  .then((response) => {
-  //    var routeData = parseRouteResponse(response);
+  window.fetch(request)
+    .then((response) => {
+      return response.text();
+    })
+    .then((response) => {
+      var routeData = parseRouteResponse(response);
+
+      Store.dispatch(Actions.setDebugRoute(routeData.route));
+    });
+
+  //let response  = '30.3066410000 59.9353147000 1\n30.3066085000 59.9353022000 1\n30.3059586000 59.9350519000 1\n30.3046356000 59.9345424000 1\n30.3044474998 59.9344699278\ndist: 788 0 0\n';
+  //var routeData = parseRouteResponse(response);
   //
-  //    Store.dispatch(Actions.setDebugRoute(routeData.route));
-  //  });
-
-  let response  = '30.3066410000 59.9353147000 1\n30.3066085000 59.9353022000 1\n30.3059586000 59.9350519000 1\n30.3046356000 59.9345424000 1\n30.3044474998 59.9344699278\ndist: 788 0 0\n';
-  var routeData = parseRouteResponse(response);
-
-  Store.dispatch(Actions.setDebugRoute(routeData.route));
+  //Store.dispatch(Actions.setDebugRoute(routeData.route));
 }
 
 function fetchObstacleWayGuess(coords) {
