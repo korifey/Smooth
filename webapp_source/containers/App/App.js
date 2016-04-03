@@ -681,7 +681,7 @@ export default class App extends Component {
   }
 
   onRouteDebug(id) {
-    State.dispatch(Actions.setDebugRoute([]));
+    Store.dispatch(Actions.setDebugRoute([]));
     console.log("Id:", id);
     fetchRouteById.bind(this)(id);
   }
