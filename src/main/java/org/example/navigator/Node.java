@@ -62,7 +62,7 @@ public class Node {
     }
 
     public String toString() {
-        return String.format("id=%d lat=%.10f lon=%.10f cachedDist=%.2f", id, lon, lat, cachedDist);
+        return String.format("id=%d lon=%.10f lat=%.10f cachedDist=%.2f", id, lon, lat, cachedDist);
     }
 
     public void traversePrev(Consumer<Node> consumer) {

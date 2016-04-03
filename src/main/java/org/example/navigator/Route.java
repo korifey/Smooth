@@ -12,6 +12,7 @@ public class Route extends Way {
         this.shortName = shortName;
         this.name = name;
         this.isCircular = isCircular;
+        roadType = RoadType.BUS;
     }
 
 

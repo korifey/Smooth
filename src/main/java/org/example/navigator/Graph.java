@@ -265,7 +265,7 @@ public class Graph {
 
         //some magic here to prefer pedastrian over roads
         double dist = n.dist(edgeNode);
-        if (dist < 10 || dist < n.dist(closestNode)) return edgeNode;
+        if (closestNode == null || dist < 10 || dist < n.dist(closestNode)) return edgeNode;
         else return closestNode;
     }
 

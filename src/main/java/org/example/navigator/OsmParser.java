@@ -9,6 +9,7 @@ import javax.xml.parsers.*;
 import java.io.*;
 import java.util.Collections;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -26,6 +27,41 @@ public class OsmParser {
         String path = "spb-full.zip";
         logger.info("Start parsing: "+path);
         graph = Parse(path);
+        appendRoutes(graph);
+    }
+
+
+
+    private static void appendRoutes(Graph graph) {
+        //todo graph.build (add node to cell)
+        logger.info("Adding bus routes: " + RoutesParser.INSTANCE.routes.size());
+        int i = 0;
+
+        for (Route route : RoutesParser.INSTANCE.routes.valueCollection()) {
+            logger.info("processing bus route "+(++i));
+            if (i > 2) break;
+
+            for (Node node: route.nodes()
+                    .filter(nd -> nd instanceof BusStopNode)
+                    .collect(Collectors.toList())) {
+
+                try {
+                    graph.findNodeOrEdge(node, 20);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Node n = graph.findNodeOrEdge(node, 20);
+                if (n == null) continue;
+
+                Way w = new Way(0); //todo id
+                w.roadType = RoadType.PEDESTRIAN;
+                w.nodes.add(node);
+                w.nodes.add(n);
+                w.finish();
+                graph.addWay(w);
+            }
+            graph.addWay(route);
+        }
     }
 
 

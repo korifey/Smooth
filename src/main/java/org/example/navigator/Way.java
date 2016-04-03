@@ -1,6 +1,7 @@
 package org.example.navigator;
 
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
 /**
 * Created by Dmitry.Ivanov on 10/26/2014.
@@ -58,5 +59,14 @@ public class Way {
         }
 //        dist = d;
         nodes = null;
+    }
+
+    public Stream<Node> nodes() {
+        if (nodes != null) return nodes.stream();
+        if (edges.isEmpty()) return Stream.empty();
+        return Stream.concat(
+                Stream.of(edges.get(0).start),
+                edges.stream().map(e -> e.end)
+        );
     }
 }

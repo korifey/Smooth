@@ -81,7 +81,7 @@ public class RoutesParser {
 
 
                 route.finish();
-                res.put(route.id, route);
+                res.put(route.id, route); //todo route id can clash, node ids can clash
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
