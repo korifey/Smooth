@@ -373,7 +373,7 @@ export default class App extends Component {
     Store.dispatch(Actions.setFinishRoutePin(pin));
     Store.dispatch(Actions.hideTooltip());
     setTimeout(this.onRouteSubmit.bind(this), 100);
-    showObstacles.bind(this)();
+    //showObstacles.bind(this)();
     pin.addTo(this.state.mapState.mapObject);
   }
 
@@ -401,7 +401,7 @@ export default class App extends Component {
 
     if (!this.state.uiState.obstacleFormVisibility) {
 
-      showObstacles.bind(this)();
+      //showObstacles.bind(this)();
 
       Store.dispatch(Actions.setUiMode('OBSTACLE'));
       Store.dispatch(Actions.enableObstacleForm());
@@ -669,6 +669,7 @@ export default class App extends Component {
   }
 
   onRouteDebug(id) {
+    State.dispatch(Actions.setDebugRoute([]));
     console.log("Id:", id);
     fetchRouteById.bind(this)(id);
   }
@@ -801,6 +802,13 @@ function clearMap() {
 
     for (var i = 0; i < this.state.mapState.polylines.length; i++) {
       var polyline = this.state.mapState.polylines[i];
+      this.state.mapState.mapObject.removeLayer(polyline);
+    }
+  }
+
+  if (this.state.mapState.debugPolylines.length) {
+    for (var i = 0; i < this.state.mapState.debugPolylines.length; i++) {
+      var polyline = this.state.mapState.debugPolylines[i];
       this.state.mapState.mapObject.removeLayer(polyline);
     }
   }
