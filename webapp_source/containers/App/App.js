@@ -833,7 +833,7 @@ function fetchRoute() {
   let queryString = this.state.routeState.start[1] + '&' + this.state.routeState.start[0] +
       '&' + this.state.routeState.finish[1] + '&' + this.state.routeState.finish[0];
   console.log("query string", queryString);
-  let request = new Request('http://smooth.lc/path?' + queryString, {
+  let request = new Request('/path?' + queryString, {
     headers: new Headers({
       'Content-Type': 'text/plain'
     })
@@ -856,7 +856,7 @@ function fetchRouteById(id) {
 
   let queryString = id;
   console.log("query string", queryString);
-  let request = new Request('http://smooth.lc/path?' + queryString, {
+  let request = new Request('/path?' + queryString, {
     headers: new Headers({
       'Content-Type': 'text/plain'
     })
@@ -945,7 +945,7 @@ function fetchObstacles() {
 
 function fetchTransport() {
   return new Promise((resolve, reject) => {
-    let request = new Request('http://smooth.lc/transport');
+    let request = new Request('/transport');
 
     window.fetch(request)
       .then((response) => {
