@@ -43,7 +43,7 @@ public class RouteServlet extends HttpServlet {
             return;
         }
 
-        Path path = new Path(route);
+        Path path = Path.createBusWay(route);
         path.print(new PrintStream(out));
 
     }

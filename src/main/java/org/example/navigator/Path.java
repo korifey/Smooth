@@ -24,6 +24,13 @@ public class Path {
         edges.addAll(way.edges);
     }
 
+    boolean isBusWay = false;
+    public static Path createBusWay(Way way) {
+        Path res = new Path(way);
+        res.isBusWay = true;
+        return res;
+    }
+
     public Stream<Node> nodes() {
         if (edges.size() == 0) return Stream.empty();
         return Stream.concat(Stream.of(edges.get(0).start), edges.stream().map(e -> e.end));
@@ -45,7 +52,14 @@ public class Path {
             edges.stream().forEach(e -> {
                 out.print(n[0].printCoords());
 
-                RoadType rt = e.way.roadType;
+                RoadType rt = !isBusWay ?
+                        e.way.roadType :
+                        //for debug purposes
+                        (e.start instanceof BusStopNode) ?
+                                RoadType.PEDESTRIAN :
+                                RoadType.BUS;
+
+
                 out.println(" " + rt.typeId);
                 dist.put(rt, dist.get(rt) + e.realDist);
                 n[0] = e.otherEnd(n[0]);

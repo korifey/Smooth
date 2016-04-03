@@ -58,7 +58,7 @@ public class RoutesParser {
                 if (node_list.getLength() == 0) continue;
 
                 NodeList nodes = ((Element)node_list.item(0)).getElementsByTagName("node");
-                if (nodes.getLength() == 0) continue; //todo empty route
+                if (nodes.getLength() < 2) continue; //todo empty route
 
                 for (int j=0; j<nodes.getLength(); j++) {
                     Element ndelt = (Element)nodes.item(j);
@@ -78,6 +78,8 @@ public class RoutesParser {
                     }
                     route.nodes.add(node);
                 }
+
+
                 route.finish();
                 res.put(route.id, route);
             }

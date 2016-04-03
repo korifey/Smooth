@@ -45,7 +45,7 @@ public class Main {
         System.out.println(route.isCircular);
 
         System.out.println("--------------------------");
-        new Path(route).print(System.out);
+        Path.createBusWay(route).print(System.out);
         System.out.println("--------------------------");
 
 
