@@ -194,31 +194,41 @@ export default class App extends Component {
       //}
     }
 
-    if (this.state.routeState.debugRoute.length && this.state.mapState.debugPolylines.length === 0) {
-      let polylines = [];
+    console.log("this.state.routeState.debugRoute.length && this.state.mapState.debugPolylines.length === 0",
+      this.state.routeState.debugRoute.length && this.state.mapState.debugPolylines.length === 0,
+      this.state.routeState.debugRoute.length,
+      this.state.mapState.debugPolylines.length, this.state);
 
-      for (let i = 0; i < this.state.routeState.route.length; i++) {
-        let polyline = this.state.routeState.route[i].polyline;
-        const color = '#212121';
+    setTimeout(() => {
+      if (this.state.routeState.debugRoute.length && this.state.mapState.debugPolylines.length === 0) {
+        let polylines = [];
 
-        let line = L.polyline(polyline, {
-          stroke: true,
-          color: color,
-          weight: 5,
-          opacity: 1
-        });
+        for (let i = 0; i < this.state.routeState.debugRoute.length; i++) {
+          let polyline = this.state.routeState.debugRoute[i].polyline;
+          const color = '#212121';
 
-        this.state.mapState.mapObject.addLayer(line);
+          let line = L.polyline(polyline, {
+            stroke: true,
+            color: color,
+            weight: 5,
+            opacity: 1
+          });
 
-        polylines.push(line);
+          this.state.mapState.mapObject.addLayer(line);
+
+          polylines.push(line);
+        }
+
+        Store.dispatch(Actions.setDebugRoutePolylines(polylines));
       }
+    }, 200);
 
-      Store.dispatch(Actions.setDebugRoutePolylines(polylines));
-    }
+    //console.log("!this.state.routeState.debugRoute.length && this.state.mapState.debugPolylines.length === 0",
+    //  !this.state.routeState.debugRoute.length && this.state.mapState.debugPolylines.length === 0);
 
-    if (!this.state.routeState.debugRoute.length && this.state.mapState.debugPolylines.length === 0) {
-      clearMap.bind(this);
-    }
+    //if (!this.state.routeState.debugRoute.length && this.state.mapState.debugPolylines.length) {
+    //  clearMap.bind(this)();
+    //}
 
 
     //console.log("redrawMap", this.state.routeState.route.length, this.state.mapState.route);
@@ -659,9 +669,8 @@ export default class App extends Component {
   }
 
   onRouteDebug(id) {
-    Store.dispatch(Actions.setDebugRoute([]));
-
-    fetchRouteById(id);
+    console.log("Id:", id);
+    fetchRouteById.bind(this)(id);
   }
 
   render() {
@@ -862,15 +871,20 @@ function fetchRouteById(id) {
     })
   });
 
-  window.fetch(request)
-    .then((response) => {
-      return response.text();
-    })
-    .then((response) => {
-      var routeData = parseRouteResponse(response);
+  //window.fetch(request)
+  //  .then((response) => {
+  //    return response.text();
+  //  })
+  //  .then((response) => {
+  //    var routeData = parseRouteResponse(response);
+  //
+  //    Store.dispatch(Actions.setDebugRoute(routeData.route));
+  //  });
 
-      Store.dispatch(Actions.setDebugRoute(routeData.route));
-    });
+  let response  = '30.3066410000 59.9353147000 1\n30.3066085000 59.9353022000 1\n30.3059586000 59.9350519000 1\n30.3046356000 59.9345424000 1\n30.3044474998 59.9344699278\ndist: 788 0 0\n';
+  var routeData = parseRouteResponse(response);
+
+  Store.dispatch(Actions.setDebugRoute(routeData.route));
 }
 
 function fetchObstacleWayGuess(coords) {
