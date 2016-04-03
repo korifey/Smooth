@@ -30,14 +30,24 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        bugMikhailovsky();
-        if (true) return;
+        //bugMikhailovsky();
+        //if (true) return;
 
 //        Node __src = new Node(0, 30.31252384185791, 59.937472354745424);
 //        Node __dst = new Node(0, 30.323853492736816, 59.93980482945983);
 
 //        Node __src = new Node(0, 30.31252384185791, 59.937472354745424);
 //        Node __dst = new Node(0, 30.335065126419067, 59.934188339228506);
+
+        Route route = RoutesParser.INSTANCE.routes.get(1550L);
+        System.out.println("Route"+route.shortName);
+        System.out.println(route.name);
+        System.out.println(route.isCircular);
+
+        System.out.println("--------------------------");
+        Path.createBusWay(route).print(System.out);
+        System.out.println("--------------------------");
+
 
         Node __src = new Node(0, 30.679321289062496,59.89720326334451);
         Node __dst = new Node(0, 30.146484374999996,60.056615845305764);
@@ -88,6 +98,7 @@ public class Main {
         System.out.println();
         System.out.println("Add way obstacle:");
         printTime(() -> { graph[0].addObstacle(obs);});
+
 
 
 
