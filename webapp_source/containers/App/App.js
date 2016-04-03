@@ -205,6 +205,7 @@ export default class App extends Component {
 
         for (let i = 0; i < this.state.routeState.debugRoute.length; i++) {
           let polyline = this.state.routeState.debugRoute[i].polyline;
+          let type = this.state.routeState.debugRoute[i].type;
           let color = '#212121';
 
           switch (type) {
