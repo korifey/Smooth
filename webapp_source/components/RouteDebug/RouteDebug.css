@@ -1,0 +1,7 @@
+.RouteDebug {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  z-index: 150;
+  transform: translateX(-50%);
+}
