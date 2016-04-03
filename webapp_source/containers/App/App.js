@@ -205,13 +205,25 @@ export default class App extends Component {
 
         for (let i = 0; i < this.state.routeState.debugRoute.length; i++) {
           let polyline = this.state.routeState.debugRoute[i].polyline;
-          const color = '#212121';
+          let color = '#212121';
+
+          switch (type) {
+            case '1':
+              color = '#64DD17';
+              break;
+            case '2':
+              color = '#FF5252';
+              break;
+            case '3':
+              color = '#3F51B5';
+              break;
+          }
 
           let line = L.polyline(polyline, {
             stroke: true,
             color: color,
             weight: 5,
-            opacity: 1
+            opacity: 0.5
           });
 
           this.state.mapState.mapObject.addLayer(line);
