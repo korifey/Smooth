@@ -20,6 +20,10 @@ public class Path {
     public Path() {
     }
 
+    public Path(Edge e) {
+        edges.add(e);
+    }
+
     public Path(Way way) {
         edges.addAll(way.edges);
     }

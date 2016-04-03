@@ -92,7 +92,7 @@ public class Main {
         System.out.println("Try way obstacle:");
         Obstacle obs = new Obstacle(30.3125342000, 59.9371094000, false);
         printTime(() -> {
-            new Path(graph[0].findClosestPedestrian(obs).orElse(null)).print(System.out);
+            new Path(graph[0].findClosestPedestrianEdge(obs).orElse(null)).print(System.out);
         });
 
         System.out.println();

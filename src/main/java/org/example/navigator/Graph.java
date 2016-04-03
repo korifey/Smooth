@@ -61,12 +61,15 @@ public class Graph {
                 .filter(e -> e.distTo(node) < dist);
     }
 
+    private static <T> Collection<T> asCollection(Optional<T> opt) {
+        return opt.isPresent() ? Collections.singleton(opt.get()) : Collections.emptyList();
+    }
 
     public void addObstacle(Obstacle o) {
         obstacles.put(o.id, o);
         Collection<Edge> edges = o.isDistanceBlocking ?
                 closestEdges(o, Obstacle.AoeDistanceToEdge).collect(Collectors.toSet()) :
-                findClosestPedestrian(o).map(w -> w.edges).orElse(new ArrayList<>());
+                asCollection(findClosestPedestrianEdge(o));
 
         o.nearEdges.addAll(edges);
         for (Edge e: edges) e.obstacles++;
@@ -74,12 +77,12 @@ public class Graph {
 
 
 
-    public Optional<Way> findClosestPedestrian(Node n) {
-        return findClosestEdge(n)
-                .map(e -> e.way);
-    }
+//    public Optional<Way> findClosestPedestrian(Node n) {
+//        return findClosestPedestrianEdge(n)
+//                .map(e -> e.way);
+//    }
 
-    private Optional<Edge> findClosestEdge(Node n) {
+    public Optional<Edge> findClosestPedestrianEdge(Node n) {
         return closestEdges(n, Obstacle.MaxDistanceToEdge)
                 .filter(e -> e.way.roadType == RoadType.PEDESTRIAN)
                 .min((e1,e2) -> Double.compare(e1.distTo(n), e2.distTo(n)));
@@ -255,7 +258,7 @@ public class Graph {
     public Node findNodeOrEdge(Node n, double maxdist) {
         Node closestNode = find(n.lon, n.lat, maxdist);
 
-        Optional<Edge> closestPedestrian = findClosestEdge(n);
+        Optional<Edge> closestPedestrian = findClosestPedestrianEdge(n);
         if (!closestPedestrian.isPresent()) return closestNode;
 
         EdgeNode edgeNode = EdgeNode.create(n, closestPedestrian.get());

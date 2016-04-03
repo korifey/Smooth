@@ -1,9 +1,6 @@
 package org.example.navigator.obstacle;
 
-import org.example.navigator.Obstacle;
-import org.example.navigator.OsmParser;
-import org.example.navigator.Path;
-import org.example.navigator.Way;
+import org.example.navigator.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -23,10 +20,10 @@ public class ObstacleTryServlet extends HttpServlet {
         Obstacle o = ObstacleAddServlet.parseObstacle(req, resp);
         if (o == null) return;
 
-        Way w = OsmParser.INSTANCE.graph.findClosestPedestrian(o).orElse(null);
+        Edge e = OsmParser.INSTANCE.graph.findClosestPedestrianEdge(o).orElse(null);
 
-        if (w != null) {
-            new Path(w).print(new PrintStream(resp.getOutputStream()));
+        if (e != null) {
+            new Path(e).print(new PrintStream(resp.getOutputStream()));
         }
     }
 
