@@ -856,7 +856,7 @@ function fetchRouteById(id) {
 
   let queryString = id;
   console.log("query string", queryString);
-  let request = new Request('/path?' + queryString, {
+  let request = new Request('/route?id=' + queryString, {
     headers: new Headers({
       'Content-Type': 'text/plain'
     })
