@@ -205,6 +205,7 @@ export default class App extends Component {
 
         for (let i = 0; i < this.state.routeState.debugRoute.length; i++) {
           let polyline = this.state.routeState.debugRoute[i].polyline;
+          let type = this.state.routeState.debugRoute[i].type;
           let color = '#212121';
 
           switch (type) {
@@ -885,7 +886,7 @@ function fetchRouteById(id) {
 
   let queryString = id;
   console.log("query string", queryString);
-  let request = new Request('/route?id=' + queryString, {
+  let request = new Request('http://smooth.lc/route?id=' + queryString, {
     headers: new Headers({
       'Content-Type': 'text/plain'
     })
