@@ -373,7 +373,7 @@ export default class App extends Component {
     Store.dispatch(Actions.setFinishRoutePin(pin));
     Store.dispatch(Actions.hideTooltip());
     setTimeout(this.onRouteSubmit.bind(this), 100);
-    showObstacles.bind(this)();
+    //showObstacles.bind(this)();
     pin.addTo(this.state.mapState.mapObject);
   }
 
@@ -401,7 +401,7 @@ export default class App extends Component {
 
     if (!this.state.uiState.obstacleFormVisibility) {
 
-      showObstacles.bind(this)();
+      //showObstacles.bind(this)();
 
       Store.dispatch(Actions.setUiMode('OBSTACLE'));
       Store.dispatch(Actions.enableObstacleForm());
