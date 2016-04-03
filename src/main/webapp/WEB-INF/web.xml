@@ -35,11 +35,20 @@
         <servlet-class>org.example.navigator.obstacle.ObstacleTryServlet</servlet-class>
     </servlet>
 
+    <servlet>
+      <servlet-name>RouteServlet</servlet-name>
+      <servlet-class>org.example.navigator.RouteServlet</servlet-class>
+    </servlet>
+
 
 
     <servlet-mapping>
         <servlet-name>MainServlet</servlet-name>
         <url-pattern>/path</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+      <servlet-name>RouteServlet</servlet-name>
+      <url-pattern>/route</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ObstacleGetServlet</servlet-name>
