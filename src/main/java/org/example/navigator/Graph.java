@@ -50,6 +50,8 @@ public class Graph {
     }
 
     public void addNode(Node n, boolean addToCell) {
+        if (nodes.containsKey(n.id)) throw new IllegalArgumentException("Node exists: "+n.id);
+
         nodes.put(n.id, n);
         if (addToCell) cells[findCell(n)].add(n);
         //do no place into cell yet
@@ -261,13 +263,14 @@ public class Graph {
         Optional<Edge> closestPedestrian = findClosestPedestrianEdge(n);
         if (!closestPedestrian.isPresent()) return closestNode;
 
-        EdgeNode edgeNode = EdgeNode.create(n, closestPedestrian.get());
+        Node edgeNode = EdgeNode.create(n, closestPedestrian.get());
 
         //some magic here to prefer pedastrian over roads
         double dist = n.dist(edgeNode);
-        if (closestNode == null || dist < 10 || dist < n.dist(closestNode)) return edgeNode;
+        if (closestNode == null || dist < 10 /* magic!*/ || dist < n.dist(closestNode)) return edgeNode;
         else return closestNode;
     }
+
 
     public synchronized Node find(double lon, double lat, double maxdist) {
         Node test = new Node(0, lon, lat);

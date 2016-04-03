@@ -37,7 +37,7 @@ public class OsmParser {
         logger.info("Adding bus routes: " + RoutesParser.INSTANCE.routes.size());
         int i = 0;
 
-        for (Route route : RoutesParser.INSTANCE.routes.valueCollection()) {
+        for (Route route : Collections.singleton(RoutesParser.INSTANCE.routes.get(3918))) {
             logger.info("processing bus route "+(++i));
             if (i > 2) break;
 
@@ -45,13 +45,15 @@ public class OsmParser {
                     .filter(nd -> nd instanceof BusStopNode)
                     .collect(Collectors.toList())) {
 
-                try {
-                    graph.findNodeOrEdge(node, 20);
-                } catch (Exception e) {
-                    e.printStackTrace();
+//                try {
+//                    graph.findNodeOrEdge(node, 20);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+                Node n = graph.findNodeOrEdge(node, 50);
+                if (n == null) {
+                    continue;
                 }
-                Node n = graph.findNodeOrEdge(node, 20);
-                if (n == null) continue;
 
                 Way w = new Way(0); //todo id
                 w.roadType = RoadType.PEDESTRIAN;
@@ -59,6 +61,7 @@ public class OsmParser {
                 w.nodes.add(n);
                 w.finish();
                 graph.addWay(w);
+                graph.addNode(node, true);
             }
             graph.addWay(route);
         }

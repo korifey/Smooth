@@ -33,6 +33,8 @@ public class RoutesParser {
     }
 
 
+    static long idGen = 100500900;
+
     public static TLongObjectHashMap<Route> Parse(String filePath) {
         TLongObjectHashMap<Route> res = new TLongObjectHashMap<>();
         try {
@@ -71,7 +73,7 @@ public class RoutesParser {
                                 elemValue(ndelt, "name")
                         );
                     } else {
-                        node = new Node(0,
+                        node = new Node(idGen++,
                                 Double.parseDouble(elemValue(ndelt, "lon")),
                                 Double.parseDouble(elemValue(ndelt, "lat"))
                                 );

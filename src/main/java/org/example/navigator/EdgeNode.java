@@ -24,8 +24,11 @@ public class EdgeNode extends Node {
         fakeWay.finish();
     }
 
-    public static EdgeNode create(Node n, Edge e) {
-        return new EdgeNode(e, n.vector().closestPointInSegment(e.start.vector(), e.end.vector()));
+    public static Node create(Node n, Edge e) {
+        double alpha = n.vector().closestPointInSegment(e.start.vector(), e.end.vector());
+        if (alpha < Vector.EPS) return e.start;
+        if (1.0 - alpha < Vector.EPS) return e.end;
+        return new EdgeNode(e, alpha);
     }
 
     public void close() {

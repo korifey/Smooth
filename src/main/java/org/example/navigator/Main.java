@@ -45,12 +45,14 @@ public class Main {
         System.out.println(route.isCircular);
 
         System.out.println("--------------------------");
-        Path.createBusWay(route).print(System.out);
+//        Path.createBusWay(route).print(System.out);
         System.out.println("--------------------------");
 
 
-        Node __src = new Node(0, 30.679321289062496,59.89720326334451);
-        Node __dst = new Node(0, 30.146484374999996,60.056615845305764);
+        Node __src = new Node(0, 29.864128, 59.880324); //stary petergof
+//        Node __src = new Node(0, 30.679321289062496,59.89720326334451);
+        Node __dst = new Node(0, 29.925383, 59.86466);
+//        Node __dst = new Node(0, 30.146484374999996,60.056615845305764);
 
         System.out.println("Building graph:");
         Graph[] graph = new Graph[1];
@@ -70,12 +72,15 @@ public class Main {
         System.out.println("__dst:" + __dst);
         System.out.println("dst:" + dst[0]);
 
+
+        System.out.println("");
+        System.out.println("AStar:");
+        printTime(() -> graph[0].aStar(src[0], dst[0]).print(System.out));
+
+        System.in.read();
         System.out.println("");
         System.out.println("Djikstra:");
         printTime(() -> graph[0].djikstra(src[0], dst[0]).print(System.out));
-
-        System.out.println("AStar:");
-        printTime(() -> graph[0].aStar(src[0], dst[0]).print(System.out));
 
         System.out.println("Add aoe obstacle:");
         printTime(() -> graph[0].addObstacle(new Obstacle(30.3125342000, 59.9371094000, true)));
