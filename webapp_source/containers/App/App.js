@@ -4,6 +4,7 @@ import ModeToggle from '../../components/ModeToggle/ModeToggle';
 import RouteForm from '../../components/RouteForm/RouteForm';
 import ObstacleForm from '../../components/ObstacleForm/ObstacleForm';
 import ChoicesTooltip from '../../components/ChoiceTooltip/ChoiceTooltip';
+import RouteDebug from '../../components/RouteDebug/RouteDebug';
 import Legend from '../../components/Legend/Legend';
 import Transport from '../../components/Transport/Transport';
 import Store from '../../store/store';
@@ -192,6 +193,33 @@ export default class App extends Component {
       //  }
       //}
     }
+
+    if (this.state.routeState.debugRoute.length && this.state.mapState.debugPolylines.length === 0) {
+      let polylines = [];
+
+      for (let i = 0; i < this.state.routeState.route.length; i++) {
+        let polyline = this.state.routeState.route[i].polyline;
+        const color = '#212121';
+
+        let line = L.polyline(polyline, {
+          stroke: true,
+          color: color,
+          weight: 5,
+          opacity: 1
+        });
+
+        this.state.mapState.mapObject.addLayer(line);
+
+        polylines.push(line);
+      }
+
+      Store.dispatch(Actions.setDebugRoutePolylines(polylines));
+    }
+
+    if (!this.state.routeState.debugRoute.length && this.state.mapState.debugPolylines.length === 0) {
+      clearMap.bind(this);
+    }
+
 
     //console.log("redrawMap", this.state.routeState.route.length, this.state.mapState.route);
 
@@ -630,6 +658,12 @@ export default class App extends Component {
     }
   }
 
+  onRouteDebug(id) {
+    Store.dispatch(Actions.setDebugRoute([]));
+
+    fetchRouteById(id);
+  }
+
   render() {
     let choices;
 
@@ -694,6 +728,7 @@ export default class App extends Component {
           badDistance={this.state.routeState.badDistance}
           transportDistance={this.state.routeState.transportDistance}
         />
+        <RouteDebug onSubmit={this.onRouteDebug.bind(this)} />
       </div>
     );
   }
@@ -814,6 +849,28 @@ function fetchRoute() {
         Store.dispatch(Actions.setRoute(routeData.route));
         Store.dispatch(Actions.setRouteDistances(routeData.distances[0], routeData.distances[1], routeData.distances[2]))
       });
+}
+
+function fetchRouteById(id) {
+  Store.dispatch(Actions.setIsFetchingRoute(true));
+
+  let queryString = id;
+  console.log("query string", queryString);
+  let request = new Request('http://smooth.lc/path?' + queryString, {
+    headers: new Headers({
+      'Content-Type': 'text/plain'
+    })
+  });
+
+  window.fetch(request)
+    .then((response) => {
+      return response.text();
+    })
+    .then((response) => {
+      var routeData = parseRouteResponse(response);
+
+      Store.dispatch(Actions.setDebugRoute(routeData.route));
+    });
 }
 
 function fetchObstacleWayGuess(coords) {

@@ -90,6 +90,13 @@ export function setRoutePolylines(polylines) {
   }
 }
 
+export function setDebugRoutePolylines(polylines) {
+  return {
+    type: types.SET_DEBUG_MAP_POLYLINES,
+    polylines
+  }
+}
+
 /**
  * Action creator for setting route nodes
  * @param pins Array of leaflet markers
@@ -284,6 +291,13 @@ export function setIsFetchingRoute(status) {
 export function setRoute(route) {
   return {
     type: types.SET_ROUTE,
+    route
+  }
+}
+
+export function setDebugRoute(route) {
+  return {
+    type: types.SET_DEBUG_ROUTE,
     route
   }
 }

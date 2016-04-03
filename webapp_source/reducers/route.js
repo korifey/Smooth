@@ -7,6 +7,7 @@ const initialRouteState = {
   start: [],
   finish: [],
   route: [],
+  debugRoute: [],
   walkDistance: 0,
   transportDistance: 0,
   badDistance: 0,
@@ -40,6 +41,13 @@ export default function routeReducer(state = initialRouteState, action) {
     case ActionTypes.SET_ROUTE:
       newState = Object.assign({}, state, {
         route: action.route
+      });
+      console.log("routeReducer", action.type, state, newState);
+      return newState;
+
+    case ActionTypes.SET_DEBUG_ROUTE:
+      newState = Object.assign({}, state, {
+        debugRoute: action.route
       });
       console.log("routeReducer", action.type, state, newState);
       return newState;

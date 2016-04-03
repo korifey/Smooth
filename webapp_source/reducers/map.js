@@ -13,6 +13,7 @@ const initialMapState = {
   route: null,
   routeNodes: [],
   polylines: [],
+  debugPolylines: [],
   vehicles: [],
   vehiclesData: [],
   vehiclesVisibility: false
@@ -65,6 +66,13 @@ export default function mapReducer(state = initialMapState, action) {
     case ActionTypes.SET_MAP_POLYLINES:
       newState = Object.assign({}, state, {
         polylines: action.polylines
+      });
+      console.log("mapReducer", action.type, state, newState);
+      return newState;
+
+    case ActionTypes.SET_DEBUG_MAP_POLYLINES:
+      newState = Object.assign({}, state, {
+        debugPolylines: action.polylines
       });
       console.log("mapReducer", action.type, state, newState);
       return newState;
