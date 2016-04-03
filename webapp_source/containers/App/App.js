@@ -669,6 +669,7 @@ export default class App extends Component {
   }
 
   onRouteDebug(id) {
+    State.dispatch(Actions.setDebugRoute([]));
     console.log("Id:", id);
     fetchRouteById.bind(this)(id);
   }
@@ -801,6 +802,13 @@ function clearMap() {
 
     for (var i = 0; i < this.state.mapState.polylines.length; i++) {
       var polyline = this.state.mapState.polylines[i];
+      this.state.mapState.mapObject.removeLayer(polyline);
+    }
+  }
+
+  if (this.state.mapState.debugPolylines.length) {
+    for (var i = 0; i < this.state.mapState.debugPolylines.length; i++) {
+      var polyline = this.state.mapState.debugPolylines[i];
       this.state.mapState.mapObject.removeLayer(polyline);
     }
   }
