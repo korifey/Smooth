@@ -1,5 +1,7 @@
 package org.example.navigator;
 
+import gnu.trove.map.hash.TLongObjectHashMap;
+
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -10,9 +12,6 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-/**
- * Created by User on 4/3/2016.
- */
 public class RouteServlet extends HttpServlet {
 
     private Logger logger = Logger.getLogger(getClass().getName());
@@ -36,7 +35,7 @@ public class RouteServlet extends HttpServlet {
             return;
         }
 
-        HashMap<Long, Route> routes = RoutesParser.INSTANCE.routes;
+        TLongObjectHashMap<Route> routes = RoutesParser.INSTANCE.routes;
 
         Route route = routes.get(id);
         if (route == null) {

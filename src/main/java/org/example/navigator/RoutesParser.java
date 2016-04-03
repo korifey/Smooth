@@ -1,5 +1,6 @@
 package org.example.navigator;
 
+import gnu.trove.map.hash.TLongObjectHashMap;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -18,7 +19,7 @@ public class RoutesParser {
     private static Logger logger = Logger.getLogger(RoutesParser.class.getName());
     public static RoutesParser INSTANCE = new RoutesParser();
 
-    HashMap<Long, Route> routes;
+    TLongObjectHashMap<Route> routes;
     public RoutesParser() {
         String path = "routes.xml";
         logger.info("Start parsing: "+path);
@@ -32,8 +33,8 @@ public class RoutesParser {
     }
 
 
-    public static HashMap<Long, Route> Parse(String filePath) {
-        HashMap<Long, Route> res = new HashMap<>();
+    public static TLongObjectHashMap<Route> Parse(String filePath) {
+        TLongObjectHashMap<Route> res = new TLongObjectHashMap<>();
         try {
             InputStream is = RoutesParser.class.getClassLoader().getResourceAsStream(filePath);
             DocumentBuilderFactory df = DocumentBuilderFactory.newInstance();
